@@ -1,0 +1,15 @@
+{
+  "platform": "win32",
+  "assembleInstructionSet": "ia32",
+  "aa": [
+    {
+      "aaa": 1
+    },
+    {
+      "aaa": 2
+    },
+    {
+      "aaa": 3
+    }
+  ]
+}

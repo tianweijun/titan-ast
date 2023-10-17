@@ -1,0 +1,116 @@
+@StartGrammar compilationUnit ;
+
+@NonterminalGrammar begin ;
+
+compilationUnit
+	:	packageDeclaration? typeDeclaration*
+	;
+
+packageDeclaration
+	:	'package' packageName ';'
+	;
+
+packageName
+	:	Identifier
+	|	packageName '.' Identifier
+	;
+
+typeDeclaration
+	:	classDeclaration
+	;
+
+classDeclaration
+	:	normalClassDeclaration
+	;
+
+normalClassDeclaration
+	:	classModifier* 'class' Identifier classBody
+	;
+
+classModifier
+	:	'public'
+	;
+
+classBody
+	:	'{' classBodyDeclaration* '}'
+	;
+
+classBodyDeclaration
+	:	classMemberDeclaration
+	;
+
+classMemberDeclaration
+	:	methodDeclaration
+	;
+
+methodDeclaration
+	:	methodModifier* methodHeader methodBody
+	;
+
+methodModifier
+	: 'public'
+	|	'static'
+	;
+
+methodHeader
+	:	result methodDeclarator
+	;
+
+result
+	:	'void'
+	;
+
+methodDeclarator
+	:	Identifier '(' formalParameterList? ')'
+	;
+
+formalParameterList
+	:		lastFormalParameter
+	;
+
+lastFormalParameter
+	:	formalParameter
+	;
+
+formalParameter
+	:	unannType variableDeclaratorId
+	;
+
+unannType
+	:	unannReferenceType
+	;
+
+unannReferenceType
+	:		unannArrayType
+	;
+
+unannArrayType
+	:	unannClassOrInterfaceType dims
+	;
+
+unannClassOrInterfaceType
+	:	unannClassType_lfno_unannClassOrInterfaceType
+	;
+
+unannClassType_lfno_unannClassOrInterfaceType
+	:	Identifier
+	;
+
+dims
+	:	'[' ']'
+	;
+
+methodBody
+	:	block
+	|	';'
+	;
+
+block
+	:	'{' '}'
+	;
+
+variableDeclaratorId
+	:	Identifier dims?
+	;
+
+@NonterminalGrammar end ;

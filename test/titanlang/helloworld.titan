@@ -1,0 +1,10 @@
+
+module entry {
+  use std::io;
+
+  public  main() -> i32 {
+      printfln("hello world");
+      return 0;
+  }
+
+}

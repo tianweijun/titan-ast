@@ -1,0 +1,120 @@
+
+/*
+*
+* cyana language lexer
+*
+*/
+
+@TerminalGrammar begin ;
+Comment acceptWhenFirstArriveAtTerminalState()
+    :   '/*'  AnyOneChar* '*/' -> skip
+    ;
+
+LineComment
+    :   '//' ~[\r\n]* -> skip
+    ;
+
+WordSpace
+    :  [\s\t\r\n]+ -> skip
+    ;
+
+// binary operator
+PathSeparator : '::' ;
+Arrow : '->' ;
+
+// unary operator
+Semi : ';' ;
+LeftBrace : '{' ;
+RightBrace : '}' ;
+LeftParen : '(' ;
+RightParen : ')' ;
+Comma : ',' ;
+
+// KeyWord
+Module : 'module' ;
+Use : 'use' ;
+Public : 'public' ;
+Return : 'return' ;
+
+IntegerLiteral :
+  DecimalLiteral
+;
+
+DecimalLiteral :
+  DecimalDigit (DecimalDigit | '_')*
+;
+
+StringLiteral :
+  '"' StringLiteralCharSequence? '"'
+;
+
+Identifier
+	:	IdentifierStart IdentifierPart*
+	;
+
+
+@TerminalGrammar end ;
+
+
+@TerminalFragmentGrammar begin ;
+
+StringLiteralCharSequence :
+    StringLiteralChar+
+;
+
+StringLiteralChar
+    :   ~["\\\r\n]
+    |   EscapeSequence
+    |   '\\\n' // Added line
+    |   '\\\r\n' // Added line
+    ;
+
+EscapeSequence
+    :   SimpleEscapeSequence
+    |   OctalEscapeSequence
+    |   HexadecimalEscapeSequence
+    ;
+
+SimpleEscapeSequence
+    :   '\\' ['"?abfnrtv\\]
+    ;
+
+OctalEscapeSequence
+    :   '\\' OctalDigit
+    |   '\\' OctalDigit OctalDigit
+    |   '\\' OctalDigit OctalDigit OctalDigit
+    ;
+
+HexadecimalEscapeSequence
+    :   '\\x' HexadecimalDigit+
+    ;
+
+OctalDigit
+    :   [0-7]
+    ;
+
+DecimalDigit
+  :  [0-9]
+  ;
+
+HexadecimalDigit
+    :   [0-9a-fA-F]
+    ;
+
+IdentifierStart
+	  : [\x41-\x5A]   // A-Z [\u0041-\u005A]
+	  | [\x5F]          // _ [\u005F]
+	  | [\x61-\x7A]  // a-z [\u0061-\u007A]
+	  ;
+
+IdentifierPart
+  	: IdentifierStart
+  	| [\x30-\x39] // 0-9
+  	;
+
+AnyOneChar
+    :
+        [\x00-\xFF]
+    ;
+
+@TerminalFragmentGrammar end ;

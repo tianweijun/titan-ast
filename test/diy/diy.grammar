@@ -1,0 +1,33 @@
+
+// grammar diy ;
+
+@StartGrammar diy ;
+
+@NonterminalGrammar begin ;
+diy
+   :  a* h*
+   ;
+
+d : 'D' ;
+e : 'E' ;
+a : 'A' ;
+b : 'B' ;
+h : 'A' ;
+
+@NonterminalGrammar end ;
+
+@TerminalGrammar begin ;
+
+D : 'D' ;
+E : 'E' ;
+A : 'A' ;
+B : 'B' ;
+
+ WS
+    : [\s\t\n\r]+ -> skip
+    ;
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+
+@TerminalFragmentGrammar end ;

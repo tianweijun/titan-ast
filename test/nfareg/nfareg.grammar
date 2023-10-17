@@ -1,0 +1,52 @@
+@StartGrammar compilationUnit ;
+
+@NonterminalGrammar begin ;
+compilationUnit
+  :
+    helloSuffix*
+  ;
+
+helloSuffix
+ : HelloSuffix
+ ;
+@NonterminalGrammar end ;
+
+
+@TerminalGrammar begin ;
+
+HelloSuffix
+    nfa(start,end)
+    :
+     start[]waitingForInput
+     waitingForInput[h]hSuffix waitingForInput~[h]waitingForInput
+     hSuffix[e]heSuffix        hSuffix~[e]waitingForInput
+     heSuffix[l]helSuffix      heSuffix~[l]waitingForInput
+     helSuffix[l]hellSuffix    helSuffix~[l]waitingForInput
+     hellSuffix[o]helloSuffix  hellSuffix~[o]waitingForInput
+     helloSuffix[]end
+    ;
+
+BlockComment acceptWhenFirstArriveAtTerminalState()
+:   '/*' AnyOneChar* '*/'
+    -> skip
+;
+
+LineComment
+:   '//' ~[\r\n]*
+    -> skip
+;
+
+WS
+: [\s\t\n\r]+ -> skip
+;
+@TerminalGrammar end ;
+
+
+@TerminalFragmentGrammar begin ;
+
+AnyOneChar regexp()
+    :
+        [\x00-\xFF]
+    ;
+
+@TerminalFragmentGrammar end ;
