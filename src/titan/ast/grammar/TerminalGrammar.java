@@ -14,9 +14,7 @@ public class TerminalGrammar extends Grammar {
   }
 
   public void setLookaheadMatchingMode() {
-    if (GrammarAttribute.isAcceptWhenFirstArriveAtTerminalState(attributes)) {
-      lookaheadMatchingMode = LookaheadMatchingMode.ACCEPT_WHEN_FIRST_ARRIVE_AT_TERMINAL_STATE;
-    } else if (GrammarAttribute.isLaziness(attributes)) {
+    if (GrammarAttribute.isLaziness(attributes)) {
       lookaheadMatchingMode = LookaheadMatchingMode.LAZINESS;
     } else {
       lookaheadMatchingMode = LookaheadMatchingMode.GREEDINESS;

@@ -533,7 +533,7 @@ StringLiteral
     :   EncodingPrefix? '"' SCharSequence? '"'
     ;
 
-BlockComment acceptWhenFirstArriveAtTerminalState()
+BlockComment laziness()
 :   '/*' AnyOneChar* '*/'
     -> skip
 ;

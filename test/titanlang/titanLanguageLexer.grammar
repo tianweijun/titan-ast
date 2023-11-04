@@ -6,7 +6,7 @@
 */
 
 @TerminalGrammar begin ;
-Comment acceptWhenFirstArriveAtTerminalState()
+Comment laziness()
     :   '/*'  AnyOneChar* '*/' -> skip
     ;
 

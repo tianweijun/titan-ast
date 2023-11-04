@@ -64,13 +64,4 @@ public class GrammarAttribute {
     }
     return false;
   }
-
-  public static boolean isAcceptWhenFirstArriveAtTerminalState(List<GrammarToken> attributes) {
-    for (GrammarToken token : attributes) {
-      if (KW_ACCEPT_WHEN_FIRST_ARRIVE_AT_TERMINAL_STATE_DESCRIPTOR.equals(token.text)) {
-        return true;
-      }
-    }
-    return false;
-  }
 }

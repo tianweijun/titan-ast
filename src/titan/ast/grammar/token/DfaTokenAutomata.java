@@ -132,10 +132,8 @@ public class DfaTokenAutomata {
     TerminalGrammar terminal = (TerminalGrammar) heaviestTerminalState.terminal;
     ch = byteBufferedInputStream.read();
     // 如果没有文本嗅探了直接跳出循环
-    // 如果当前接受状态是acceptWhenFirstArriveAtTerminalState，就直接接受,跳出嗅探循环
-    while (ch != eof
-        && terminal.lookaheadMatchingMode
-            != LookaheadMatchingMode.ACCEPT_WHEN_FIRST_ARRIVE_AT_TERMINAL_STATE) {
+    // 贪婪或者嗅探高优先级
+    while (ch != eof) {
       TokenDfaState nextState = currentState.edges.get(ch);
       oneTokenStringBuilder.append((char) ch);
       currentState = nextState;

@@ -49,7 +49,7 @@ LINE_COMMENT
     :   '//' ~[\r\n]* -> skip
     ;
 
-COMMENT acceptWhenFirstArriveAtTerminalState()
+COMMENT laziness()
     :   '/*'  [\x00-\xFF]* '*/' -> skip
     ;
 
