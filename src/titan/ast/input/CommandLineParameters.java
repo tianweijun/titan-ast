@@ -2,7 +2,7 @@ package titan.ast.input;
 
 import java.util.LinkedList;
 import java.util.List;
-import titan.util.StringUtils;
+import titan.ast.util.StringUtils;
 
 /**
  * 命令行参数对应的实体.

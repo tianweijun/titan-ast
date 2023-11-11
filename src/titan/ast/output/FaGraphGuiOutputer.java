@@ -22,7 +22,7 @@ import titan.ast.grammar.token.TokenDfaState;
 import titan.ast.grammar.token.TokenNfa;
 import titan.ast.grammar.token.TokenNfaState;
 import titan.ast.output.graph.GraphViewerDialog;
-import titan.util.StringUtils;
+import titan.ast.util.StringUtils;
 
 /**
  * 图形化显示自动机.

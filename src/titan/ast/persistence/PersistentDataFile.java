@@ -13,7 +13,7 @@ import titan.ast.grammar.GrammarType;
 import titan.ast.grammar.TerminalGrammar;
 import titan.ast.grammar.syntax.ProductionRule;
 import titan.ast.runtime.AstRuntimeException;
-import titan.util.StringUtils;
+import titan.ast.util.StringUtils;
 
 /**
  * PersistentDatad对应在文件中的对象.

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarType;
-import titan.util.StringUtils;
+import titan.ast.util.StringUtils;
 
 /**
  * 抽象语法树.

@@ -14,7 +14,7 @@ import titan.ast.grammar.syntax.ProductionRule;
  */
 public class AstContext {
 
-  private static ThreadLocal<AstContext> localAstContext = new ThreadLocal<>();
+  private static ThreadLocal<AstContext> contextThreadLocal = new ThreadLocal<>();
 
   public ResourceGenerator resourceGenerator = new ResourceGenerator();
   public LanguageGrammar languageGrammar = null;
@@ -37,14 +37,14 @@ public class AstContext {
   }
 
   public static void set(AstContext ctx) {
-    localAstContext.set(ctx);
+    contextThreadLocal.set(ctx);
   }
 
   public static void clear() {
-    localAstContext.remove();
+    contextThreadLocal.remove();
   }
 
   public static AstContext get() {
-    return localAstContext.get();
+    return contextThreadLocal.get();
   }
 }

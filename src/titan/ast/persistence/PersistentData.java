@@ -13,7 +13,7 @@ import titan.ast.grammar.syntax.SyntaxDfa;
 import titan.ast.grammar.syntax.SyntaxDfaState;
 import titan.ast.grammar.token.TokenDfa;
 import titan.ast.grammar.token.TokenDfaState;
-import titan.util.StringUtils;
+import titan.ast.util.StringUtils;
 
 /**
  * 持久化数据.

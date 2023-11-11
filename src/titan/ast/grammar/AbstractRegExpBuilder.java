@@ -11,7 +11,7 @@ import titan.ast.grammar.RegExp.RepTimes;
 import titan.ast.grammar.io.GrammarCharset;
 import titan.ast.grammar.io.GrammarToken;
 import titan.ast.runtime.AstRuntimeException;
-import titan.util.StringUtils;
+import titan.ast.util.StringUtils;
 
 /**
  * 嵌套发生的原因，是因为分组，嵌套分组的标志是()。 解析流程： 枚举所有符号 形似于 ~(...)(unit|(unit|(...)))?*+{num,num}?
