@@ -128,19 +128,30 @@ public class SyntaxDfaOptimizer {
       return;
     }
     // 分割边
-    int nextIndexOfInputGrammar = group.indexOfInputGrammar + 1;
-    Grammar inputGrammar = inputGrammars[nextIndexOfInputGrammar];
+    int indexOfInputGrammarForNewGroup = group.indexOfInputGrammar + 1;
+    Grammar inputGrammar = inputGrammars[indexOfInputGrammarForNewGroup];
     HashMap<SyntaxDfaState, HashSet<SyntaxDfaState>> toFromsMap = new HashMap<>();
+    HashSet<SyntaxDfaState> chToEmptyFroms = new HashSet<>();
     for (SyntaxDfaState from : equivalentStates) {
       SyntaxDfaState to = from.edges.get(inputGrammar);
-      addToFromsMap(toFromsMap, to, from);
+      if (null != to) {
+        addToFromsMap(toFromsMap, to, from);
+      } else {
+        chToEmptyFroms.add(from);
+      }
     }
     // 重复此操作，直到状态机数量最少时为止
     for (HashSet<SyntaxDfaState> froms : toFromsMap.values()) {
       DfaStatesGroup fromsStateGroup = new DfaStatesGroup();
-      fromsStateGroup.indexOfInputGrammar = nextIndexOfInputGrammar;
+      fromsStateGroup.indexOfInputGrammar = indexOfInputGrammarForNewGroup;
       fromsStateGroup.equivalentStates.addAll(froms);
       willBeFinshedGroups.add(fromsStateGroup);
+    }
+    if (!chToEmptyFroms.isEmpty()) {
+      DfaStatesGroup chToEmptyFromsStateGroup = new DfaStatesGroup();
+      chToEmptyFromsStateGroup.indexOfInputGrammar = indexOfInputGrammarForNewGroup;
+      chToEmptyFromsStateGroup.equivalentStates.addAll(chToEmptyFroms);
+      willBeFinshedGroups.add(chToEmptyFromsStateGroup);
     }
   }
 

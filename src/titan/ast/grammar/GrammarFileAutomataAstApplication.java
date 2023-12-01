@@ -17,19 +17,19 @@ import titan.ast.target.Token;
 public class GrammarFileAutomataAstApplication {
 
   public void setContext(String grammarFilePath) {
-    AstContext.build();
+    AstContext.init();
     AstAutomataBuilder astAutomataBuilder = new AstAutomataBuilder();
     astAutomataBuilder.build(grammarFilePath);
   }
 
   public void setContext(List<String> grammarFilePaths) {
-    AstContext.build();
+    AstContext.init();
     AstAutomataBuilder astAutomataBuilder = new AstAutomataBuilder();
     astAutomataBuilder.buildByFiles(grammarFilePaths);
   }
 
   public void setContext(InputStream grammarFileInputStream) {
-    AstContext.build();
+    AstContext.init();
     AstAutomataBuilder astAutomataBuilder = new AstAutomataBuilder();
     astAutomataBuilder.build(grammarFileInputStream);
   }

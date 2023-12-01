@@ -111,19 +111,30 @@ public class TokenDfaOptimizer {
       return;
     }
     // 分割边
-    int nextIndexOfChar = group.indexOfChar + 1;
-    int ch = chars[nextIndexOfChar];
+    int indexOfCharForNewGroup = group.indexOfChar + 1;
+    int ch = chars[indexOfCharForNewGroup];
     HashMap<TokenDfaState, HashSet<TokenDfaState>> toFromsMap = new HashMap<>();
+    HashSet<TokenDfaState> chToEmptyFroms = new HashSet<>();
     for (TokenDfaState from : equivalentStates) {
       TokenDfaState to = from.edges.get(ch);
-      addToFromsMap(toFromsMap, to, from);
+      if (null != to) {
+        addToFromsMap(toFromsMap, to, from);
+      } else {
+        chToEmptyFroms.add(from);
+      }
     }
     // 重复此操作，直到状态机数量最少时为止
     for (HashSet<TokenDfaState> froms : toFromsMap.values()) {
       DfaStatesGroup fromsStateGroup = new DfaStatesGroup();
-      fromsStateGroup.indexOfChar = nextIndexOfChar;
+      fromsStateGroup.indexOfChar = indexOfCharForNewGroup;
       fromsStateGroup.equivalentStates.addAll(froms);
       willBeFinshedGroups.add(fromsStateGroup);
+    }
+    if (!chToEmptyFroms.isEmpty()) {
+      DfaStatesGroup chToEmptyFromsStateGroup = new DfaStatesGroup();
+      chToEmptyFromsStateGroup.indexOfChar = indexOfCharForNewGroup;
+      chToEmptyFromsStateGroup.equivalentStates.addAll(chToEmptyFroms);
+      willBeFinshedGroups.add(chToEmptyFromsStateGroup);
     }
   }
 

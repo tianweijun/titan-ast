@@ -27,8 +27,7 @@ public class AstContext {
    *
    * @return 当前应用程序的 上下文
    */
-  public static AstContext build() {
-    clear();
+  public static AstContext init() {
     AstContext astContext = new AstContext();
     astContext.grammarCharset = new GrammarCharset();
     astContext.languageGrammar = new LanguageGrammar();
