@@ -1,5 +1,6 @@
 package titan.ast.runtime;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -36,6 +37,9 @@ public class JComponent2PicConverter {
         new BufferedImage(
             viewer.getSize().width, viewer.getSize().height, BufferedImage.TYPE_INT_ARGB);
     Graphics bufferedImageGraphics = bufferedImage.createGraphics();
+    bufferedImageGraphics.setColor(Color.WHITE);
+    bufferedImageGraphics.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+    viewer.paint(bufferedImageGraphics);
     viewer.paint(bufferedImageGraphics);
     bufferedImageGraphics.dispose();
 
