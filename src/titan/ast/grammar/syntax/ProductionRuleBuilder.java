@@ -1,6 +1,5 @@
 package titan.ast.grammar.syntax;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -10,7 +9,7 @@ import titan.ast.grammar.RelationshipQualifier;
 import titan.ast.runtime.AstRuntimeException;
 
 /**
- * 根据终结符正则构造产生式，并将产生式中的[]、''的基本正则转为token非终结符正则.
+ * 根据终结符正则构造产生式，并将产生式中的[]、''的基本正则转为token终结符正则.
  *
  * @author tian wei jun
  */
@@ -174,7 +173,6 @@ public class ProductionRuleBuilder {
       for (RegExp.RegExpCharSet regExpCharSet : unitRegExp.sets) {
         cloner.sets.add(regExpCharSet.clone());
       }
-      cloner.relationshipOfChars = unitRegExp.relationshipOfChars;
       return cloner;
     }
     return null;
@@ -194,9 +192,7 @@ public class ProductionRuleBuilder {
 
   private void setAlias(ProductionRule productionRule) {
     RegExp regExp = productionRule.rule;
-    Iterator<RegExp> regExpChildrenIt = regExp.children.iterator();
-    while (regExpChildrenIt.hasNext()) {
-      RegExp child = regExpChildrenIt.next();
+    for (RegExp child : regExp.children) {
       if (child.isHelperAliasRegExpUnit()) {
         productionRule.alias = new String(child.sets.getFirst().chars);
       }

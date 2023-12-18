@@ -1,7 +1,6 @@
 package titan.ast.grammar;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
@@ -16,6 +15,7 @@ import titan.ast.util.StringUtils;
 /**
  * 嵌套发生的原因，是因为分组，嵌套分组的标志是()。 解析流程： 枚举所有符号 形似于 ~(...)(unit|(unit|(...)))?*+{num,num}?
  * 分组起始开始标志~，其次的标志是([，结束标志是? * + {，对应匹配字符)] num,num}，其他是范围字符。 层序遍历 语法节点：基本正则->内容的正则表达式.
+ * [xxx-xxx]表示某个字符集的一个字符，支持~运算. 'xxxxxx'表示若干个字符组成的序列 .
  *
  * @author tian wei jun
  */
@@ -51,6 +51,11 @@ public abstract class AbstractRegExpBuilder {
     }
   }
 
+  /**
+   * 当前构建完后的正则形态（有正确的层级关系、type、和text） .
+   *
+   * @param grammar
+   */
   private void build(Grammar grammar) {
     this.grammar = grammar;
     // 创建普通正则
@@ -89,6 +94,7 @@ public abstract class AbstractRegExpBuilder {
   private void initRootRegExp(Grammar grammar) {
     // regExp
     RegExp rootRegExp = this.grammar.regExp;
+    rootRegExp.type = RegExpType.COMPOSITE;
     // text
     StringBuilder rootRegExpText = new StringBuilder();
     for (GrammarToken token : grammar.text) {
@@ -174,11 +180,11 @@ public abstract class AbstractRegExpBuilder {
   private int createAndInitHelperOrUnitRegExp(char[] text, int indexOfText) {
     // | -> helper
     RegExp regExp = new RegExp(regExpStack.peek(), newRegExpContext.isNotForNewRexExp);
+    regExp.type = RegExp.RegExpType.UNIT;
+    regExp.unitType = RegExp.RegExpUnitType.HELPER_OR;
     newRegExpContext.init();
     regExp.text = text;
     regExp.startOfText = indexOfText;
-    regExp.type = RegExp.RegExpType.UNIT;
-    regExp.unitType = RegExp.RegExpUnitType.HELPER_OR;
     ++indexOfText;
     regExp.lengthOfText = 1;
     return indexOfText;
@@ -188,13 +194,12 @@ public abstract class AbstractRegExpBuilder {
     int startIndexOfText = indexOfText;
     // [' ->unit regexp
     RegExp charsRegExpUnit = new RegExp(regExpStack.peek(), newRegExpContext.isNotForNewRexExp);
+    charsRegExpUnit.type = RegExp.RegExpType.UNIT;
+    charsRegExpUnit.setUnitType(RegExp.RegExpUnitType.SEQUENCE_CHARS);
     newRegExpContext.init();
     charsRegExpUnit.text = text;
     charsRegExpUnit.startOfText = indexOfText;
     regExpStack.push(charsRegExpUnit);
-    charsRegExpUnit.type = RegExp.RegExpType.UNIT;
-    charsRegExpUnit.setUnitType(RegExp.RegExpUnitType.SEQUENCE_CHARS);
-    charsRegExpUnit.relationshipOfChars = RelationshipQualifier.AND;
     ++indexOfText;
     indexOfText = setSetsOfBaseUnitRegExp(text, indexOfText);
     indexOfText = expectOneChar('\'', text, indexOfText);
@@ -214,13 +219,12 @@ public abstract class AbstractRegExpBuilder {
     int startIndexOfText = indexOfText;
     // [' ->unit regexp
     RegExp charsRegExpUnit = new RegExp(regExpStack.peek(), newRegExpContext.isNotForNewRexExp);
+    charsRegExpUnit.type = RegExp.RegExpType.UNIT;
+    charsRegExpUnit.setUnitType(RegExp.RegExpUnitType.ONE_CHAR_OPTION_CHARSET);
     newRegExpContext.init();
     charsRegExpUnit.text = text;
     charsRegExpUnit.startOfText = indexOfText;
     regExpStack.push(charsRegExpUnit);
-    charsRegExpUnit.type = RegExp.RegExpType.UNIT;
-    charsRegExpUnit.setUnitType(RegExp.RegExpUnitType.ONE_CHAR_OPTION_CHARSET);
-    charsRegExpUnit.relationshipOfChars = RelationshipQualifier.OR;
     ++indexOfText;
     indexOfText = setSetsOfBaseUnitRegExp(text, indexOfText);
     indexOfText = expectOneChar(']', text, indexOfText);
@@ -240,6 +244,8 @@ public abstract class AbstractRegExpBuilder {
     int startIndexOfText = indexOfText;
     // ( ->parent
     RegExp compositeRegExp = new RegExp(regExpStack.peek(), newRegExpContext.isNotForNewRexExp);
+    compositeRegExp.type = RegExpType.COMPOSITE;
+    compositeRegExp.relationshipOfChildren = RelationshipQualifier.AND;
     newRegExpContext.init();
     compositeRegExp.text = text;
     compositeRegExp.startOfText = indexOfText;
@@ -328,6 +334,8 @@ public abstract class AbstractRegExpBuilder {
     int startIndexOfText = indexOfText;
     ++indexOfText; // skip #
     RegExp aliasRegExp = new RegExp(regExpStack.peek(), newRegExpContext.isNotForNewRexExp);
+    aliasRegExp.type = RegExpType.UNIT;
+    aliasRegExp.setUnitType(RegExp.RegExpUnitType.HELPER_ALIAS);
     newRegExpContext.init();
     aliasRegExp.text = text;
     aliasRegExp.startOfText = indexOfText;
@@ -347,7 +355,6 @@ public abstract class AbstractRegExpBuilder {
               "%s:alias is empty,error near %s",
               grammar.name, new String(text, startIndexOfText, text.length - startIndexOfText)));
     }
-    aliasRegExp.setUnitType(RegExp.RegExpUnitType.HELPER_ALIAS);
     RegExp.RegExpCharSet aliasRegExpSet = new RegExp.RegExpCharSet();
     aliasRegExpSet.type = RegExp.RegExpCharSetType.HELPER_ALIAS;
     aliasRegExpSet.chars =
@@ -360,6 +367,8 @@ public abstract class AbstractRegExpBuilder {
   private int createAndInitGrammarUnitRegExp(char[] text, int indexOfText) {
     int startIndexOfText = indexOfText;
     RegExp grammarRegExp = new RegExp(regExpStack.peek(), newRegExpContext.isNotForNewRexExp);
+    grammarRegExp.type = RegExpType.UNIT;
+    grammarRegExp.setUnitType(RegExp.RegExpUnitType.GRAMMAR);
     newRegExpContext.init();
     grammarRegExp.text = text;
     grammarRegExp.startOfText = indexOfText;
@@ -393,7 +402,6 @@ public abstract class AbstractRegExpBuilder {
               this.grammar.name,
               new String(text, startIndexOfText, text.length - startIndexOfText)));
     }
-    grammarRegExp.setUnitType(RegExp.RegExpUnitType.GRAMMAR);
     RegExp.RegExpCharSet grammarRegExpSet = new RegExp.RegExpCharSet();
     grammarRegExpSet.type = RegExp.RegExpCharSetType.GRAMMAR;
     grammarRegExpSet.grammar = grammar;
@@ -794,50 +802,53 @@ public abstract class AbstractRegExpBuilder {
   }
 
   /**
-   * 按照|分割成多个孩子们 孩子们组成新的一个孩子作为原来的孩子的替换.
+   * 按照|分割成元素，一个元素对应多个孩子们，孩子们组成新的一个孩子作为原来的孩子的替换.
    *
    * @param regExp 正则
    */
   private void buildOrRelationshipOfChildren(RegExp regExp) {
-    LinkedList<LinkedList<RegExp>> childRegExps = new LinkedList<>();
-    Iterator<RegExp> childrenIt = regExp.children.iterator();
-    LinkedList<RegExp> elementrChildern = new LinkedList<>();
-    while (childrenIt.hasNext()) {
-      RegExp child = childrenIt.next();
-      if (child.isHelperOrRegExpUnit()) {
-        if (elementrChildern.isEmpty()) {
+    // regExpsOfOrChildren:它的元素是按照|分隔的若干个正则，元素就是新孩子的孩子
+    LinkedList<LinkedList<RegExp>> regExpsOfOrChildren = new LinkedList<>();
+    LinkedList<RegExp> currentChildernRegExp = new LinkedList<>();
+    for (RegExp child : regExp.children) {
+      if (child.isHelperOrRegExpUnit()) { // 遇到|分隔，形成childRegExp
+        if (currentChildernRegExp.isEmpty()) {
           RegExp emptyRegExp = RegExp.createEmptyRegExp(null);
-          elementrChildern.add(emptyRegExp);
+          currentChildernRegExp.add(emptyRegExp);
         }
-        childRegExps.add(elementrChildern);
-        elementrChildern = new LinkedList<>();
+        regExpsOfOrChildren.add(currentChildernRegExp);
+        currentChildernRegExp = new LinkedList<>();
       } else {
-        elementrChildern.add(child);
+        currentChildernRegExp.add(child);
       }
     }
     // 无or
-    if (childRegExps.isEmpty()) {
+    if (regExpsOfOrChildren.isEmpty()) {
       return;
     }
-    // 有or
-    if (elementrChildern.isEmpty()) {
+    // 有or,最后一个孩子是空的，currentChildernRegExp添加emptyRegExp，表示最后一个是空正则
+    if (currentChildernRegExp.isEmpty()) {
       RegExp emptyRegExp = RegExp.createEmptyRegExp(null);
-      elementrChildern.add(emptyRegExp);
+      currentChildernRegExp.add(emptyRegExp);
     }
-    childRegExps.add(elementrChildern);
+    // 添加最后一个孩子
+    regExpsOfOrChildren.add(currentChildernRegExp);
 
-    regExp.relationshipOfChildren = RelationshipQualifier.OR;
+    // 将regExpsOfOrChild转化为真正的child（构建父子关系和text）
     LinkedList<RegExp> newChildren = new LinkedList<>();
-    for (LinkedList<RegExp> eleChildRegExps : childRegExps) {
-      RegExp newChild = new RegExp(regExp);
+    for (LinkedList<RegExp> regExpsOfOrChild : regExpsOfOrChildren) {
       // 设置层级关系
-      for (RegExp eleChildRegExp : eleChildRegExps) {
+      RegExp newChild = new RegExp(regExp);
+      newChild.type = RegExpType.COMPOSITE;
+      // 设置新孩子的孩子
+      newChild.relationshipOfChildren = RelationshipQualifier.AND;
+      for (RegExp eleChildRegExp : regExpsOfOrChild) {
         newChild.children.add(eleChildRegExp);
         eleChildRegExp.parent = newChild;
       }
       // 设置text
-      RegExp newChildFirstChild = eleChildRegExps.getFirst();
-      RegExp newChildLastChild = eleChildRegExps.getLast();
+      RegExp newChildFirstChild = regExpsOfOrChild.getFirst();
+      RegExp newChildLastChild = regExpsOfOrChild.getLast();
       newChild.text = newChildFirstChild.text;
       newChild.startOfText = newChildFirstChild.startOfText;
       newChild.lengthOfText =
@@ -847,6 +858,7 @@ public abstract class AbstractRegExpBuilder {
       // 新的or关系正则建立
       newChildren.add(newChild);
     }
+    regExp.relationshipOfChildren = RelationshipQualifier.OR;
     regExp.children = newChildren;
   }
 

@@ -20,9 +20,6 @@ public class RegExp {
   public RegExpType type = RegExpType.COMPOSITE;
 
   public boolean isNot = false;
-  public RepTimes repMinTimes = new RepTimes(RepTimesType.NUMBER, 1);
-  public RepTimes repMaxTimes = new RepTimes(RepTimesType.NUMBER, 1);
-  public MatchingPattern matchingPattern = MatchingPattern.UNBACKTRACKING_GREEDINESS;
 
   // text
   public char[] text = null;
@@ -37,8 +34,11 @@ public class RegExp {
   // -----------UNIT  start----------
   public RegExpUnitType unitType = RegExpUnitType.EMPTY;
   public LinkedList<RegExpCharSet> sets = new LinkedList<>();
-  public RelationshipQualifier relationshipOfChars = RelationshipQualifier.AND;
   // -----------UNIT  end------------
+
+  public RepTimes repMinTimes = new RepTimes(RepTimesType.NUMBER, 1);
+  public RepTimes repMaxTimes = new RepTimes(RepTimesType.NUMBER, 1);
+  public MatchingPattern matchingPattern = MatchingPattern.UNBACKTRACKING_GREEDINESS;
 
   // TokenNFA
   public TokenNfa tokenNfa = null;
@@ -151,8 +151,7 @@ public class RegExp {
         && children.equals(regExp.children)
         && relationshipOfChildren == regExp.relationshipOfChildren
         && unitType == regExp.unitType
-        && sets.equals(regExp.sets)
-        && relationshipOfChars == regExp.relationshipOfChars;
+        && sets.equals(regExp.sets);
   }
 
   @Override
@@ -166,8 +165,7 @@ public class RegExp {
         children,
         relationshipOfChildren,
         unitType,
-        sets,
-        relationshipOfChars);
+        sets);
   }
 
   @Override

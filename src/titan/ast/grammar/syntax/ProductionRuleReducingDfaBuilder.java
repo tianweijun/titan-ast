@@ -58,7 +58,6 @@ public class ProductionRuleReducingDfaBuilder {
     reducingRegExp.relationshipOfChildren = baseRegExp.relationshipOfChildren;
     reducingRegExp.unitType = baseRegExp.unitType;
     reducingRegExp.sets.addAll(baseRegExp.sets);
-    reducingRegExp.relationshipOfChars = baseRegExp.relationshipOfChars;
     return reducingRegExp;
   }
 }
