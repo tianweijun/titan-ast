@@ -11,7 +11,7 @@
 class SyntaxDfa;
 
 class ProductionRule {
- public:
+public:
   ProductionRule();
   ProductionRule(const ProductionRule &productionRule) = delete;
   ProductionRule(const ProductionRule &&productionRule) = delete;
@@ -23,4 +23,4 @@ class ProductionRule {
   const SyntaxDfa *reducingDfa;
 };
 
-#endif//AST__PRODUCTIONRULE_H_
+#endif // AST__PRODUCTIONRULE_H_

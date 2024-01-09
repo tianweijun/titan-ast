@@ -11,6 +11,7 @@ import titan.ast.grammar.LanguageGrammar;
 import titan.ast.grammar.syntax.ProductionRule;
 import titan.ast.grammar.syntax.SyntaxDfa;
 import titan.ast.grammar.syntax.SyntaxDfaState;
+import titan.ast.grammar.token.KeyWordAutomata;
 import titan.ast.grammar.token.TokenDfa;
 import titan.ast.grammar.token.TokenDfaState;
 import titan.ast.util.StringUtils;
@@ -30,6 +31,7 @@ public class PersistentData {
   // public int[] tokenDfaStates = null;
   // public Grammar start;
   public LinkedHashMap<ProductionRule, Integer> productionRuleIntegerMap;
+  // KeyWordAutomata
   // ----------data end-----------
   AstContext astContext;
 
@@ -90,21 +92,37 @@ public class PersistentData {
 
   public void initStringPool() {
     LanguageGrammar languageGrammar = astContext.languageGrammar;
-    int capacity = languageGrammar.terminals.size() + languageGrammar.nonterminals.size();
+    KeyWordAutomata keyWordAutomata = languageGrammar.keyWordAutomata;
+    int capacity =
+        languageGrammar.terminals.size()
+            + languageGrammar.nonterminals.size()
+            + keyWordAutomata.textTerminalMap.size();
     stringPool = new LinkedHashMap<>(capacity);
     int indexOfString = 0;
+    // terminals
     for (Grammar terminal : languageGrammar.terminals.values()) {
       String name = terminal.name;
       if (!stringPool.containsKey(name)) {
         stringPool.put(name, indexOfString++);
       }
     }
+    // nonterminals
     for (Grammar nonterminal : languageGrammar.nonterminals.values()) {
       String name = nonterminal.name;
       if (!stringPool.containsKey(name)) {
         stringPool.put(name, indexOfString++);
       }
     }
+    // text of KeyWords
+    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.NOT_EMPTY) {
+      for (String text : keyWordAutomata.textTerminalMap.keySet()) {
+        if (!stringPool.containsKey(text)) {
+          stringPool.put(text, indexOfString++);
+        }
+      }
+    }
+
+    // productionRule alias
     for (LinkedList<ProductionRule> productionRules :
         astContext.nonterminalProductionRulesMap.values()) {
       for (ProductionRule productionRule : productionRules) {

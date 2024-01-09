@@ -614,71 +614,6 @@ Comma : ',' ;
 Assign : '=' ;
 Dot : '.' ;
 
-Auto : 'auto' ;
-Break : 'break' ;
-Case : 'case' ;
-Char : 'char' ;
-Const : 'const' ;
-Continue : 'continue' ;
-Default : 'default' ;
-Do : 'do' ;
-Double : 'double' ;
-Else : 'else' ;
-Enum : 'enum' ;
-Extern : 'extern' ;
-Float : 'float' ;
-For : 'for' ;
-Goto : 'goto' ;
-If : 'if' ;
-Inline : 'inline' ;
-Int : 'int' ;
-Long : 'long' ;
-Register : 'register' ;
-Restrict : 'restrict' ;
-Return : 'return' ;
-Short : 'short' ;
-Signed : 'signed' ;
-Sizeof : 'sizeof' ;
-Static : 'static' ;
-Struct : 'struct' ;
-Switch : 'switch' ;
-Typedef : 'typedef' ;
-Union : 'union' ;
-Unsigned : 'unsigned' ;
-Void : 'void' ;
-Volatile : 'volatile' ;
-While : 'while' ;
-
-Alignas : '_Alignas' ;
-Alignof : '_Alignof' ;
-Atomic : '_Atomic' ;
-Bool : '_Bool' ;
-Complex : '_Complex' ;
-Generic : '_Generic' ;
-Imaginary : '_Imaginary' ;
-Noreturn : '_Noreturn' ;
-StaticAssert : '_Static_assert' ;
-ThreadLocal : '_Thread_local' ;
-
-// extension
-Extension__m128 : '__m128' ;
-Extension__m128d : '__m128d' ;
-Extension__m128i : '__m128i' ;
-
-Extension__inline__ : '__inline__' ;
-Extension__stdcall : '__stdcall' ;
-Extension__declspec : '__declspec' ;
-Extension__asm : '__asm' ;
-Extension__asm__ : '__asm__' ;
-Extension__volatile__ : '__volatile__' ;
-
-Extension__typeof__ : '__typeof__' ;
-
-Extension__extension__ : '__extension__' ;
-Extension__builtin_va_arg : '__builtin_va_arg' ;
-Extension__builtin_offsetof : '__builtin_offsetof' ;
-Extension__attribute__ : '__attribute__' ;
-
 Identifier
     :   IdentifierNondigit
         (   IdentifierNondigit
@@ -899,3 +834,74 @@ WhitespaceFragment
     :   [\s\t]+
     ;
 @TerminalFragmentGrammar end ;
+
+@RootKeyWord Identifier ;
+
+@KeyWord begin ;
+
+Auto : 'auto' ;
+Break : 'break' ;
+Case : 'case' ;
+Char : 'char' ;
+Const : 'const' ;
+Continue : 'continue' ;
+Default : 'default' ;
+Do : 'do' ;
+Double : 'double' ;
+Else : 'else' ;
+Enum : 'enum' ;
+Extern : 'extern' ;
+Float : 'float' ;
+For : 'for' ;
+Goto : 'goto' ;
+If : 'if' ;
+Inline : 'inline' ;
+Int : 'int' ;
+Long : 'long' ;
+Register : 'register' ;
+Restrict : 'restrict' ;
+Return : 'return' ;
+Short : 'short' ;
+Signed : 'signed' ;
+Sizeof : 'sizeof' ;
+Static : 'static' ;
+Struct : 'struct' ;
+Switch : 'switch' ;
+Typedef : 'typedef' ;
+Union : 'union' ;
+Unsigned : 'unsigned' ;
+Void : 'void' ;
+Volatile : 'volatile' ;
+While : 'while' ;
+
+Alignas : '_Alignas' ;
+Alignof : '_Alignof' ;
+Atomic : '_Atomic' ;
+Bool : '_Bool' ;
+Complex : '_Complex' ;
+Generic : '_Generic' ;
+Imaginary : '_Imaginary' ;
+Noreturn : '_Noreturn' ;
+StaticAssert : '_Static_assert' ;
+ThreadLocal : '_Thread_local' ;
+
+// extension
+Extension__m128 : '__m128' ;
+Extension__m128d : '__m128d' ;
+Extension__m128i : '__m128i' ;
+
+Extension__inline__ : '__inline__' ;
+Extension__stdcall : '__stdcall' ;
+Extension__declspec : '__declspec' ;
+Extension__asm : '__asm' ;
+Extension__asm__ : '__asm__' ;
+Extension__volatile__ : '__volatile__' ;
+
+Extension__typeof__ : '__typeof__' ;
+
+Extension__extension__ : '__extension__' ;
+Extension__builtin_va_arg : '__builtin_va_arg' ;
+Extension__builtin_offsetof : '__builtin_offsetof' ;
+Extension__attribute__ : '__attribute__' ;
+
+@KeyWord end ;

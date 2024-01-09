@@ -10,22 +10,17 @@
 
 using namespace logger;
 
-const char *Logger::s_level[LEVEL_COUNT] =
-    {
-        "DEBUG",
-        "INFO",
-        "WARN",
-        "ERROR",
-        "FATAL"};
+const char *Logger::s_level[LEVEL_COUNT] = {"DEBUG", "INFO", "WARN", "ERROR",
+                                            "FATAL"};
 
 Logger Logger::logger;
 
-Logger::Logger() : m_level(INFO) {
-}
+Logger::Logger() : m_level(INFO) {}
 
 Logger::~Logger() = default;
 
-void Logger::log(Level level, const char *file, int line, const char *format, ...) const {
+void Logger::log(Level level, const char *file, int line, const char *format,
+                 ...) const {
   if (m_level > level) {
     return;
   }
@@ -65,6 +60,4 @@ void Logger::log(Level level, const char *file, int line, const char *format, ..
   std::cout.flush();
 }
 
-void Logger::level(int level) {
-  m_level = level;
-}
+void Logger::level(int level) { m_level = level; }

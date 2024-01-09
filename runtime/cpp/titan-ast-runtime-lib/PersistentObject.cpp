@@ -4,31 +4,36 @@
 
 #include "PersistentObject.h"
 
-PersistentObject::PersistentObject() : persistentData(nullptr),
-                                       tokenDfa(nullptr), astDfa(nullptr),
-                                       startGrammar(nullptr) {
-}
+PersistentObject::PersistentObject()
+    : persistentData(nullptr), keyWordAutomata(nullptr), tokenDfa(nullptr),
+      astDfa(nullptr), startGrammar(nullptr) {}
 
-PersistentObject::PersistentObject(PersistentData *persistentData) : persistentData(persistentData),
-                                                                     tokenDfa(nullptr), astDfa(nullptr),
-                                                                     startGrammar(nullptr) {
+PersistentObject::PersistentObject(PersistentData *persistentData)
+    : persistentData(persistentData), keyWordAutomata(nullptr),
+      tokenDfa(nullptr), astDfa(nullptr), startGrammar(nullptr) {
   init();
 }
 
 PersistentObject::~PersistentObject() {
   delete astDfa;
   astDfa = nullptr;
+
   delete tokenDfa;
   tokenDfa = nullptr;
+
+  delete keyWordAutomata;
+  keyWordAutomata = nullptr;
+
   delete persistentData;
   persistentData = nullptr;
-  //startGrammar delete by persistentData.grammars
+  // startGrammar delete by persistentData.grammars
 }
 
 void PersistentObject::init() {
   // 按文件组织顺序获得各个部分数据，每个部分获取一次
   initStringPool();
   initGrammars();
+  initKeyWordAutomata();
   initTokenDfa();
   initStartGrammar();
   initProductionRules();
@@ -51,6 +56,10 @@ void PersistentObject::initStartGrammar() {
 
 void PersistentObject::initTokenDfa() {
   tokenDfa = persistentData->getTokenDfaByInputStream();
+}
+
+void PersistentObject::initKeyWordAutomata() {
+  keyWordAutomata = persistentData->getKeyWordAutomataByInputStream();
 }
 
 void PersistentObject::initGrammars() const {

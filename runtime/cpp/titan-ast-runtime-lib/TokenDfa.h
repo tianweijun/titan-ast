@@ -8,8 +8,9 @@
 #include "TokenDfaState.h"
 
 class TokenDfa {
- public:
-  TokenDfa(const TokenDfaState *start, const TokenDfaState **states, int sizeOfStates);
+public:
+  TokenDfa(const TokenDfaState *start, const TokenDfaState **states,
+           int sizeOfStates);
   TokenDfa(const TokenDfa &tokenDfa) = delete;
   TokenDfa(const TokenDfa &&tokenDfa) = delete;
   ~TokenDfa();
@@ -19,4 +20,4 @@ class TokenDfa {
   const int sizeOfStates;
 };
 
-#endif//AST__TOKENDFA_H_
+#endif // AST__TOKENDFA_H_

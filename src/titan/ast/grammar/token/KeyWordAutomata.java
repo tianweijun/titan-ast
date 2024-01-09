@@ -1,0 +1,37 @@
+package titan.ast.grammar.token;
+
+import java.util.HashMap;
+import java.util.List;
+import titan.ast.grammar.Grammar;
+import titan.ast.target.Token;
+
+/**
+ * .
+ *
+ * @author tian wei jun
+ */
+public class KeyWordAutomata {
+  public static final int EMPTY = 0;
+  public static final int NOT_EMPTY = 1;
+
+  public int emptyOrNot = EMPTY;
+
+  public Grammar rootKeyWord = null;
+
+  public HashMap<String, Grammar> textTerminalMap = new HashMap<>();
+
+  public List<Token> buildToken(List<Token> tokens) {
+    if (emptyOrNot == EMPTY) {
+      return tokens;
+    }
+    for (Token token : tokens) {
+      if (token.terminal == rootKeyWord) {
+        Grammar terminal = textTerminalMap.get(token.text);
+        if (null != terminal) {
+          token.terminal = terminal;
+        }
+      }
+    }
+    return tokens;
+  }
+}

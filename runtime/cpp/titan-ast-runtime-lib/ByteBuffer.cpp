@@ -4,13 +4,13 @@
 
 #include "ByteBuffer.h"
 
-
-ByteBuffer::ByteBuffer(int capacity) : isBigEndian(true), capacity(capacity), position(0) {
+ByteBuffer::ByteBuffer(int capacity)
+    : isBigEndian(true), capacity(capacity), position(0) {
   buffer = new byte[capacity];
 }
 
-ByteBuffer::ByteBuffer(int capacity, bool isBigEndian) : isBigEndian(isBigEndian),capacity(capacity),
-                                                          position(0) {
+ByteBuffer::ByteBuffer(int capacity, bool isBigEndian)
+    : isBigEndian(isBigEndian), capacity(capacity), position(0) {
   buffer = new byte[capacity];
 }
 
@@ -19,7 +19,7 @@ ByteBuffer::ByteBuffer(const ByteBuffer &byteBuffer) {
   this->capacity = byteBuffer.capacity;
   this->position = byteBuffer.position;
   this->buffer = new byte[this->capacity];
-  for(int i = 0 ; i < this->capacity; i++){
+  for (int i = 0; i < this->capacity; i++) {
     this->buffer[i] = byteBuffer.buffer[i];
   }
 }
@@ -40,13 +40,9 @@ ByteBuffer::~ByteBuffer() {
   buffer = nullptr;
 }
 
-void ByteBuffer::setPosition(int pos) {
-  position = pos;
-}
+void ByteBuffer::setPosition(int pos) { position = pos; }
 
-int ByteBuffer::length() const {
-  return position;
-}
+int ByteBuffer::length() const { return position; }
 
 void ByteBuffer::append(byte b) {
   if (position >= capacity) {
@@ -66,13 +62,9 @@ void ByteBuffer::extendBuffer() {
   capacity = newCapacity;
 }
 
-void ByteBuffer::clear() {
-  position = 0;
-}
+void ByteBuffer::clear() { position = 0; }
 
-int ByteBuffer::getInt() const {
-  return isBigEndian ? getIntB() : getIntL();
-}
+int ByteBuffer::getInt() const { return isBigEndian ? getIntB() : getIntL(); }
 
 int ByteBuffer::getIntB() const {
   int base = 0;
@@ -95,4 +87,3 @@ int ByteBuffer::getIntL() const {
   }
   return value;
 }
-

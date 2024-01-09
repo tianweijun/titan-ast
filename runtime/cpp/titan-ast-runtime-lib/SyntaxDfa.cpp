@@ -5,8 +5,8 @@
 #include "SyntaxDfa.h"
 
 SyntaxDfa::SyntaxDfa(const SyntaxDfaState *start, const SyntaxDfaState **states,
-                     const int sizeOfStates) : start(start), states(states), sizeOfStates(sizeOfStates) {
-}
+                     const int sizeOfStates)
+    : start(start), states(states), sizeOfStates(sizeOfStates) {}
 
 SyntaxDfa::~SyntaxDfa() {
   for (int i = 0; i < sizeOfStates; i++) {

@@ -6,20 +6,23 @@
 #define AST__DFATOKENAUTOMATA_H_
 #include "ByteBuffer.h"
 #include "ByteBufferedInputStream.h"
+#include "KeyWordAutomata.h"
 #include "Token.h"
 #include "TokenDfa.h"
 #include <list>
 #include <string>
 
 class DfaTokenAutomata {
- public:
-  explicit DfaTokenAutomata(const TokenDfa *tokenDfa);
+public:
+  explicit DfaTokenAutomata(const KeyWordAutomata *keyWordAutomata,
+                            const TokenDfa *tokenDfa);
   DfaTokenAutomata(const DfaTokenAutomata &dfaTokenAutomata) = delete;
   DfaTokenAutomata(const DfaTokenAutomata &&dfaTokenAutomata) = delete;
   ~DfaTokenAutomata();
   std::list<Token *> *buildToken(const std::string *sourceFilePath);
 
- private:
+private:
+  const KeyWordAutomata *keyWordAutomata;
   const TokenDfa *dfa;
   ByteBufferedInputStream byteBufferedInputStream{};
   std::list<Token *> *tokens;
@@ -27,10 +30,10 @@ class DfaTokenAutomata {
   int startIndexOfToken;
   const int eof;
 
- private:
+private:
   bool buildOneToken();
   const TokenDfaState *getTerminalState();
   void clear();
 };
 
-#endif//AST__DFATOKENAUTOMATA_H_
+#endif // AST__DFATOKENAUTOMATA_H_

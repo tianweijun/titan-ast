@@ -5,8 +5,5 @@
 #ifndef AST__RUNTIME__GRAMMARACTION_H_
 #define AST__RUNTIME__GRAMMARACTION_H_
 
-enum class GrammarAction : int {
-  TEXT = 0,
-  SKIP = 1
-};
-#endif//AST__RUNTIME__GRAMMARACTION_H_
+enum class GrammarAction : int { TEXT = 0, SKIP = 1 };
+#endif // AST__RUNTIME__GRAMMARACTION_H_

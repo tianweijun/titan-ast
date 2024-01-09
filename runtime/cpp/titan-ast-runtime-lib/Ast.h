@@ -5,17 +5,17 @@
 #ifndef AST__RUNTIME__AST_H_
 #define AST__RUNTIME__AST_H_
 
+#include "AstToken.h"
 #include "Grammar.h"
 #include "ProductionRule.h"
+#include "Runtime.h"
 #include "Token.h"
-#include "AstToken.h"
 #include <list>
 #include <map>
 #include <string>
-#include "Runtime.h"
 
 class DLL_PUBLIC Ast {
- public:
+public:
   Ast(Grammar grammar);
   Ast(Grammar grammar, std::string alias);
   explicit Ast(const Token &token);
@@ -32,4 +32,4 @@ class DLL_PUBLIC Ast {
   std::list<Ast *> children;
 };
 
-#endif//AST__RUNTIME__AST_H_
+#endif // AST__RUNTIME__AST_H_

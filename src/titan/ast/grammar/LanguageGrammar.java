@@ -1,13 +1,16 @@
 package titan.ast.grammar;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import titan.ast.grammar.io.GrammarToken;
 import titan.ast.grammar.io.GrammarTokenType;
 import titan.ast.grammar.syntax.AstAutomata;
 import titan.ast.grammar.syntax.SyntaxDfa;
 import titan.ast.grammar.token.DfaTokenAutomata;
+import titan.ast.grammar.token.KeyWordAutomata;
 import titan.ast.grammar.token.TokenDfa;
 import titan.ast.runtime.AstRuntimeException;
+import titan.ast.util.StringUtils;
 
 /**
  * 语法文件所对应的实体，以及其所表示的自动机等.
@@ -28,6 +31,11 @@ public class LanguageGrammar {
   public SyntaxDfa astDfa;
   public DfaTokenAutomata tokenAutomata;
   public AstAutomata astAutomata;
+
+  // keyword
+  public String rootKeyWord = null;
+  public LinkedHashSet<Grammar> keyWords = new LinkedHashSet<>();
+  public KeyWordAutomata keyWordAutomata = null;
 
   public LanguageGrammar() {
     init();
@@ -56,7 +64,7 @@ public class LanguageGrammar {
     epsilon.type = GrammarType.TERMINAL;
   }
 
-  void addGrammarNode(Grammar grammar) {
+  public void addGrammar(Grammar grammar) {
     if (!isUnique(grammar)) {
       throw new AstRuntimeException(
           String.format("name of grammar '%s' is not unique.", grammar.name));
@@ -108,5 +116,21 @@ public class LanguageGrammar {
 
   public Grammar getStart() {
     return nonterminals.get(start);
+  }
+
+  public void updateRootKeyWord(String rootKeyWord) {
+    this.rootKeyWord = rootKeyWord;
+  }
+
+  public void addKeyWord(Grammar keyWord) {
+    if (keyWords.contains(keyWord)) {
+      throw new AstRuntimeException(
+          String.format("name of grammar '%s' is not unique.", keyWord.name));
+    }
+    keyWords.add(keyWord);
+  }
+
+  public boolean isKeyWordEmpty() {
+    return !(StringUtils.isNotBlank(rootKeyWord) && !keyWords.isEmpty());
   }
 }

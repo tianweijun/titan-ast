@@ -21,10 +21,14 @@ public class TextOfGrammarBuilder {
   private static final String PREFIX_TERMINAL_GRAMMAR_STATEMENT = "@TerminalGrammar";
   private static final String PREFIX_FRAGMENT_GRAMMAR_STATEMENT = "@TerminalFragmentGrammar";
   private static final String BEGINNING_GRAMMAR_DEFINITION = "begin";
+  private static final String END_GRAMMAR_DEFINITION = "end";
 
   private static final String KW_MID_OF_GRAMMAR_DEFINITION = ":";
   private static final String KW_PREFIX_ACTION = "->";
   private static final String KW_END_OF_GRAMMAR_DEFINITION = ";";
+
+  private static final String PREFIX_START_ROOT_KEY_WORD = "@RootKeyWord";
+  private static final String PREFIX_KEY_WORD_STATEMENT = "@KeyWord";
 
   private final LanguageGrammar languageGrammar;
   private final List<GrammarToken> grammarTokens;
@@ -78,7 +82,9 @@ public class TextOfGrammarBuilder {
           firstTokenText.equals(PREFIX_START_GRAMMAR_STATEMENT)
               || firstTokenText.equals(PREFIX_TERMINAL_GRAMMAR_STATEMENT)
               || firstTokenText.equals(PREFIX_NONTERMINAL_GRAMMAR_STATEMENT)
-              || firstTokenText.equals(PREFIX_FRAGMENT_GRAMMAR_STATEMENT);
+              || firstTokenText.equals(PREFIX_FRAGMENT_GRAMMAR_STATEMENT)
+              || firstTokenText.equals(PREFIX_START_ROOT_KEY_WORD)
+              || firstTokenText.equals(PREFIX_KEY_WORD_STATEMENT);
       if (isPrefixOfIdentificationStatement && statementTokens.size() != 2) {
         isStatementTokensWrong = true;
       }
@@ -105,6 +111,11 @@ public class TextOfGrammarBuilder {
       languageGrammar.updateStart(contentTokenText);
       return true;
     }
+    // 设置RootKeyWord，该标识语句放在任何状态下都可以，也不影响状态的改变
+    if (firstTokenText.equals(PREFIX_START_ROOT_KEY_WORD)) {
+      languageGrammar.updateRootKeyWord(contentTokenText);
+      return true;
+    }
     // 语法定义状态管理
     if (contentTokenText.equals(BEGINNING_GRAMMAR_DEFINITION)) {
       if (firstTokenText.equals(PREFIX_NONTERMINAL_GRAMMAR_STATEMENT)) {
@@ -116,10 +127,21 @@ public class TextOfGrammarBuilder {
       if (firstTokenText.equals(PREFIX_FRAGMENT_GRAMMAR_STATEMENT)) {
         state = State.TERMINAL_FRAGMENT;
       }
-    } else {
+      if (firstTokenText.equals(PREFIX_KEY_WORD_STATEMENT)) {
+        state = State.KEY_WORD;
+      }
+    } else if (contentTokenText.equals(END_GRAMMAR_DEFINITION)) {
       state = State.NORMAL;
+    } else {
+      throw new AstRuntimeException(
+          String.format(
+              "expect '%s,%s' after %s,error near %s %s.",
+              BEGINNING_GRAMMAR_DEFINITION,
+              END_GRAMMAR_DEFINITION,
+              firstTokenText,
+              firstTokenText,
+              contentTokenText));
     }
-
     return true;
   }
 
@@ -129,20 +151,27 @@ public class TextOfGrammarBuilder {
    * @param statementTokens 从grammarName到;前的内容，同时没有skiptoken,如Newline : NewlineFragment -> skip
    */
   private void createGrammarNode(LinkedList<GrammarToken> statementTokens) {
-    if (state == State.NORMAL || statementTokens.size() < 3) {
-      // 如果是空正则则接受，否则出错
-      if (!(statementTokens.size() == 2
-          && statementTokens.getLast().text.equals(KW_MID_OF_GRAMMAR_DEFINITION))) {
-        StringBuilder errorInfo =
-            new StringBuilder(
-                "statementTokens  must be legal and in grammar node context ,create node of grammar is error in '");
-        for (GrammarToken token : statementTokens) {
-          errorInfo.append(token.text);
-          errorInfo.append(" ");
-        }
-        errorInfo.append("'");
-        throw new AstRuntimeException(errorInfo.toString());
+    // NORMAL状态不能建立语法，出错
+    boolean isWrong = state == State.NORMAL;
+    if (statementTokens.size() < 3) { // 语句太短可能出错
+      if (statementTokens.size() == 2) { // 不是空正则，出错
+        isWrong = isWrong || !statementTokens.getLast().text.equals(KW_MID_OF_GRAMMAR_DEFINITION);
+      } else { // 语句太短出错
+        isWrong = true;
       }
+    }
+
+    // 出错，报异常
+    if (isWrong) {
+      StringBuilder errorInfo =
+          new StringBuilder(
+              "statementTokens  must be legal and in grammar node context ,create node of grammar is error in '");
+      for (GrammarToken token : statementTokens) {
+        errorInfo.append(token.text);
+        errorInfo.append(" ");
+      }
+      errorInfo.append("'");
+      throw new AstRuntimeException(errorInfo.toString());
     }
     Grammar grammar = null;
     switch (state) {
@@ -150,6 +179,7 @@ public class TextOfGrammarBuilder {
         grammar = new NonterminaltGrammar(null);
         break;
       case TERMINAL:
+      case KEY_WORD:
         grammar = new TerminalGrammar(null);
         break;
       case TERMINAL_FRAGMENT:
@@ -190,7 +220,11 @@ public class TextOfGrammarBuilder {
     // text & action
     setTextAndActionOfGrammarNode(grammar, statementTokensIt);
     // add to languageGrammar
-    languageGrammar.addGrammarNode(grammar);
+    if (state == State.KEY_WORD) {
+      languageGrammar.addKeyWord(grammar);
+    } else {
+      languageGrammar.addGrammar(grammar);
+    }
   }
 
   private void setTextAndActionOfGrammarNode(
@@ -243,6 +277,7 @@ public class TextOfGrammarBuilder {
     NORMAL,
     TERMINAL_FRAGMENT,
     TERMINAL,
-    NONTERMINAL
+    NONTERMINAL,
+    KEY_WORD
   }
 }

@@ -8,15 +8,14 @@ bool GrammarCompare::operator()(const Grammar *t1, const Grammar *t2) {
   return t1->compare(*t2);
 }
 
-TokenReducingSymbolInputStream::TokenReducingSymbolInputStream(Grammar **innerGrammars,
-                                                               int countOfInnerGrammars)
+TokenReducingSymbolInputStream::TokenReducingSymbolInputStream(
+    Grammar **innerGrammars, int countOfInnerGrammars)
     : innerGrammars(std::set<Grammar *, GrammarCompare>()),
-      tokenReducingSymbols(nullptr),
-      nextReadIndex(0),
+      tokenReducingSymbols(nullptr), nextReadIndex(0),
       sizeOfTokenReducingSymbols(0) {
-  for(int i = 0 ; i < countOfInnerGrammars;i++){
-    Grammar* grammar = innerGrammars[i];
-    if(grammar->type == GrammarType::TERMINAL){
+  for (int i = 0; i < countOfInnerGrammars; i++) {
+    Grammar *grammar = innerGrammars[i];
+    if (grammar->type == GrammarType::TERMINAL) {
       this->innerGrammars.insert(grammar);
     }
   }
@@ -30,9 +29,7 @@ void TokenReducingSymbolInputStream::clear() {
   nextReadIndex = 0;
 }
 
-TokenReducingSymbolInputStream::~TokenReducingSymbolInputStream() {
-  clear();
-}
+TokenReducingSymbolInputStream::~TokenReducingSymbolInputStream() { clear(); }
 
 void TokenReducingSymbolInputStream::init(std::list<Token *> *sourceTokens) {
   clear();
@@ -46,7 +43,8 @@ void TokenReducingSymbolInputStream::init(std::list<Token *> *sourceTokens) {
   tokenReducingSymbols = new AutomataTmpToken[sizeOfTokenReducingSymbols];
   int indexOfTokenReducingSymbol = 0;
   for (auto token : textTokens) {
-    AutomataTmpToken *automataTmpToken = &tokenReducingSymbols[indexOfTokenReducingSymbol++];
+    AutomataTmpToken *automataTmpToken =
+        &tokenReducingSymbols[indexOfTokenReducingSymbol++];
     automataTmpToken->shallowCopy(token);
     // 使grammar变为context的内部grammar,以适应语法自动机要求
     automataTmpToken->terminal = *innerGrammars.find(&token->terminal);

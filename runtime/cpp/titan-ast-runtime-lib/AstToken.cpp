@@ -4,12 +4,9 @@
 
 #include "AstToken.h"
 
-AstToken::AstToken() : start(0),text(std::string()){
-}
+AstToken::AstToken() : start(0), text(std::string()) {}
 
-AstToken::AstToken(int start, std::string text)
-    : start(start), text(text){
-}
+AstToken::AstToken(int start, std::string text) : start(start), text(text) {}
 
 AstToken::AstToken(const AstToken &token) = default;
 

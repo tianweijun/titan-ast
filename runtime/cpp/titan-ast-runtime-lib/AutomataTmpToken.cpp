@@ -4,21 +4,23 @@
 
 #include "AutomataTmpToken.h"
 
-AutomataTmpToken::AutomataTmpToken() : terminal(nullptr), start(0), text(nullptr), type(TokenType::TEXT) {
-}
+AutomataTmpToken::AutomataTmpToken()
+    : terminal(nullptr), start(0), text(nullptr), type(TokenType::TEXT) {}
 
-AutomataTmpToken::AutomataTmpToken(Grammar *terminal, int start, std::string *text, TokenType type)
-    : terminal(terminal), start(start), text(text), type(type) {
-}
+AutomataTmpToken::AutomataTmpToken(Grammar *terminal, int start,
+                                   std::string *text, TokenType type)
+    : terminal(terminal), start(start), text(text), type(type) {}
 
 AutomataTmpToken::AutomataTmpToken(const AutomataTmpToken &token) = default;
 
 AutomataTmpToken::AutomataTmpToken(AutomataTmpToken &&token) noexcept = default;
 
-AutomataTmpToken &AutomataTmpToken::operator=(const AutomataTmpToken &other) = default;
+AutomataTmpToken &
+AutomataTmpToken::operator=(const AutomataTmpToken &other) = default;
 
 const AutomataTmpToken *AutomataTmpToken::clone() const {
-  auto *token = new AutomataTmpToken(this->terminal, this->start, this->text, this->type);
+  auto *token =
+      new AutomataTmpToken(this->terminal, this->start, this->text, this->type);
   return token;
 }
 

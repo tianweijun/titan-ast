@@ -78,6 +78,13 @@ NewlineFragment
 	;
 ...
 @TerminalFragmentGrammar end ;
+
+@RootKeyWord Identifier ;
+
+@KeyWord begin ;
+If : 'if' ;
+...
+@KeyWord end ;
 ```
 
 java -jar  titan-ast.jar  -grammarFilePath D:/github-pro/titan/titan-ast/test/c/C.grammar -sourceFilePath D:/github-pro/titan/titan-ast/test/c/helloworld.c  --graphicalViewOfAst

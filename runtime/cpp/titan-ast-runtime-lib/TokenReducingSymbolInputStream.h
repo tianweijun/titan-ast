@@ -11,13 +11,14 @@
 #include <set>
 
 class GrammarCompare {
- public:
+public:
   bool operator()(const Grammar *t1, const Grammar *t2);
 };
 
 class TokenReducingSymbolInputStream {
- public:
-  TokenReducingSymbolInputStream(Grammar **innerGrammars, int countOfInnerGrammars);
+public:
+  TokenReducingSymbolInputStream(Grammar **innerGrammars,
+                                 int countOfInnerGrammars);
   ~TokenReducingSymbolInputStream();
 
   int sizeOfTokenReducingSymbols;
@@ -30,8 +31,8 @@ class TokenReducingSymbolInputStream {
   void clear();
   void init(std::list<Token *> *sourceTokens);
 
- private:
+private:
   std::set<Grammar *, GrammarCompare> innerGrammars;
 };
 
-#endif//AST__TOKENREDUCINGSYMBOLINPUTSTREAM_H_
+#endif // AST__TOKENREDUCINGSYMBOLINPUTSTREAM_H_

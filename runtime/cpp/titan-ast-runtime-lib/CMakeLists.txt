@@ -42,5 +42,5 @@ add_library(titan-ast-runtime-lib SHARED Ast.cpp Ast.h
         TokenReducingSymbolInputStream.cpp TokenReducingSymbolInputStream.h
         BacktrackingBottomUpBranch.cpp BacktrackingBottomUpBranch.h ReducingSymbol.cpp
         ReducingSymbol.h ThreadLocalContext.h AstToken.h AstToken.cpp
-        Runtime.h
+        Runtime.h KeyWordAutomata.cpp KeyWordAutomata.h
         )

@@ -12,7 +12,7 @@
 using byte = uint8_t;
 
 class TokenDfaState {
- public:
+public:
   TokenDfaState();
   TokenDfaState(const TokenDfaState &tokenDfaState) = delete;
   TokenDfaState(const TokenDfaState &&tokenDfaState) = delete;
@@ -26,4 +26,4 @@ class TokenDfaState {
   std::map<byte, TokenDfaState *> edges;
 };
 
-#endif//AST__TOKENDFASTATE_H_
+#endif // AST__TOKENDFASTATE_H_

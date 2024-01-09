@@ -7,11 +7,11 @@
 #include <string>
 
 #include "Grammar.h"
-#include "TokenType.h"
 #include "Runtime.h"
+#include "TokenType.h"
 
 class DLL_PUBLIC Token {
- public:
+public:
   Token();
   Token(Grammar terminal, int start, std::string text, TokenType type);
   Token(const Token &token);
@@ -26,4 +26,4 @@ class DLL_PUBLIC Token {
   TokenType type;
 };
 
-#endif//AST__RUNTIME__TOKEN_H_
+#endif // AST__RUNTIME__TOKEN_H_

@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarType;
 import titan.ast.grammar.TerminalGrammar;
 import titan.ast.grammar.syntax.ProductionRule;
+import titan.ast.grammar.token.KeyWordAutomata;
 import titan.ast.runtime.AstRuntimeException;
 import titan.ast.util.StringUtils;
 
@@ -34,10 +36,10 @@ public class PersistentDataFile {
     this.persistentData = persistentData;
     try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
       this.outputStream = fileOutputStream;
-      persistentData.initStringPool();
 
       writeStringPool();
       writeGrammars();
+      writeKeyWordAutomata();
       writeTokenDfaStates();
       writeInt(persistentData.startGrammar());
       writeProductionRules();
@@ -83,6 +85,33 @@ public class PersistentDataFile {
     }
   }
 
+  private void writeKeyWordAutomata() {
+    LinkedHashMap<Grammar, Integer> grammarIntegerMap = persistentData.grammarIntegerMap;
+    KeyWordAutomata keyWordAutomata = AstContext.get().languageGrammar.keyWordAutomata;
+
+    writeInt(keyWordAutomata.emptyOrNot);
+
+    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.EMPTY) {
+      return;
+    }
+
+    writeInt(grammarIntegerMap.get(keyWordAutomata.rootKeyWord));
+
+    int keyWordsSize = keyWordAutomata.textTerminalMap.size();
+    writeInt(keyWordsSize);
+
+    LinkedHashMap<String, Integer> stringPool = persistentData.stringPool;
+    for (Entry<String, Grammar> entry : keyWordAutomata.textTerminalMap.entrySet()) {
+      String text = entry.getKey();
+      int intOfText = stringPool.get(text);
+      writeInt(intOfText);
+
+      Grammar terminal = entry.getValue();
+      Integer intOfTerminal = grammarIntegerMap.get(terminal);
+      writeInt(intOfTerminal);
+    }
+  }
+
   private void writeGrammars() {
     persistentData.initGrammars();
     Set<Grammar> grammars = persistentData.grammarIntegerMap.keySet();
@@ -101,6 +130,7 @@ public class PersistentDataFile {
   }
 
   private void writeStringPool() {
+    persistentData.initStringPool();
     Set<String> strings = persistentData.stringPool.keySet();
     writeInt(strings.size());
     for (String str : strings) {

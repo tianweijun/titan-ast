@@ -9,13 +9,15 @@
 using byte = uint8_t;
 
 class ByteBufferedInputStream {
- public:
+public:
   ByteBufferedInputStream();
-  ByteBufferedInputStream(const ByteBufferedInputStream &byteBufferedInputStream) = delete;
-  ByteBufferedInputStream(const ByteBufferedInputStream &&byteBufferedInputStream) = delete;
+  ByteBufferedInputStream(
+      const ByteBufferedInputStream &byteBufferedInputStream) = delete;
+  ByteBufferedInputStream(
+      const ByteBufferedInputStream &&byteBufferedInputStream) = delete;
   ~ByteBufferedInputStream();
 
- public:
+public:
   void init(const std::string *sourceFilePath);
   int read();
   bool fill();
@@ -24,17 +26,17 @@ class ByteBufferedInputStream {
   void skip(int skipSteps);
   void reset();
   void mark();
-  int doReadBuffer(byte* readBuffer,int offset,int len);
+  int doReadBuffer(byte *readBuffer, int offset, int len);
   int doRead();
   void clear();
 
- public:
+public:
   int nextReadIndex;
 
- private:
+private:
   const static int standardBufferCapacity;
 
- private:
+private:
   int eof;
   int nextPos;
   int count;
@@ -44,4 +46,4 @@ class ByteBufferedInputStream {
   std::ifstream byteInputStream;
 };
 
-#endif//AST__BYTEBUFFEREDINPUTSTREAM_H_
+#endif // AST__BYTEBUFFEREDINPUTSTREAM_H_

@@ -14,7 +14,7 @@
 #include <string>
 
 class AutomataTmpAst {
- public:
+public:
   AutomataTmpAst(const Grammar *grammar, const std::string *alias);
   explicit AutomataTmpAst(const AutomataTmpToken *token);
   AutomataTmpAst(const AutomataTmpAst &automataTmpAst) = delete;
@@ -35,4 +35,4 @@ class AutomataTmpAst {
   Ast *toAst() const;
 };
 
-#endif//AST__AUTOMATATMPAST_H_
+#endif // AST__AUTOMATATMPAST_H_

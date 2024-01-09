@@ -6,11 +6,11 @@
 #define AST__RUNTIME__GRAMMAR_H_
 #include "GrammarAction.h"
 #include "GrammarType.h"
-#include <string>
 #include "Runtime.h"
+#include <string>
 
-class  DLL_PUBLIC Grammar {
- public:
+class DLL_PUBLIC Grammar {
+public:
   Grammar();
   Grammar(std::string name, GrammarType type, GrammarAction action);
   Grammar(const Grammar &grammar);
@@ -31,8 +31,8 @@ enum class LookaheadMatchingMode : int {
   ACCEPT_WHEN_FIRST_ARRIVE_AT_TERMINAL_STATE = 2
 };
 
-class DLL_PUBLIC TerminalGrammar : public Grammar{
- public :
+class DLL_PUBLIC TerminalGrammar : public Grammar {
+public:
   TerminalGrammar();
   TerminalGrammar(std::string name, GrammarType type, GrammarAction action);
   TerminalGrammar(const TerminalGrammar &grammar);
@@ -41,18 +41,16 @@ class DLL_PUBLIC TerminalGrammar : public Grammar{
   ~TerminalGrammar();
 
   LookaheadMatchingMode lookaheadMatchingMode;
-
 };
 
-class DLL_PUBLIC NonterminaltGrammar : public Grammar{
- public :
+class DLL_PUBLIC NonterminaltGrammar : public Grammar {
+public:
   NonterminaltGrammar();
   NonterminaltGrammar(std::string name, GrammarType type, GrammarAction action);
   NonterminaltGrammar(const NonterminaltGrammar &grammar);
   NonterminaltGrammar(NonterminaltGrammar &&grammar) noexcept;
   NonterminaltGrammar &operator=(const NonterminaltGrammar &other);
   ~NonterminaltGrammar();
-
 };
 
-#endif//AST__RUNTIME__GRAMMAR_H_
+#endif // AST__RUNTIME__GRAMMAR_H_

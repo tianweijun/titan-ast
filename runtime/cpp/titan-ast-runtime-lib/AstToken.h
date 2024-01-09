@@ -4,11 +4,11 @@
 
 #ifndef AST__RUNTIME_RUNTIME_ASTTOKEN_H_
 #define AST__RUNTIME_RUNTIME_ASTTOKEN_H_
-#include <string>
 #include "Runtime.h"
+#include <string>
 
 class DLL_PUBLIC AstToken {
- public:
+public:
   AstToken();
   AstToken(int start, std::string text);
   AstToken(const AstToken &token);
@@ -21,4 +21,4 @@ class DLL_PUBLIC AstToken {
   std::string text;
 };
 
-#endif//AST__RUNTIME_RUNTIME_ASTTOKEN_H_
+#endif // AST__RUNTIME_RUNTIME_ASTTOKEN_H_

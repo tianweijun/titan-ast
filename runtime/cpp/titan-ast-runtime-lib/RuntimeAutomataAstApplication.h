@@ -6,14 +6,16 @@
 #define AST__RUNTIME__RUNTIMEAUTOMATAASTAPPLICATION_H_
 #include "Ast.h"
 #include "PersistentAutomataAstApplication.h"
-#include <string>
 #include "Runtime.h"
+#include <string>
 
 class DLL_PUBLIC RuntimeAutomataAstApplication {
- public:
+public:
   RuntimeAutomataAstApplication();
-  RuntimeAutomataAstApplication(const RuntimeAutomataAstApplication &runtimeAutomataAstApplication) = delete;
-  RuntimeAutomataAstApplication(const RuntimeAutomataAstApplication &&runtimeAutomataAstApplication) = delete;
+  RuntimeAutomataAstApplication(const RuntimeAutomataAstApplication
+                                    &runtimeAutomataAstApplication) = delete;
+  RuntimeAutomataAstApplication(const RuntimeAutomataAstApplication
+                                    &&runtimeAutomataAstApplication) = delete;
   ~RuntimeAutomataAstApplication();
 
   void setContext(const std::string *automataFilePath);
@@ -22,8 +24,8 @@ class DLL_PUBLIC RuntimeAutomataAstApplication {
 
   const std::list<Ast *> *buildAsts(const std::string *sourceCodeFilePath);
 
- private:
+private:
   const PersistentAutomataAstApplication *persistentAutomataAstApplication;
 };
 
-#endif//AST__RUNTIME__RUNTIMEAUTOMATAASTAPPLICATION_H_
+#endif // AST__RUNTIME__RUNTIMEAUTOMATAASTAPPLICATION_H_

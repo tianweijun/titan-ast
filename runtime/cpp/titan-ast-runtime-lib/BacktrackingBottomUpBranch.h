@@ -17,10 +17,12 @@ enum class BacktrackingBottomUpBranchStatus : int {
 };
 
 class BacktrackingBottomUpBranch {
- public:
+public:
   BacktrackingBottomUpBranch();
-  BacktrackingBottomUpBranch(const BacktrackingBottomUpBranch &backtrackingBottomUpBranch) = delete;
-  BacktrackingBottomUpBranch(const BacktrackingBottomUpBranch &&backtrackingBottomUpBranch) = delete;
+  BacktrackingBottomUpBranch(
+      const BacktrackingBottomUpBranch &backtrackingBottomUpBranch) = delete;
+  BacktrackingBottomUpBranch(
+      const BacktrackingBottomUpBranch &&backtrackingBottomUpBranch) = delete;
   ~BacktrackingBottomUpBranch();
 
   BacktrackingBottomUpBranch *clone() const;
@@ -32,7 +34,6 @@ class BacktrackingBottomUpBranch {
 
   BacktrackingBottomUpBranchStatus status;
   std::list<ReducingSymbol *> reducingSymbols;
-
 };
 
-#endif//AST__BACKTRACKINGBOTTOMUPBRANCH_H_
+#endif // AST__BACKTRACKINGBOTTOMUPBRANCH_H_

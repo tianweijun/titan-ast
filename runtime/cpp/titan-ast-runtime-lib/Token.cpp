@@ -4,12 +4,12 @@
 
 #include "Token.h"
 
-Token::Token() : terminal(Grammar()), start(0),text(std::string()), type(TokenType::TEXT) {
-}
+Token::Token()
+    : terminal(Grammar()), start(0), text(std::string()),
+      type(TokenType::TEXT) {}
 
 Token::Token(Grammar terminal, int start, std::string text, TokenType type)
-    : terminal(terminal), start(start), text(text), type(type) {
-}
+    : terminal(terminal), start(start), text(text), type(type) {}
 
 Token::Token(const Token &token) = default;
 

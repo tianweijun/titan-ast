@@ -20,6 +20,7 @@ import titan.ast.target.TokenType;
  */
 public class DfaTokenAutomata {
 
+  KeyWordAutomata keyWordAutomata;
   TokenDfa dfa;
   int eof = -1;
   ByteBufferedInputStream byteBufferedInputStream;
@@ -31,9 +32,11 @@ public class DfaTokenAutomata {
   /**
    * 初始化oneTokenStringBuilder、eof、dfa.
    *
+   * @param keyWordAutomata keyWord自动机
    * @param dfa 识别token的 确定有限状态自动机
    */
-  public DfaTokenAutomata(TokenDfa dfa) {
+  public DfaTokenAutomata(KeyWordAutomata keyWordAutomata, TokenDfa dfa) {
+    this.keyWordAutomata = keyWordAutomata;
     this.dfa = dfa;
     this.oneTokenStringBuilder = new StringBuilder();
   }
@@ -75,7 +78,7 @@ public class DfaTokenAutomata {
       throw e;
     }
 
-    return ret;
+    return keyWordAutomata.buildToken(ret);
   }
 
   /**

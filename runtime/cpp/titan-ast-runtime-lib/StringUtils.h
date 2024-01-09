@@ -8,10 +8,10 @@
 #include <string>
 
 class StringUtils {
- private:
+private:
   StringUtils() = default;
 
- public:
+public:
   StringUtils(const StringUtils &stringUtils) = delete;
   StringUtils(const StringUtils &&stringUtils) = delete;
   static bool isEmpty(const std::string *str);
@@ -20,4 +20,4 @@ class StringUtils {
   static bool isNotBlank(const std::string *str);
 };
 
-#endif//AST__STRINGUTILS_H_
+#endif // AST__STRINGUTILS_H_

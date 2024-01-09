@@ -6,12 +6,13 @@
 #define AST__PERSISTENTOBJECT_H_
 
 #include "Grammar.h"
+#include "KeyWordAutomata.h"
 #include "PersistentData.h"
 #include "SyntaxDfa.h"
 #include "TokenDfa.h"
 
 class PersistentObject {
- public:
+public:
   PersistentObject();
   explicit PersistentObject(PersistentData *persistentData);
   PersistentObject(const PersistentObject &persistentObject) = delete;
@@ -20,19 +21,21 @@ class PersistentObject {
 
   void init();
 
- private:
+private:
   void initStringPool() const;
   void initGrammars() const;
+  void initKeyWordAutomata();
   void initTokenDfa();
   void initStartGrammar();
   void initProductionRules() const;
   void initAstDfa();
 
- public:
-  PersistentData *persistentData{};
-  const TokenDfa *tokenDfa{};
-  const SyntaxDfa *astDfa{};
-  const Grammar *startGrammar{};
+public:
+  PersistentData *persistentData;
+  KeyWordAutomata *keyWordAutomata;
+  const TokenDfa *tokenDfa;
+  const SyntaxDfa *astDfa;
+  const Grammar *startGrammar;
 };
 
-#endif//AST__PERSISTENTOBJECT_H_
+#endif // AST__PERSISTENTOBJECT_H_

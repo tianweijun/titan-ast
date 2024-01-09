@@ -141,8 +141,7 @@ public class ProductionRuleBuilder {
 
   private RegExp cloneSequenceCharsOrOneCharOptionCharsetUnitRegExp(RegExp unitRegExp) {
     if (unitRegExp.type == RegExp.RegExpType.UNIT
-        && (unitRegExp.unitType == RegExp.RegExpUnitType.SEQUENCE_CHARS
-            || unitRegExp.unitType == RegExp.RegExpUnitType.ONE_CHAR_OPTION_CHARSET)) {
+        && unitRegExp.unitType == RegExp.RegExpUnitType.SEQUENCE_CHARS) {
       // 复制的字段和RegExp的equals字段一样
       RegExp cloner = new RegExp();
       cloner.type = unitRegExp.type;

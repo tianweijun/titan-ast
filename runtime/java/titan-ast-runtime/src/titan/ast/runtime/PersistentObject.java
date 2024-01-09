@@ -6,6 +6,7 @@ package titan.ast.runtime;
  * @author tian wei jun
  */
 public class PersistentObject {
+  KeyWordAutomata keyWordAutomata = null;
   TokenDfa tokenDfa = null;
   Grammar startGrammar = null;
   SyntaxDfa astDfa = null;
@@ -22,6 +23,7 @@ public class PersistentObject {
       // 按文件组织顺序获得各个部分数据，每个部分获取一次
       initStringPool();
       initGrammars();
+      initKeyWordAutomata();
       initTokenDfa();
       initStartGrammar();
       initProductionRules();
@@ -46,6 +48,10 @@ public class PersistentObject {
 
   private void initTokenDfa() {
     tokenDfa = persistentData.getTokenDfaByInputStream();
+  }
+
+  private void initKeyWordAutomata() {
+    keyWordAutomata = persistentData.getKeyWordAutomataByInputStream();
   }
 
   private void initGrammars() {

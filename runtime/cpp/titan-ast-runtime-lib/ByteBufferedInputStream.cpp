@@ -7,10 +7,9 @@
 
 const int ByteBufferedInputStream::standardBufferCapacity = 256;
 
-ByteBufferedInputStream::ByteBufferedInputStream() : nextReadIndex(0), eof(-1), nextPos(0),
-                                                     count(0), markPos(-1), sizeOfBuffer(0),
-                                                     buffer(nullptr),byteInputStream(std::ifstream()) {
-}
+ByteBufferedInputStream::ByteBufferedInputStream()
+    : nextReadIndex(0), eof(-1), nextPos(0), count(0), markPos(-1),
+      sizeOfBuffer(0), buffer(nullptr), byteInputStream(std::ifstream()) {}
 
 ByteBufferedInputStream::~ByteBufferedInputStream() {
   delete[] buffer;
@@ -37,19 +36,19 @@ int ByteBufferedInputStream::read() {
  * 只有当读完缓冲后才能调用，其他时候不能调用，只能在read方法中调用.
  */
 bool ByteBufferedInputStream::fill() {
-  if (markPos == eof) {// 重新填入
+  if (markPos == eof) { // 重新填入
     return fillByNoMark();
-  } else if (markPos == 0) {// 扩容
+  } else if (markPos == 0) { // 扩容
     return fillByExpansion();
-  } else {// mark>0 && mark<=count 移动
+  } else { // mark>0 && mark<=count 移动
     for (int indexOfBuffer = markPos; indexOfBuffer < count; indexOfBuffer++) {
       buffer[indexOfBuffer - markPos] = buffer[indexOfBuffer];
     }
     int oldCount = count - markPos;
     int newCount = oldCount;
 
-    if(oldCount < sizeOfBuffer) {
-      int countOfRead = doReadBuffer(buffer,oldCount,sizeOfBuffer-oldCount);
+    if (oldCount < sizeOfBuffer) {
+      int countOfRead = doReadBuffer(buffer, oldCount, sizeOfBuffer - oldCount);
       newCount += countOfRead;
     }
 
@@ -68,8 +67,8 @@ bool ByteBufferedInputStream::fillByExpansion() {
     nBuffer[i] = buffer[i];
   }
   int newCount = oldCount;
-  //extend read
-  int countOfRead = doReadBuffer(nBuffer,oldCount,nsz-oldCount);
+  // extend read
+  int countOfRead = doReadBuffer(nBuffer, oldCount, nsz - oldCount);
   newCount += countOfRead;
 
   delete[] this->buffer;
@@ -88,11 +87,11 @@ bool ByteBufferedInputStream::fillByNoMark() {
   nextPos = 0;
   count = 0;
 
-  buffer[0] = (byte) read;
+  buffer[0] = (byte)read;
   ++count;
 
-  if(count < sizeOfBuffer){
-    int countOfRead = doReadBuffer(buffer,count,sizeOfBuffer-count);
+  if (count < sizeOfBuffer) {
+    int countOfRead = doReadBuffer(buffer, count, sizeOfBuffer - count);
     count += countOfRead;
   }
 
@@ -114,11 +113,10 @@ void ByteBufferedInputStream::reset() {
   markPos = eof;
 }
 
-void ByteBufferedInputStream::mark() {
-  this->markPos = nextPos;
-}
+void ByteBufferedInputStream::mark() { this->markPos = nextPos; }
 
-int ByteBufferedInputStream::doReadBuffer(byte* readBuffer,int offset,int len) {
+int ByteBufferedInputStream::doReadBuffer(byte *readBuffer, int offset,
+                                          int len) {
   char *base = reinterpret_cast<char *>(readBuffer + offset);
   int countOfRead = byteInputStream.read(base, len).gcount();
   if (byteInputStream.bad() || countOfRead <= 0) {
@@ -135,7 +133,7 @@ int ByteBufferedInputStream::doRead() {
   return read;
 }
 
-void ByteBufferedInputStream::clear(){
+void ByteBufferedInputStream::clear() {
   nextReadIndex = 0;
   eof = -1;
   nextPos = 0;
@@ -161,8 +159,8 @@ void ByteBufferedInputStream::init(const std::string *sourceFilePath) {
   }
   byteInputStream.open(*sourceFilePath, std::ios::in | std::ios::binary);
   if (!byteInputStream.is_open()) {
-    AstRuntimeExceptionResolver::throwException(
-        AstRuntimeException(AstRuntimeExceptionCode::IO_ERROR,
-                                     "open source File error,path:'" + *sourceFilePath + "'"));
+    AstRuntimeExceptionResolver::throwException(AstRuntimeException(
+        AstRuntimeExceptionCode::IO_ERROR,
+        "open source File error,path:'" + *sourceFilePath + "'"));
   }
 }

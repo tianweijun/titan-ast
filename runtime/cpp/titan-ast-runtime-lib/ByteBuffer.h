@@ -10,11 +10,11 @@
 using byte = unsigned char;
 
 class ByteBuffer {
- public:
+public:
   explicit ByteBuffer(int capacity);
   ByteBuffer(int capacity, bool isBigEndian);
   ByteBuffer(const ByteBuffer &byteBuffer);
-  ByteBuffer(ByteBuffer &&byteBuffer) noexcept ;
+  ByteBuffer(ByteBuffer &&byteBuffer) noexcept;
   ~ByteBuffer();
 
   void setPosition(int pos);
@@ -30,8 +30,8 @@ class ByteBuffer {
   int position;
   byte *buffer;
 
- private:
+private:
   void extendBuffer();
 };
 
-#endif//AST__BYTEBUFFER_H_
+#endif // AST__BYTEBUFFER_H_

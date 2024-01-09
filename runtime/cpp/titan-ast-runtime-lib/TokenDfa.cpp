@@ -4,9 +4,9 @@
 
 #include "TokenDfa.h"
 
-TokenDfa::TokenDfa(const TokenDfaState *start, const TokenDfaState **states, int sizeOfStates)
-    : start(start), states(states), sizeOfStates(sizeOfStates) {
-}
+TokenDfa::TokenDfa(const TokenDfaState *start, const TokenDfaState **states,
+                   int sizeOfStates)
+    : start(start), states(states), sizeOfStates(sizeOfStates) {}
 
 TokenDfa::~TokenDfa() {
   for (int i = 0; i < sizeOfStates; i++) {

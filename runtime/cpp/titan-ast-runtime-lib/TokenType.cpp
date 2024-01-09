@@ -6,12 +6,12 @@
 TokenType TokenTypeNamespace::getByGrammarAction(GrammarAction grammarAction) {
   TokenType res = TokenType::TEXT;
   switch (grammarAction) {
-    case GrammarAction::SKIP:
-      res = TokenType::SKIP;
-      break;
-    case GrammarAction::TEXT:
-    default:
-      res = TokenType::TEXT;
+  case GrammarAction::SKIP:
+    res = TokenType::SKIP;
+    break;
+  case GrammarAction::TEXT:
+  default:
+    res = TokenType::TEXT;
   }
   return res;
 }

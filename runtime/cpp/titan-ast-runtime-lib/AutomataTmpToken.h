@@ -5,15 +5,16 @@
 #ifndef AST__TEST_RUNTIME_AUTOMATATMPTOKEN_H_
 #define AST__TEST_RUNTIME_AUTOMATATMPTOKEN_H_
 
+#include "AstToken.h"
 #include "Grammar.h"
 #include "Token.h"
 #include "TokenType.h"
-#include "AstToken.h"
 
 class AutomataTmpToken {
- public:
+public:
   AutomataTmpToken();
-  AutomataTmpToken(Grammar *terminal, int start, std::string *text, TokenType type);
+  AutomataTmpToken(Grammar *terminal, int start, std::string *text,
+                   TokenType type);
   AutomataTmpToken(const AutomataTmpToken &token);
   AutomataTmpToken(AutomataTmpToken &&token) noexcept;
   AutomataTmpToken &operator=(const AutomataTmpToken &a);
@@ -29,4 +30,4 @@ class AutomataTmpToken {
   TokenType type;
 };
 
-#endif//AST__TEST_RUNTIME_AUTOMATATMPTOKEN_H_
+#endif // AST__TEST_RUNTIME_AUTOMATATMPTOKEN_H_

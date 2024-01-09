@@ -10,8 +10,9 @@
 class SyntaxDfaState;
 
 class SyntaxDfa {
- public:
-  SyntaxDfa(const SyntaxDfaState *start, const SyntaxDfaState **states, const int sizeOfStates);
+public:
+  SyntaxDfa(const SyntaxDfaState *start, const SyntaxDfaState **states,
+            const int sizeOfStates);
   SyntaxDfa(const SyntaxDfa &syntaxDfa) = delete;
   SyntaxDfa(const SyntaxDfa &&syntaxDfa) = delete;
   ~SyntaxDfa();
@@ -21,4 +22,4 @@ class SyntaxDfa {
   const int sizeOfStates;
 };
 
-#endif//AST__SYNTAXDFA_H_
+#endif // AST__SYNTAXDFA_H_

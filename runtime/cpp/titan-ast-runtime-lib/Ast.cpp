@@ -5,22 +5,17 @@
 #include "Ast.h"
 #include "StringUtils.h"
 
-Ast::Ast(Grammar grammar) : grammar(grammar),
-                            alias(std::string()),
-                            token(AstToken()),
-                            children(std::list<Ast *>()) {
-}
+Ast::Ast(Grammar grammar)
+    : grammar(grammar), alias(std::string()), token(AstToken()),
+      children(std::list<Ast *>()) {}
 
-Ast::Ast(Grammar grammar, std::string alias) : grammar(grammar),
-                                               alias(alias),
-                                               token(AstToken()),
-                                               children(std::list<Ast *>()) {
-}
+Ast::Ast(Grammar grammar, std::string alias)
+    : grammar(grammar), alias(alias), token(AstToken()),
+      children(std::list<Ast *>()) {}
 
-Ast::Ast(const Token &token) : grammar(token.terminal), alias(std::string()),
-                               token(AstToken()),
-                               children(std::list<Ast *>()) {
-}
+Ast::Ast(const Token &token)
+    : grammar(token.terminal), alias(std::string()), token(AstToken()),
+      children(std::list<Ast *>()) {}
 
 Ast::~Ast() {
   for (auto ast : children) {

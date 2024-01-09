@@ -11,4 +11,4 @@ enum class GrammarType : int {
   NONTERMINAL = 2
 };
 
-#endif//AST__RUNTIME__GRAMMARTYPE_H_
+#endif // AST__RUNTIME__GRAMMARTYPE_H_

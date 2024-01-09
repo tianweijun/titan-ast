@@ -10,7 +10,7 @@
 #include "SyntaxDfaState.h"
 
 class ReducingSymbol {
- public:
+public:
   ReducingSymbol();
   ReducingSymbol(const ReducingSymbol &reducingSymbol) = delete;
   ReducingSymbol(const ReducingSymbol &&reducingSymbol) = delete;
@@ -33,4 +33,4 @@ class ReducingSymbol {
   size_t hashCode() const;
 };
 
-#endif//AST__REDUCINGSYMBOL_H_
+#endif // AST__REDUCINGSYMBOL_H_

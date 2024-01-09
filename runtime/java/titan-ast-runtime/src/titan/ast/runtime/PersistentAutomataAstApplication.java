@@ -25,7 +25,8 @@ public class PersistentAutomataAstApplication implements Cloneable {
 
   public void buildContext(PersistentData persistentData) {
     persistentObject = new PersistentObject(persistentData);
-    dfaTokenAutomata = new DfaTokenAutomata(persistentObject.tokenDfa);
+    dfaTokenAutomata = new DfaTokenAutomata(persistentObject.keyWordAutomata,
+        persistentObject.tokenDfa);
     astAutomata =
         new BacktrackingBottomUpAstAutomata(persistentObject.astDfa, persistentObject.startGrammar);
   }
@@ -59,7 +60,8 @@ public class PersistentAutomataAstApplication implements Cloneable {
       throw new AstRuntimeException(e);
     }
     app.persistentObject = this.persistentObject;
-    dfaTokenAutomata = new DfaTokenAutomata(persistentObject.tokenDfa);
+    dfaTokenAutomata = new DfaTokenAutomata(persistentObject.keyWordAutomata,
+        persistentObject.tokenDfa);
     astAutomata =
         new BacktrackingBottomUpAstAutomata(persistentObject.astDfa, persistentObject.startGrammar);
     return app;

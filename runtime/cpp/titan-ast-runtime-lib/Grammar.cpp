@@ -4,12 +4,12 @@
 
 #include "Grammar.h"
 
-Grammar::Grammar() : name(std::string()), type(GrammarType::TERMINAL), action(GrammarAction::TEXT) {
-}
+Grammar::Grammar()
+    : name(std::string()), type(GrammarType::TERMINAL),
+      action(GrammarAction::TEXT) {}
 
 Grammar::Grammar(std::string name, GrammarType type, GrammarAction action)
-    : name(name), type(type), action(action) {
-}
+    : name(name), type(type), action(action) {}
 
 Grammar::Grammar(const Grammar &grammar) {
   this->name = grammar.name;
@@ -31,7 +31,7 @@ bool Grammar::compare(const Grammar &o) const {
   if (type != o.type) {
     return type < o.type;
   }
-  return name.compare(o.name) < 0;
+  return name < o.name;
 }
 
 bool Grammar::equals(const Grammar &o) const {
@@ -40,12 +40,15 @@ bool Grammar::equals(const Grammar &o) const {
 
 // ------------------TerminalGrammar----------------------
 
-TerminalGrammar::TerminalGrammar() : Grammar(),lookaheadMatchingMode(LookaheadMatchingMode::GREEDINESS) {
+TerminalGrammar::TerminalGrammar()
+    : Grammar(), lookaheadMatchingMode(LookaheadMatchingMode::GREEDINESS) {
   this->type = GrammarType::TERMINAL;
 }
 
-TerminalGrammar::TerminalGrammar(std::string name, GrammarType type, GrammarAction action)
-    : Grammar(name,type,action),lookaheadMatchingMode(LookaheadMatchingMode::GREEDINESS) {
+TerminalGrammar::TerminalGrammar(std::string name, GrammarType type,
+                                 GrammarAction action)
+    : Grammar(name, type, action),
+      lookaheadMatchingMode(LookaheadMatchingMode::GREEDINESS) {
   this->type = GrammarType::TERMINAL;
 }
 
@@ -53,7 +56,8 @@ TerminalGrammar::TerminalGrammar(const TerminalGrammar &grammar) = default;
 
 TerminalGrammar::TerminalGrammar(TerminalGrammar &&grammar) noexcept = default;
 
-TerminalGrammar &TerminalGrammar::operator=(const TerminalGrammar &other) = default;
+TerminalGrammar &
+TerminalGrammar::operator=(const TerminalGrammar &other) = default;
 
 TerminalGrammar::~TerminalGrammar() = default;
 
@@ -62,15 +66,19 @@ NonterminaltGrammar::NonterminaltGrammar() : Grammar() {
   this->type = GrammarType::NONTERMINAL;
 }
 
-NonterminaltGrammar::NonterminaltGrammar(std::string name, GrammarType type, GrammarAction action)
-    : Grammar(name,type,action) {
+NonterminaltGrammar::NonterminaltGrammar(std::string name, GrammarType type,
+                                         GrammarAction action)
+    : Grammar(name, type, action) {
   this->type = GrammarType::NONTERMINAL;
 }
 
-NonterminaltGrammar::NonterminaltGrammar(const NonterminaltGrammar &grammar) = default;
+NonterminaltGrammar::NonterminaltGrammar(const NonterminaltGrammar &grammar) =
+    default;
 
-NonterminaltGrammar::NonterminaltGrammar(NonterminaltGrammar &&grammar) noexcept = default;
+NonterminaltGrammar::NonterminaltGrammar(
+    NonterminaltGrammar &&grammar) noexcept = default;
 
-NonterminaltGrammar &NonterminaltGrammar::operator=(const NonterminaltGrammar &other) = default;
+NonterminaltGrammar &
+NonterminaltGrammar::operator=(const NonterminaltGrammar &other) = default;
 
 NonterminaltGrammar::~NonterminaltGrammar() = default;

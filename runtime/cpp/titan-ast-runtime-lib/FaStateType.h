@@ -13,10 +13,10 @@ enum class FaStateEnumType : int {
 };
 
 class FaStateType {
- public:
+public:
   static int appendState(int state, FaStateEnumType appendState);
   static int removeState(int state, FaStateEnumType removeState);
   static bool isClosingTag(int state);
 };
 
-#endif//AST__FASTATETYPE_H_
+#endif // AST__FASTATETYPE_H_

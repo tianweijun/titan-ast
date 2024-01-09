@@ -4,12 +4,11 @@
 
 #include "SyntaxDfaState.h"
 
-SyntaxDfaState::SyntaxDfaState() : type(0),
-                                   edges(std::map<const Grammar *, SyntaxDfaState *>()),
-                                   closingProductionRules(std::list<ProductionRule *>()) {
-}
+SyntaxDfaState::SyntaxDfaState()
+    : type(0), edges(std::map<const Grammar *, SyntaxDfaState *>()),
+      closingProductionRules(std::list<ProductionRule *>()) {}
 
-//edges grammar delete by PersistentData.gammars
-//edges SyntaxDfaState delete by dfa
-//closingProductionRules delete by  PersistentData.productionRules
+// edges grammar delete by PersistentData.gammars
+// edges SyntaxDfaState delete by dfa
+// closingProductionRules delete by  PersistentData.productionRules
 SyntaxDfaState::~SyntaxDfaState() = default;

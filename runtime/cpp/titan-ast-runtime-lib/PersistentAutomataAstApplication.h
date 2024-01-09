@@ -15,20 +15,26 @@
 #include <string>
 
 class PersistentAutomataAstApplication {
- public:
+public:
   PersistentAutomataAstApplication();
-  explicit PersistentAutomataAstApplication(const std::string *persistentDataFilePath);
-  PersistentAutomataAstApplication(const PersistentAutomataAstApplication &persistentAutomataAstApplication) = delete;
-  PersistentAutomataAstApplication(const PersistentAutomataAstApplication &&persistentAutomataAstApplication) = delete;
+  explicit PersistentAutomataAstApplication(
+      const std::string *persistentDataFilePath);
+  PersistentAutomataAstApplication(
+      const PersistentAutomataAstApplication
+          &persistentAutomataAstApplication) = delete;
+  PersistentAutomataAstApplication(
+      const PersistentAutomataAstApplication
+          &&persistentAutomataAstApplication) = delete;
   ~PersistentAutomataAstApplication();
 
   void buildContext(const std::string *persistentDataFilePath);
   const Ast *buildAst(const std::string *sourceCodeFilePath) const;
   const PersistentAutomataAstApplication *clone() const;
 
-  const std::list<Ast *> *buildAsts(const std::string *sourceCodeFilePath) const;
+  const std::list<Ast *> *
+  buildAsts(const std::string *sourceCodeFilePath) const;
 
- private:
+private:
   std::shared_ptr<PersistentObject> persistentObject;
   DfaTokenAutomata *dfaTokenAutomata;
   BacktrackingBottomUpAstAutomata *astAutomata;
@@ -36,4 +42,4 @@ class PersistentAutomataAstApplication {
   static std::mutex cloneLock;
 };
 
-#endif//AST__RUNTIME__PERSISTENTAUTOMATAASTAPPLICATION_H_
+#endif // AST__RUNTIME__PERSISTENTAUTOMATAASTAPPLICATION_H_

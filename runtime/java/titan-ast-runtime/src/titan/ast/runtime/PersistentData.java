@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.HashMap;
 
 /**
  * PersistentData对应在文件中的对象.
@@ -99,6 +100,39 @@ public class PersistentData {
       default:
     }
     return grammar;
+  }
+
+  /**
+   * 只能调用一次.
+   *
+   * @return
+   */
+  public KeyWordAutomata getKeyWordAutomataByInputStream() {
+    KeyWordAutomata keyWordAutomata = new KeyWordAutomata();
+
+    keyWordAutomata.emptyOrNot = readInt();
+
+    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.EMPTY) {
+      return keyWordAutomata;
+    }
+
+    keyWordAutomata.rootKeyWord = grammars[readInt()];
+
+    int keyWordsSize = readInt();
+
+    HashMap<String, Grammar> textTerminalMap = new HashMap<>(keyWordsSize);
+    for (int indexOfKeyWords = 0; indexOfKeyWords < keyWordsSize; indexOfKeyWords++) {
+      int intOfText = readInt();
+      String text = stringPool[intOfText];
+
+      int intOfTerminal = readInt();
+      Grammar terminal = grammars[intOfTerminal];
+
+      textTerminalMap.put(text, terminal);
+    }
+    keyWordAutomata.textTerminalMap = textTerminalMap;
+
+    return keyWordAutomata;
   }
 
   /**

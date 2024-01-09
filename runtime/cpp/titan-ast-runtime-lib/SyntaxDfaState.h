@@ -12,7 +12,7 @@
 class ProductionRule;
 
 class SyntaxDfaState {
- public:
+public:
   SyntaxDfaState();
   SyntaxDfaState(const SyntaxDfaState &syntaxDfaState) = delete;
   SyntaxDfaState(const SyntaxDfaState &&syntaxDfaState) = delete;
@@ -24,4 +24,4 @@ class SyntaxDfaState {
   std::list<ProductionRule *> closingProductionRules;
 };
 
-#endif//AST__SYNTAXDFASTATE_H_
+#endif // AST__SYNTAXDFASTATE_H_

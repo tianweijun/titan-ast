@@ -15,46 +15,57 @@
 #include <unordered_set>
 
 class BacktrackingBottomUpHash {
- public:
-  size_t operator()(const BacktrackingBottomUpBranch *t) const ;
+public:
+  size_t operator()(const BacktrackingBottomUpBranch *t) const;
 };
 class BacktrackingBottomUpEqual {
- public:
-  bool operator()(const BacktrackingBottomUpBranch *t1, const BacktrackingBottomUpBranch *t2) const ;
+public:
+  bool operator()(const BacktrackingBottomUpBranch *t1,
+                  const BacktrackingBottomUpBranch *t2) const;
 };
 
 class BacktrackingBottomUpAstAutomata {
- public:
-  BacktrackingBottomUpAstAutomata(const SyntaxDfa *astDfa, const Grammar *startGrammar,
-                                  Grammar **innerGrammars, int countOfInnerGrammars);
-  BacktrackingBottomUpAstAutomata(const BacktrackingBottomUpAstAutomata &backtrackingBottomUpAstAutomata) = delete;
-  BacktrackingBottomUpAstAutomata(const BacktrackingBottomUpAstAutomata &&backtrackingBottomUpAstAutomata) = delete;
+public:
+  BacktrackingBottomUpAstAutomata(const SyntaxDfa *astDfa,
+                                  const Grammar *startGrammar,
+                                  Grammar **innerGrammars,
+                                  int countOfInnerGrammars);
+  BacktrackingBottomUpAstAutomata(const BacktrackingBottomUpAstAutomata &
+                                      backtrackingBottomUpAstAutomata) = delete;
+  BacktrackingBottomUpAstAutomata(const BacktrackingBottomUpAstAutomata &&
+                                      backtrackingBottomUpAstAutomata) = delete;
   ~BacktrackingBottomUpAstAutomata();
 
   const Ast *buildAst(std::list<Token *> *sourceTokens);
 
   const std::list<Ast *> *buildAsts(std::list<Token *> *sourceTokens);
 
- private:
+private:
   void init(std::list<Token *> *sourceTokens);
   ReducingSymbol *getConnectedSignOfStartGrammarReducingSymbol();
-  bool addNewBacktrackingBottomUpBranch(BacktrackingBottomUpBranch *newBacktrackingBottomUpBranch);
+  bool addNewBacktrackingBottomUpBranch(
+      BacktrackingBottomUpBranch *newBacktrackingBottomUpBranch);
   void consumeBottomUpBranch();
   void closeBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
   void shiftBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
   void reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
-  void doReduce(BacktrackingBottomUpBranch *bottomUpBranch, ProductionRule *closingProductionRule);
+  void doReduce(BacktrackingBottomUpBranch *bottomUpBranch,
+                ProductionRule *closingProductionRule);
   void clear();
 
- private:
+private:
   TokenReducingSymbolInputStream tokenReducingSymbolInputStream;
   std::list<BacktrackingBottomUpBranch *> bottomUpBranchs;
-  std::unordered_set<BacktrackingBottomUpBranch *, BacktrackingBottomUpHash,BacktrackingBottomUpEqual> bottomUpBranchsShadow;
-  std::unordered_set<BacktrackingBottomUpBranch *, BacktrackingBottomUpHash,BacktrackingBottomUpEqual> triedBottomUpBranchs;
+  std::unordered_set<BacktrackingBottomUpBranch *, BacktrackingBottomUpHash,
+                     BacktrackingBottomUpEqual>
+      bottomUpBranchsShadow;
+  std::unordered_set<BacktrackingBottomUpBranch *, BacktrackingBottomUpHash,
+                     BacktrackingBottomUpEqual>
+      triedBottomUpBranchs;
 
   const SyntaxDfa *astDfa;
   const Grammar *startGrammar;
   std::list<Ast *> result;
 };
 
-#endif//AST__BACKTRACKINGBOTTOMUPASTAUTOMATA_H_
+#endif // AST__BACKTRACKINGBOTTOMUPASTAUTOMATA_H_

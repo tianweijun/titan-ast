@@ -6,6 +6,7 @@
 #define AST__RUNTIME__PERSISTENTDATA_H_
 #include "ByteBuffer.h"
 #include "Grammar.h"
+#include "KeyWordAutomata.h"
 #include "ProductionRule.h"
 #include "TokenDfa.h"
 #include "TokenDfaState.h"
@@ -13,7 +14,7 @@
 #include <string>
 
 class PersistentData {
- public:
+public:
   explicit PersistentData(const std::string *automataFilePath);
   PersistentData(const PersistentData &persistentData) = delete;
   PersistentData(const PersistentData &&persistentData) = delete;
@@ -34,6 +35,7 @@ class PersistentData {
   void getProductionRulesByInputStream();
   Grammar *getStartGrammarByInputStream();
   TokenDfa *getTokenDfaByInputStream();
+  KeyWordAutomata *getKeyWordAutomataByInputStream();
   Grammar **getGrammarsByInputStream();
   Grammar *newGrammarByType(GrammarType type);
   std::string *readByteString(int countOfStringBytes);
@@ -43,4 +45,4 @@ class PersistentData {
   void compact();
 };
 
-#endif//AST__RUNTIME__PERSISTENTDATA_H_
+#endif // AST__RUNTIME__PERSISTENTDATA_H_

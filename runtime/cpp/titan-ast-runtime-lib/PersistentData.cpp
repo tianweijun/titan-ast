@@ -6,10 +6,10 @@
 #include "AstRuntimeException.h"
 #include "SyntaxDfaState.h"
 
-PersistentData::PersistentData(const std::string *automataFilePath) : intByteBuffer(ByteBuffer(4, true)), stringPool(nullptr),
-                                                                      sizeOfStringPool(0), grammars(nullptr),
-                                                                      sizeOfGramamrs(0), productionRules(nullptr),
-                                                                      sizeOfProductionRules(0){
+PersistentData::PersistentData(const std::string *automataFilePath)
+    : intByteBuffer(ByteBuffer(4, true)), stringPool(nullptr),
+      sizeOfStringPool(0), grammars(nullptr), sizeOfGramamrs(0),
+      productionRules(nullptr), sizeOfProductionRules(0) {
   init(automataFilePath);
 }
 
@@ -17,9 +17,9 @@ void PersistentData::init(const std::string *automataFilePath) {
   inputStream.open(*automataFilePath, std::ios::in | std::ios::binary);
 
   if (!inputStream.is_open()) {
-    AstRuntimeExceptionResolver::throwException(
-        AstRuntimeException(AstRuntimeExceptionCode::IO_ERROR,
-                                     "open automata File error,path:'" + *automataFilePath + "'"));
+    AstRuntimeExceptionResolver::throwException(AstRuntimeException(
+        AstRuntimeExceptionCode::IO_ERROR,
+        "open automata File error,path:'" + *automataFilePath + "'"));
   }
 }
 
@@ -82,14 +82,12 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
   int sizeOfSyntaxDfaStates = readInt();
   auto **syntaxDfaStates = new SyntaxDfaState *[sizeOfSyntaxDfaStates];
   for (int indexOfSyntaxDfaState = 0;
-       indexOfSyntaxDfaState < sizeOfSyntaxDfaStates;
-       indexOfSyntaxDfaState++) {
+       indexOfSyntaxDfaState < sizeOfSyntaxDfaStates; indexOfSyntaxDfaState++) {
     syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState();
   }
   // countOfSyntaxDfaStates-(type-countOfEdges-[ch,dest]{countOfEdges}-countOfProductions-productions)
   for (int indexOfSyntaxDfaState = 0;
-       indexOfSyntaxDfaState < sizeOfSyntaxDfaStates;
-       indexOfSyntaxDfaState++) {
+       indexOfSyntaxDfaState < sizeOfSyntaxDfaStates; indexOfSyntaxDfaState++) {
     SyntaxDfaState *syntaxDfaState = syntaxDfaStates[indexOfSyntaxDfaState];
     syntaxDfaState->type = readInt();
     int sizeOfEdges = readInt();
@@ -100,14 +98,14 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
       syntaxDfaState->edges.insert(keyValue);
     }
     int sizeOfProductions = readInt();
-    for (int indexOfProduction = 0;
-         indexOfProduction < sizeOfProductions;
+    for (int indexOfProduction = 0; indexOfProduction < sizeOfProductions;
          indexOfProduction++) {
-      syntaxDfaState->closingProductionRules.push_back(productionRules[readInt()]);
+      syntaxDfaState->closingProductionRules.push_back(
+          productionRules[readInt()]);
     }
   }
   auto *syntaxDfa = new SyntaxDfa(syntaxDfaStates[0],
-                                  (const SyntaxDfaState **) syntaxDfaStates,
+                                  (const SyntaxDfaState **)syntaxDfaStates,
                                   sizeOfSyntaxDfaStates);
   return syntaxDfa;
 }
@@ -121,14 +119,12 @@ TokenDfa *PersistentData::getTokenDfaByInputStream() {
   int sizeOfTokenDfaStates = readInt();
   auto **tokenDfaStates = new TokenDfaState *[sizeOfTokenDfaStates];
   for (int indexOfTokenDfaState = 0;
-       indexOfTokenDfaState < sizeOfTokenDfaStates;
-       indexOfTokenDfaState++) {
+       indexOfTokenDfaState < sizeOfTokenDfaStates; indexOfTokenDfaState++) {
     tokenDfaStates[indexOfTokenDfaState] = new TokenDfaState();
   }
   // countOfTokenDfaStates-(type-weight-terminal-countOfEdges-[ch,dest]{countOfEdges})
   for (int indexOfTokenDfaState = 0;
-       indexOfTokenDfaState < sizeOfTokenDfaStates;
-       indexOfTokenDfaState++) {
+       indexOfTokenDfaState < sizeOfTokenDfaStates; indexOfTokenDfaState++) {
     TokenDfaState *tokenDfaState = tokenDfaStates[indexOfTokenDfaState];
     tokenDfaState->type = readInt();
     tokenDfaState->weight = readInt();
@@ -145,21 +141,53 @@ TokenDfa *PersistentData::getTokenDfaByInputStream() {
     }
   }
 
-  auto *tokenDfa = new TokenDfa(tokenDfaStates[0], (const TokenDfaState **) tokenDfaStates, sizeOfTokenDfaStates);
+  auto *tokenDfa =
+      new TokenDfa(tokenDfaStates[0], (const TokenDfaState **)tokenDfaStates,
+                   sizeOfTokenDfaStates);
   return tokenDfa;
+}
+
+KeyWordAutomata *PersistentData::getKeyWordAutomataByInputStream() {
+  KeyWordAutomata *keyWordAutomata = new KeyWordAutomata();
+
+  keyWordAutomata->emptyOrNot = readInt();
+
+  if (keyWordAutomata->emptyOrNot == KeyWordAutomata::EMPTY) {
+    return keyWordAutomata;
+  }
+
+  keyWordAutomata->rootKeyWord = grammars[readInt()];
+
+  int keyWordsSize = readInt();
+
+  auto textTerminalMap = &(keyWordAutomata->textTerminalMap);
+  for (int indexOfKeyWords = 0; indexOfKeyWords < keyWordsSize;
+       indexOfKeyWords++) {
+    int intOfText = readInt();
+    std::string *text = stringPool[intOfText];
+
+    int intOfTerminal = readInt();
+    Grammar *terminal = grammars[intOfTerminal];
+
+    std::pair<std::string *, Grammar *> pair(text, terminal);
+    textTerminalMap->insert(pair);
+  }
+
+  return keyWordAutomata;
 }
 
 Grammar **PersistentData::getGrammarsByInputStream() {
   int _sizeOfGramamrs = readInt();
   auto **heapGrammars = new Grammar *[_sizeOfGramamrs];
 
-  for (int indexOfGrammar = 0; indexOfGrammar < _sizeOfGramamrs; indexOfGrammar++) {
+  for (int indexOfGrammar = 0; indexOfGrammar < _sizeOfGramamrs;
+       indexOfGrammar++) {
     auto type = GrammarType(readInt());
-    auto *grammar =newGrammarByType(type);
+    auto *grammar = newGrammarByType(type);
     grammar->name = *(stringPool[readInt()]);
     grammar->action = GrammarAction(readInt());
-    if(type==GrammarType::TERMINAL){
-      auto* terminalGrammar = (TerminalGrammar*) grammar;
+    if (type == GrammarType::TERMINAL) {
+      auto *terminalGrammar = (TerminalGrammar *)grammar;
       terminalGrammar->lookaheadMatchingMode = LookaheadMatchingMode(readInt());
     }
     heapGrammars[indexOfGrammar] = grammar;
@@ -169,18 +197,18 @@ Grammar **PersistentData::getGrammarsByInputStream() {
   return heapGrammars;
 }
 
-Grammar* PersistentData::newGrammarByType(GrammarType type){
-  Grammar* grammar = nullptr;
+Grammar *PersistentData::newGrammarByType(GrammarType type) {
+  Grammar *grammar = nullptr;
   switch (type) {
-    case GrammarType::TERMINAL:
-      grammar = new TerminalGrammar();
-      break;
-    case GrammarType::NONTERMINAL:
-      grammar = new NonterminaltGrammar();
-      break;
-    case GrammarType::TERMINAL_FRAGMENT:
-    default:
-      break;
+  case GrammarType::TERMINAL:
+    grammar = new TerminalGrammar();
+    break;
+  case GrammarType::NONTERMINAL:
+    grammar = new NonterminaltGrammar();
+    break;
+  case GrammarType::TERMINAL_FRAGMENT:
+  default:
+    break;
   }
   return grammar;
 }
@@ -201,7 +229,7 @@ std::string **PersistentData::getStringPoolByInputStream() {
 std::string *PersistentData::readByteString(int countOfStringBytes) {
   auto *str = new std::string(countOfStringBytes, 0);
   char *buf = const_cast<char *>(str->data());
-  doRead((byte *) (buf), 0, countOfStringBytes);
+  doRead((byte *)(buf), 0, countOfStringBytes);
   return str;
 }
 
@@ -213,13 +241,10 @@ int PersistentData::readInt() {
 void PersistentData::doRead(byte bytes[], int offset, int length) {
   char *base = reinterpret_cast<char *>(bytes + offset);
   int countOfRead = inputStream.read(base, length).gcount();
-  if (countOfRead != length) {// 文件数据损坏
-    AstRuntimeExceptionResolver::throwException(
-        AstRuntimeException(AstRuntimeExceptionCode::IO_ERROR,
-                                     "data of automata File is error"));
+  if (countOfRead != length) { // 文件数据损坏
+    AstRuntimeExceptionResolver::throwException(AstRuntimeException(
+        AstRuntimeExceptionCode::IO_ERROR, "data of automata File is error"));
   }
 }
 
-void PersistentData::compact() {
-  inputStream.close();
-}
+void PersistentData::compact() { inputStream.close(); }

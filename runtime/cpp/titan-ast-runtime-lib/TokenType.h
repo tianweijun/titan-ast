@@ -7,12 +7,9 @@
 
 #include "GrammarAction.h"
 
-enum class TokenType : int {
-  TEXT = 0,
-  SKIP = 1
-};
+enum class TokenType : int { TEXT = 0, SKIP = 1 };
 
 namespace TokenTypeNamespace {
 TokenType getByGrammarAction(GrammarAction grammarAction);
-}// namespace TokenTypeNamespace
-#endif//AST__RUNTIME__TOKENTYPE_H_
+} // namespace TokenTypeNamespace
+#endif // AST__RUNTIME__TOKENTYPE_H_

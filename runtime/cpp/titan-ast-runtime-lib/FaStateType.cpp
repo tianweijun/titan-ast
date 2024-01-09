@@ -5,13 +5,13 @@
 #include "FaStateType.h"
 
 int FaStateType::appendState(int state, FaStateEnumType appendState) {
-  return state | (int) appendState;
+  return state | (int)appendState;
 }
 
 int FaStateType::removeState(int state, FaStateEnumType removeState) {
-  return state & (~(int) removeState);
+  return state & (~(int)removeState);
 }
 
 bool FaStateType::isClosingTag(int state) {
-  return (state & (int) FaStateEnumType::CLOSING_TAG) != 0;
+  return (state & (int)FaStateEnumType::CLOSING_TAG) != 0;
 }
