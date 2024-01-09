@@ -2,8 +2,10 @@ package titan.ast;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
+import titan.ast.grammar.RegExp;
 import titan.ast.grammar.io.GrammarCharset;
 import titan.ast.grammar.syntax.ProductionRule;
 
@@ -20,6 +22,7 @@ public class AstContext {
   public LanguageGrammar languageGrammar = null;
   public GrammarCharset grammarCharset = null;
 
+  public Map<RegExp, Grammar> unitRegExpTerminalsMap = null;
   public LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap = null;
 
   /**

@@ -38,8 +38,7 @@ public class NonterminalNfaBuilder {
   }
 
   private void buildProductionRule() {
-    ProductionRuleBuilder productionRuleBuilder =
-        new ProductionRuleBuilder(terminals, nonterminals);
+    ProductionRuleBuilder productionRuleBuilder = new ProductionRuleBuilder(nonterminals);
     LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap =
         productionRuleBuilder.build();
     AstContext.get().nonterminalProductionRulesMap = nonterminalProductionRulesMap;

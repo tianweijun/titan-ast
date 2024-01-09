@@ -3,6 +3,7 @@ package titan.ast.grammar.syntax;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.RegExp;
 import titan.ast.grammar.RelationshipQualifier;
@@ -15,7 +16,6 @@ import titan.ast.runtime.AstRuntimeException;
  */
 public class ProductionRuleBuilder {
 
-  private final LinkedHashMap<String, Grammar> terminals;
   private final LinkedHashMap<String, Grammar> nonterminals;
   private LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap;
   private Map<RegExp, Grammar> unitRegExpTerminalsMap;
@@ -24,32 +24,15 @@ public class ProductionRuleBuilder {
   /**
    * 构造方法.
    *
-   * @param terminals 终结符
    * @param nonterminals 非终结符
    */
-  public ProductionRuleBuilder(
-      LinkedHashMap<String, Grammar> terminals, LinkedHashMap<String, Grammar> nonterminals) {
-    this.terminals = terminals;
+  public ProductionRuleBuilder(LinkedHashMap<String, Grammar> nonterminals) {
     this.nonterminals = nonterminals;
-    initRegExpTerminalsMap();
+    initUnitRegExpTerminalsMap();
   }
 
-  private void initRegExpTerminalsMap() {
-    unitRegExpTerminalsMap = new LinkedHashMap<>(terminals.size());
-    for (Grammar terminal : terminals.values()) {
-      RegExp terminalCompositeRegExp = terminal.regExp;
-      if (terminalCompositeRegExp.children.size() == 1) {
-        RegExp unitRegExp = terminalCompositeRegExp.children.getFirst();
-        if (unitRegExp.type == RegExp.RegExpType.UNIT
-            && (unitRegExp.unitType == RegExp.RegExpUnitType.SEQUENCE_CHARS
-                || unitRegExp.unitType == RegExp.RegExpUnitType.ONE_CHAR_OPTION_CHARSET)) {
-          if (unitRegExp.repMinTimes.isNumberTimesAndEqual(1)
-              && unitRegExp.repMaxTimes.isNumberTimesAndEqual(1)) {
-            unitRegExpTerminalsMap.put(unitRegExp, terminal);
-          }
-        }
-      }
-    }
+  private void initUnitRegExpTerminalsMap() {
+    unitRegExpTerminalsMap = AstContext.get().unitRegExpTerminalsMap;
   }
 
   /** 将所有从构造方法传递进来的非终结符生成对应的产生式. */
