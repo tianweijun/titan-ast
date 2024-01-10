@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class TokenReducingSymbolInputStream {
   public int nextReadIndex = 0;
-  private ArrayList<Token> tokenReducingSymbols;
+  public ArrayList<Token> tokenReducingSymbols;
 
   public TokenReducingSymbolInputStream(List<Token> sourceTokens) {
     setTokenReducingSymbols(sourceTokens);
@@ -24,9 +24,7 @@ public class TokenReducingSymbolInputStream {
       }
     }
     this.tokenReducingSymbols = new ArrayList<>(textTokens.size());
-    for (Token token : textTokens) {
-      tokenReducingSymbols.add(token);
-    }
+    tokenReducingSymbols.addAll(textTokens);
   }
 
   public Token read() {

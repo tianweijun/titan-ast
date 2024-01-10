@@ -9,7 +9,7 @@ import titan.ast.grammar.io.GrammarTokenBuilder;
 import titan.ast.grammar.io.GrammarTokenBuilderProcessor;
 import titan.ast.grammar.syntax.AstAutomata;
 import titan.ast.grammar.syntax.DfaAstAutomataBuilder;
-import titan.ast.grammar.token.DfaTokenAutomataBuilder;
+import titan.ast.grammar.token.TokenAutomataBuilder;
 
 /**
  * 建造器：生成抽象语法树的自动机.
@@ -81,9 +81,10 @@ public class AstAutomataBuilder {
     TextOfGrammarBuilder textOfGrammarBuilder =
         new TextOfGrammarBuilder(grammarTokens, astContext.languageGrammar);
     textOfGrammarBuilder.build();
-    DfaTokenAutomataBuilder dfaTokenAutomataBuilder =
-        new DfaTokenAutomataBuilder(astContext.languageGrammar);
-    dfaTokenAutomataBuilder.build();
+
+    TokenAutomataBuilder tokenAutomataBuilder = new TokenAutomataBuilder();
+    tokenAutomataBuilder.build();
+
     // 语法
     DfaAstAutomataBuilder dfaAstAutomataBuilder = new DfaAstAutomataBuilder();
     return dfaAstAutomataBuilder.build();

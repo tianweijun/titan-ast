@@ -8,21 +8,20 @@
 #include "ByteBufferedInputStream.h"
 #include "KeyWordAutomata.h"
 #include "Token.h"
+#include "TokenAutomata.h"
 #include "TokenDfa.h"
 #include <list>
 #include <string>
 
-class DfaTokenAutomata {
+class DfaTokenAutomata : public TokenAutomata {
 public:
-  explicit DfaTokenAutomata(const KeyWordAutomata *keyWordAutomata,
-                            const TokenDfa *tokenDfa);
+  explicit DfaTokenAutomata(const TokenDfa *tokenDfa);
   DfaTokenAutomata(const DfaTokenAutomata &dfaTokenAutomata) = delete;
   DfaTokenAutomata(const DfaTokenAutomata &&dfaTokenAutomata) = delete;
-  ~DfaTokenAutomata();
-  std::list<Token *> *buildToken(const std::string *sourceFilePath);
+  ~DfaTokenAutomata() override;
+  std::list<Token *> *buildToken(const std::string *sourceFilePath) override;
 
 private:
-  const KeyWordAutomata *keyWordAutomata;
   const TokenDfa *dfa;
   ByteBufferedInputStream byteBufferedInputStream{};
   std::list<Token *> *tokens;

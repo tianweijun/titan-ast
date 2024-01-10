@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class PersistentAutomataAstApplication implements Cloneable {
   PersistentObject persistentObject;
-  DfaTokenAutomata dfaTokenAutomata;
+  TokenAutomata tokenAutomata;
   BacktrackingBottomUpAstAutomata astAutomata;
 
   public PersistentAutomataAstApplication(String persistentDataFilePath) {
@@ -25,29 +25,28 @@ public class PersistentAutomataAstApplication implements Cloneable {
 
   public void buildContext(PersistentData persistentData) {
     persistentObject = new PersistentObject(persistentData);
-    dfaTokenAutomata = new DfaTokenAutomata(persistentObject.keyWordAutomata,
-        persistentObject.tokenDfa);
+    tokenAutomata = new TokenAutomataBuilder().build(persistentObject);
     astAutomata =
         new BacktrackingBottomUpAstAutomata(persistentObject.astDfa, persistentObject.startGrammar);
   }
 
   public List<Ast> buildAsts(String sourceCodeFilePath) {
-    List<Token> tokens = dfaTokenAutomata.buildToken(sourceCodeFilePath);
+    List<Token> tokens = tokenAutomata.buildToken(sourceCodeFilePath);
     return astAutomata.buildAsts(tokens);
   }
 
   public List<Ast> buildAsts(InputStream sourceByteInputStream) {
-    List<Token> tokens = dfaTokenAutomata.buildToken(sourceByteInputStream);
+    List<Token> tokens = tokenAutomata.buildToken(sourceByteInputStream);
     return astAutomata.buildAsts(tokens);
   }
 
   public Ast buildAst(String sourceCodeFilePath) {
-    List<Token> tokens = dfaTokenAutomata.buildToken(sourceCodeFilePath);
+    List<Token> tokens = tokenAutomata.buildToken(sourceCodeFilePath);
     return astAutomata.buildAst(tokens);
   }
 
   public Ast buildAst(InputStream byteInputStream) {
-    List<Token> tokens = dfaTokenAutomata.buildToken(byteInputStream);
+    List<Token> tokens = tokenAutomata.buildToken(byteInputStream);
     return astAutomata.buildAst(tokens);
   }
 
@@ -60,8 +59,7 @@ public class PersistentAutomataAstApplication implements Cloneable {
       throw new AstRuntimeException(e);
     }
     app.persistentObject = this.persistentObject;
-    dfaTokenAutomata = new DfaTokenAutomata(persistentObject.keyWordAutomata,
-        persistentObject.tokenDfa);
+    tokenAutomata = new TokenAutomataBuilder().build(persistentObject);
     astAutomata =
         new BacktrackingBottomUpAstAutomata(persistentObject.astDfa, persistentObject.startGrammar);
     return app;

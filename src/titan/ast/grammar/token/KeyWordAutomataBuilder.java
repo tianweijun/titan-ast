@@ -31,7 +31,9 @@ public class KeyWordAutomataBuilder {
     if (!languageGrammar.isKeyWordEmpty()) {
       setRootKeyWord();
       setKeyWord();
-      keyWordAutomata.emptyOrNot = KeyWordAutomata.NOT_EMPTY;
+      if (!keyWordAutomata.textTerminalMap.isEmpty()) {
+        keyWordAutomata.emptyOrNot = KeyWordAutomata.NOT_EMPTY;
+      }
     }
     languageGrammar.keyWordAutomata = keyWordAutomata;
   }

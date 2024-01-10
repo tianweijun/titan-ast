@@ -2,6 +2,7 @@
 #include <list>
 #include <string>
 #include <thread>
+#include <iostream>
 
 void testSinglethreadedApp();
 
@@ -18,6 +19,10 @@ int main(int argc, char *argv[]) {
 void doTask(Ast **result, RuntimeAutomataAstApplication *runtimeAstApplication,
             std::string const *sourceCodeFilePath) {
   *result = const_cast<Ast *>(runtimeAstApplication->buildAst(sourceCodeFilePath));
+  auto exceptions = AstRuntimeExceptionResolver::getExceptions();
+  for (const auto &e : *exceptions) {
+    std::cout << e.msg << std::endl;
+  }
   AstRuntimeExceptionResolver::destory();
 }
 
@@ -33,6 +38,10 @@ void testMultithreadedApp(int taskCount) {
   runtimeAstApplication->setContext(&automataFilePath);
   //初始化错误（可能原因：自动机文件不存在，文件数损坏）
   if (AstRuntimeExceptionResolver::hasThrewException()) {
+    auto exceptions = AstRuntimeExceptionResolver::getExceptions();
+    for (const auto &e : *exceptions) {
+      std::cout << e.msg << std::endl;
+    }
     AstRuntimeExceptionResolver::destory();
     return;
   }
@@ -111,6 +120,10 @@ void testSinglethreadedApp() {
   runtimeAstApplication.setContext(&automataFilePath);
   //初始化错误（可能原因：自动机文件不存在，文件数损坏）
   if (AstRuntimeExceptionResolver::hasThrewException()) {
+    auto exceptions = AstRuntimeExceptionResolver::getExceptions();
+    for (const auto &e : *exceptions) {
+      std::cout << e.msg << std::endl;
+    }
     AstRuntimeExceptionResolver::destory();
     return;
   }
@@ -120,6 +133,10 @@ void testSinglethreadedApp() {
     astGuiOutputer.output();
     astGuiOutputer.waitToClose();
   } else {
+    auto exceptions = AstRuntimeExceptionResolver::getExceptions();
+    for (const auto &e : *exceptions) {
+      std::cout << e.msg << std::endl;
+    }
     AstRuntimeExceptionResolver::clearExceptions();
   }
 

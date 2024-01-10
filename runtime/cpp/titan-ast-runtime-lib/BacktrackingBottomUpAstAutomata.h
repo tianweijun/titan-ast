@@ -52,6 +52,7 @@ private:
   void doReduce(BacktrackingBottomUpBranch *bottomUpBranch,
                 ProductionRule *closingProductionRule);
   void clear();
+  std::string getNoResultErrorInfo();
 
 private:
   TokenReducingSymbolInputStream tokenReducingSymbolInputStream;

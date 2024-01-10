@@ -47,8 +47,7 @@ public class DfaTokenAutomataBuilder {
     buildUnitRegExpTerminalsMap();
     clearTransientObjects();
 
-    DfaTokenAutomata dfaTokenAutomata =
-        new DfaTokenAutomata(languageGrammar.keyWordAutomata, tokenDfa);
+    DfaTokenAutomata dfaTokenAutomata = DfaTokenAutomataFactory.create(languageGrammar);
     languageGrammar.tokenAutomata = dfaTokenAutomata;
 
     return dfaTokenAutomata;

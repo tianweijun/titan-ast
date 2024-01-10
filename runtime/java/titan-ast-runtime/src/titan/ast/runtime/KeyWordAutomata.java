@@ -19,9 +19,6 @@ public class KeyWordAutomata {
   public HashMap<String, Grammar> textTerminalMap = new HashMap<>();
 
   public List<Token> buildToken(List<Token> tokens) {
-    if (emptyOrNot == EMPTY) {
-      return tokens;
-    }
     for (Token token : tokens) {
       if (token.terminal == rootKeyWord) {
         Grammar terminal = textTerminalMap.get(token.text);

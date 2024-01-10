@@ -6,8 +6,8 @@ import titan.ast.grammar.io.GrammarToken;
 import titan.ast.grammar.io.GrammarTokenType;
 import titan.ast.grammar.syntax.AstAutomata;
 import titan.ast.grammar.syntax.SyntaxDfa;
-import titan.ast.grammar.token.DfaTokenAutomata;
 import titan.ast.grammar.token.KeyWordAutomata;
+import titan.ast.grammar.token.TokenAutomata;
 import titan.ast.grammar.token.TokenDfa;
 import titan.ast.runtime.AstRuntimeException;
 import titan.ast.util.StringUtils;
@@ -29,7 +29,7 @@ public class LanguageGrammar {
 
   public TokenDfa tokenDfa;
   public SyntaxDfa astDfa;
-  public DfaTokenAutomata tokenAutomata;
+  public TokenAutomata tokenAutomata;
   public AstAutomata astAutomata;
 
   // keyword

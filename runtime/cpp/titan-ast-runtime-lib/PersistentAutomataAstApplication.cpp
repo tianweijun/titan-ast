@@ -4,13 +4,14 @@
 
 #include "PersistentAutomataAstApplication.h"
 #include "AstRuntimeException.h"
+#include "TokenAutomataBuilder.h"
 #include <list>
 
 std::mutex PersistentAutomataAstApplication::cloneLock{};
 
 PersistentAutomataAstApplication::PersistentAutomataAstApplication()
     : persistentObject(std::make_shared<PersistentObject>()),
-      dfaTokenAutomata(nullptr), astAutomata(nullptr) {}
+      tokenAutomata(nullptr), astAutomata(nullptr) {}
 
 PersistentAutomataAstApplication::PersistentAutomataAstApplication(
     const std::string *persistentDataFilePath)
@@ -18,8 +19,8 @@ PersistentAutomataAstApplication::PersistentAutomataAstApplication(
   buildContext(persistentDataFilePath);
 }
 PersistentAutomataAstApplication::~PersistentAutomataAstApplication() {
-  delete dfaTokenAutomata;
-  dfaTokenAutomata = nullptr;
+  delete tokenAutomata;
+  tokenAutomata = nullptr;
   delete astAutomata;
   astAutomata = nullptr;
 
@@ -39,8 +40,8 @@ void PersistentAutomataAstApplication::buildContext(
   }
   persistentObject.reset(new PersistentObject(persistentData));
   PersistentObject *ptrPersistentObject = persistentObject.get();
-  dfaTokenAutomata = new DfaTokenAutomata(ptrPersistentObject->keyWordAutomata,
-                                          ptrPersistentObject->tokenDfa);
+  TokenAutomataBuilder tokenAutomataBuilder;
+  tokenAutomata = tokenAutomataBuilder.build(ptrPersistentObject);
   astAutomata = new BacktrackingBottomUpAstAutomata(
       ptrPersistentObject->astDfa, ptrPersistentObject->startGrammar,
       ptrPersistentObject->persistentData->grammars,
@@ -49,7 +50,7 @@ void PersistentAutomataAstApplication::buildContext(
 
 const Ast *PersistentAutomataAstApplication::buildAst(
     const std::string *sourceCodeFilePath) const {
-  std::list<Token *> *tokens = dfaTokenAutomata->buildToken(sourceCodeFilePath);
+  std::list<Token *> *tokens = tokenAutomata->buildToken(sourceCodeFilePath);
   // byteBufferedInputStream初始化错误（可能原因：源文件不存在）
   // text is not a token
   if (AstRuntimeExceptionResolver::hasThrewException()) {
@@ -84,8 +85,8 @@ PersistentAutomataAstApplication::clone() const {
   cloneLock.unlock();
 
   PersistentObject *ptrPersistentObject = app->persistentObject.get();
-  app->dfaTokenAutomata = new DfaTokenAutomata(
-      ptrPersistentObject->keyWordAutomata, ptrPersistentObject->tokenDfa);
+  TokenAutomataBuilder tokenAutomataBuilder;
+  app->tokenAutomata = tokenAutomataBuilder.build(ptrPersistentObject);
   app->astAutomata = new BacktrackingBottomUpAstAutomata(
       ptrPersistentObject->astDfa, ptrPersistentObject->startGrammar,
       ptrPersistentObject->persistentData->grammars,
@@ -94,7 +95,8 @@ PersistentAutomataAstApplication::clone() const {
 }
 const std::list<Ast *> *PersistentAutomataAstApplication::buildAsts(
     const std::string *sourceCodeFilePath) const {
-  std::list<Token *> *tokens = dfaTokenAutomata->buildToken(sourceCodeFilePath);
+  std::list<Token *> *tokens = tokenAutomata->buildToken(sourceCodeFilePath);
+
   // byteBufferedInputStream初始化错误（可能原因：源文件不存在）
   // text is not a token
   if (AstRuntimeExceptionResolver::hasThrewException()) {

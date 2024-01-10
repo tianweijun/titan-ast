@@ -11,9 +11,9 @@
 #include <string>
 
 enum class AstRuntimeExceptionCode : int {
-  LOGIC_ERROR = 0,
+  RUNTIME_ERROR = 0,
   IO_ERROR,
-  INVALID_ARGUMENT
+  INVALID_ARGUMENT,
 };
 
 class DLL_PUBLIC AstRuntimeException : public std::exception {

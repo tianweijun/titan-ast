@@ -32,7 +32,7 @@ private:
 
 public:
   PersistentData *persistentData;
-  KeyWordAutomata *keyWordAutomata;
+  const KeyWordAutomata *keyWordAutomata;
   const TokenDfa *tokenDfa;
   const SyntaxDfa *astDfa;
   const Grammar *startGrammar;

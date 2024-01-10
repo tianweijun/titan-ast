@@ -22,9 +22,6 @@ KeyWordAutomata::~KeyWordAutomata() = default;
 
 std::list<Token *> *
 KeyWordAutomata::buildToken(std::list<Token *> *tokens) const {
-  if (this->emptyOrNot == KeyWordAutomata::EMPTY) {
-    return tokens;
-  }
   for (auto token : *tokens) {
     if (rootKeyWord->equals(token->terminal)) {
       auto findIt = textTerminalMap.find(&token->text);

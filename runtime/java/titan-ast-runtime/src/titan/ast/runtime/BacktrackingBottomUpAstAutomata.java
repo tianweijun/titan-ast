@@ -37,7 +37,12 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     while (result.isEmpty() && !bottomUpBranchs.isEmpty()) {
       consumeBottomUpBranch();
     }
-    Ast ret = result.isEmpty() ? null : result.getFirst().toAst();
+
+    if (result.isEmpty()) {
+      throw new AstRuntimeException(getNoResultErrorInfo());
+    }
+
+    Ast ret = result.getFirst().toAst();
     clear();
     return ret;
   }
@@ -48,6 +53,11 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     while (!bottomUpBranchs.isEmpty()) {
       consumeBottomUpBranch();
     }
+
+    if (result.isEmpty()) {
+      throw new AstRuntimeException(getNoResultErrorInfo());
+    }
+
     List<Ast> ret = new ArrayList<>(result.size());
     for (AutomataTmpAst tmpAst : result) {
       ret.add(tmpAst.toAst());
@@ -261,5 +271,54 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       bottomUpBranchs.addFirst(newBacktrackingBottomUpBranch);
       bottomUpBranchsShadow.add(newBacktrackingBottomUpBranch);
     }
+  }
+
+  private String getNoResultErrorInfo() {
+    ArrayList<Token> tokenReducingSymbols = tokenReducingSymbolInputStream.tokenReducingSymbols;
+    int indexOfLastToken = tokenReducingSymbols.isEmpty() ? 0 : tokenReducingSymbols.size() - 1;
+
+    int startIndexOfToken = indexOfLastToken;
+    int endIndexOfToken = 0;
+    for (BacktrackingBottomUpBranch branch : triedBottomUpBranchs) {
+      int lastIndexOfBranch = branch.reducingSymbols.getLast().endIndexOfToken;
+      if (startIndexOfToken > lastIndexOfBranch) {
+        startIndexOfToken = lastIndexOfBranch;
+      }
+      if (endIndexOfToken < lastIndexOfBranch) {
+        endIndexOfToken = lastIndexOfBranch;
+      }
+    }
+    if (startIndexOfToken == indexOfLastToken || startIndexOfToken < 0) {
+      startIndexOfToken = 0;
+    }
+    if (endIndexOfToken == 0) {
+      endIndexOfToken = Math.min(indexOfLastToken, 15);
+    } else {
+      if (endIndexOfToken + 1 < indexOfLastToken) {
+        endIndexOfToken += 1;
+      }
+    }
+    int startIndexChar = 0;
+    int endIndexChar = 0;
+
+    StringBuilder tokenInfo = new StringBuilder();
+    if (!tokenReducingSymbols.isEmpty()) {
+      Token startToken = tokenReducingSymbols.get(startIndexOfToken);
+      Token endToken = tokenReducingSymbols.get(endIndexOfToken);
+      startIndexChar = startToken.start;
+      endIndexChar = endToken.start;
+
+      for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken; indexOfToken++) {
+        Token token = tokenReducingSymbols.get(indexOfToken);
+        tokenInfo.append(token.text).append(" ");
+      }
+      if (tokenInfo.length() > 0) {
+        tokenInfo.delete(tokenInfo.length() - 1, tokenInfo.length());
+      }
+    }
+
+    return String.format(
+        "generate ast failed,error near [%d,%d]:%s",
+        startIndexChar, endIndexChar, tokenInfo.toString());
   }
 }

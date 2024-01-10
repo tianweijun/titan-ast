@@ -12,8 +12,8 @@ import java.util.List;
  *
  * @author tian wei jun
  */
-public class DfaTokenAutomata {
-  KeyWordAutomata keyWordAutomata;
+public class DfaTokenAutomata implements TokenAutomata {
+
   TokenDfa dfa;
   int eof = -1;
   ByteBufferedInputStream byteBufferedInputStream;
@@ -27,12 +27,12 @@ public class DfaTokenAutomata {
    *
    * @param dfa 识别token的 确定有限状态自动机
    */
-  public DfaTokenAutomata(KeyWordAutomata keyWordAutomata, TokenDfa dfa) {
-    this.keyWordAutomata = keyWordAutomata;
+  public DfaTokenAutomata(TokenDfa dfa) {
     this.dfa = dfa;
     this.oneTokenStringBuilder = new StringBuilder();
   }
 
+  @Override
   public List<Token> buildToken(String sourceFilePath) {
     List<Token> ret = null;
     try (FileInputStream fileInputStream = new FileInputStream(sourceFilePath)) {
@@ -49,6 +49,7 @@ public class DfaTokenAutomata {
    * @param byteInputStream 将要识别文本的输入流.
    * @return
    */
+  @Override
   public List<Token> buildToken(InputStream byteInputStream) {
     List<Token> ret = null;
     try {
@@ -70,7 +71,7 @@ public class DfaTokenAutomata {
       throw e;
     }
 
-    return keyWordAutomata.buildToken(ret);
+    return ret;
   }
 
   /**

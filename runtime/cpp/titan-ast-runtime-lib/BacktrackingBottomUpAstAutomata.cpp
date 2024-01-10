@@ -3,9 +3,13 @@
 //
 
 #include "BacktrackingBottomUpAstAutomata.h"
+#include "AstRuntimeException.h"
 #include "AutomataTmpAst.h"
 #include "FaStateType.h"
-#include <iterator>
+
+#include <iostream>
+#include <sstream>
+#include <string>
 
 size_t BacktrackingBottomUpHash::operator()(
     const BacktrackingBottomUpBranch *t) const {
@@ -62,6 +66,12 @@ BacktrackingBottomUpAstAutomata::buildAsts(std::list<Token *> *sourceTokens) {
   while (!bottomUpBranchs.empty()) {
     consumeBottomUpBranch();
   }
+
+  if (result.empty()) {
+    AstRuntimeExceptionResolver::throwException(AstRuntimeException(
+        AstRuntimeExceptionCode::RUNTIME_ERROR, getNoResultErrorInfo()));
+  }
+
   auto *ret = new std::list<Ast *>();
   for (auto ast : result) {
     ret->push_back(ast);
@@ -76,6 +86,12 @@ BacktrackingBottomUpAstAutomata::buildAst(std::list<Token *> *sourceTokens) {
   while (result.empty() && !bottomUpBranchs.empty()) {
     consumeBottomUpBranch();
   }
+
+  if (result.empty()) {
+    AstRuntimeExceptionResolver::throwException(AstRuntimeException(
+        AstRuntimeExceptionCode::RUNTIME_ERROR, getNoResultErrorInfo()));
+  }
+
   const Ast *ret = result.empty() ? nullptr : result.front();
   clear();
   return ret;
@@ -338,4 +354,58 @@ bool BacktrackingBottomUpAstAutomata::addNewBacktrackingBottomUpBranch(
     return true;
   }
   return false;
+}
+std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
+  auto sizeOfTokens = tokenReducingSymbolInputStream.sizeOfTokenReducingSymbols;
+  int indexOfLastToken = sizeOfTokens <= 0 ? 0 : sizeOfTokens - 1;
+
+  int startIndexOfToken = indexOfLastToken;
+  int endIndexOfToken = 0;
+  for (auto branch : triedBottomUpBranchs) {
+    int lastIndexOfBranch = branch->reducingSymbols.back()->endIndexOfToken;
+    if (startIndexOfToken > lastIndexOfBranch) {
+      startIndexOfToken = lastIndexOfBranch;
+    }
+    if (endIndexOfToken < lastIndexOfBranch) {
+      endIndexOfToken = lastIndexOfBranch;
+    }
+  }
+  if (startIndexOfToken == indexOfLastToken || startIndexOfToken < 0) {
+    startIndexOfToken = 0;
+  }
+  if (endIndexOfToken == 0) {
+    endIndexOfToken = indexOfLastToken > 15 ? 15 : indexOfLastToken;
+  } else {
+    if (endIndexOfToken + 1 < indexOfLastToken) {
+      endIndexOfToken += 1;
+    }
+  }
+
+  int startIndexChar = 0;
+  int endIndexChar = 0;
+
+  std::stringstream tokenInfo;
+  if (sizeOfTokens > 0) {
+    auto tokenReducingSymbols =
+        tokenReducingSymbolInputStream.tokenReducingSymbols;
+    AutomataTmpToken *startToken = &tokenReducingSymbols[startIndexOfToken];
+    AutomataTmpToken *endToken = &tokenReducingSymbols[endIndexOfToken];
+    startIndexChar = startToken->start;
+    endIndexChar = endToken->start;
+
+    for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken;
+         indexOfToken++) {
+      AutomataTmpToken *token = &tokenReducingSymbols[indexOfToken];
+      tokenInfo << *(token->text) << " ";
+    }
+  }
+  auto strTokenInfo = tokenInfo.str();
+  if (!strTokenInfo.empty()) {
+    strTokenInfo.pop_back();
+  }
+
+  std::stringstream errorInfo;
+  errorInfo << "generate ast failed,error near [" << startIndexChar << ","
+            << endIndexChar << "]:" << strTokenInfo;
+  return errorInfo.str();
 }

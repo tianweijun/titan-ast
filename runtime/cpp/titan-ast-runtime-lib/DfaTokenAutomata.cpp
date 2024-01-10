@@ -5,10 +5,9 @@
 #include "DfaTokenAutomata.h"
 #include "AstRuntimeException.h"
 
-DfaTokenAutomata::DfaTokenAutomata(const KeyWordAutomata *keyWordAutomata,
-                                   const TokenDfa *tokenDfa)
-    : keyWordAutomata(keyWordAutomata), dfa(tokenDfa), tokens(nullptr),
-      oneTokenStringBuilder(256), startIndexOfToken(0), eof(-1) {}
+DfaTokenAutomata::DfaTokenAutomata(const TokenDfa *tokenDfa)
+    : dfa(tokenDfa), tokens(nullptr), oneTokenStringBuilder(256),
+      startIndexOfToken(0), eof(-1) {}
 
 // dfa delete by PersistentObject.tokenDfa
 // tokens delete by caller
@@ -29,7 +28,7 @@ DfaTokenAutomata::buildToken(const std::string *sourceFilePath) {
   } while (hasBuildedToken);
   std::list<Token *> *ret = this->tokens;
   clear();
-  return keyWordAutomata->buildToken(ret);
+  return ret;
 }
 
 void DfaTokenAutomata::clear() {
