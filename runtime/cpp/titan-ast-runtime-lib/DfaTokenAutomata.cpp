@@ -4,6 +4,7 @@
 
 #include "DfaTokenAutomata.h"
 #include "AstRuntimeException.h"
+#include <sstream>
 
 DfaTokenAutomata::DfaTokenAutomata(const TokenDfa *tokenDfa)
     : dfa(tokenDfa), tokens(nullptr), oneTokenStringBuilder(256),
@@ -84,9 +85,12 @@ const TokenDfaState *DfaTokenAutomata::getTerminalState() {
   if (!firstTerminalState) {
     std::string tokenStr((char *)(oneTokenStringBuilder.buffer),
                          oneTokenStringBuilder.position);
-    AstRuntimeExceptionResolver::throwException(
-        AstRuntimeException(AstRuntimeExceptionCode::INVALID_ARGUMENT,
-                            "'" + tokenStr + "' does not match any token"));
+    std::stringstream errorInfo;
+    errorInfo << "[" << startIndexOfToken << ","
+              << startIndexOfToken + oneTokenStringBuilder.length() << "):'"
+              << tokenStr << "' does not match any token";
+    AstRuntimeExceptionResolver::throwException(AstRuntimeException(
+        AstRuntimeExceptionCode::INVALID_ARGUMENT, errorInfo.str()));
     return nullptr;
   }
   // 重复嗅探更高优先级或贪婪

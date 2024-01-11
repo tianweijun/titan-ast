@@ -11,8 +11,6 @@ import java.util.List;
  */
 public class GrammarTokenBuilder {
 
-  public List<GrammarToken> grammarTokens = new LinkedList<>();
-
   private LinkedList<GrammarTokenProcessor> processors = new LinkedList<>();
 
   public GrammarTokenBuilder() {}
@@ -27,7 +25,7 @@ public class GrammarTokenBuilder {
    * @return 语法文件对应的tokens
    */
   public List<GrammarToken> buildTokens() {
-    grammarTokens.clear();
+    List<GrammarToken> grammarTokens = new LinkedList<>();
     Iterator<GrammarTokenProcessor> processorIt = processors.iterator();
     while (processorIt.hasNext()) {
       processorIt.next().process(grammarTokens);

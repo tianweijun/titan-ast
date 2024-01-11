@@ -9,6 +9,7 @@ public class GrammarToken {
 
   public GrammarTokenType type = GrammarTokenType.TEXT;
   public String text = "";
+  public int start = -1;
 
   public GrammarToken(GrammarTokenType type) {
     this.type = type;

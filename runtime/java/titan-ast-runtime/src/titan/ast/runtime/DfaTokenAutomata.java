@@ -119,7 +119,11 @@ public class DfaTokenAutomata implements TokenAutomata {
     }
     if (null == firstTerminalState) {
       throw new AstRuntimeException(
-          String.format("'%s' does not match any token", oneTokenStringBuilder.toString()));
+          String.format(
+              "[%d,%d):'%s' does not match any token",
+              startIndexOfToken,
+              startIndexOfToken + oneTokenStringBuilder.length(),
+              oneTokenStringBuilder.toString()));
     }
     // 重复嗅探更高优先级或贪婪
     int lengthOfToken = oneTokenStringBuilder.length();

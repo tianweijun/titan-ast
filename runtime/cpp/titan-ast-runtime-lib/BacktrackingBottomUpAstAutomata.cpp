@@ -374,15 +374,15 @@ std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
     startIndexOfToken = 0;
   }
   if (endIndexOfToken == 0) {
-    endIndexOfToken = indexOfLastToken > 15 ? 15 : indexOfLastToken;
+    endIndexOfToken = indexOfLastToken > 1 ? 1 : indexOfLastToken;
   } else {
     if (endIndexOfToken + 1 < indexOfLastToken) {
       endIndexOfToken += 1;
     }
   }
 
-  int startIndexChar = 0;
-  int endIndexChar = 0;
+  int startIndexByte = 0;
+  int endIndexByte = 0;
 
   std::stringstream tokenInfo;
   if (sizeOfTokens > 0) {
@@ -390,8 +390,8 @@ std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
         tokenReducingSymbolInputStream.tokenReducingSymbols;
     AutomataTmpToken *startToken = &tokenReducingSymbols[startIndexOfToken];
     AutomataTmpToken *endToken = &tokenReducingSymbols[endIndexOfToken];
-    startIndexChar = startToken->start;
-    endIndexChar = endToken->start;
+    startIndexByte = startToken->start;
+    endIndexByte = endToken->start + endToken->text->length();
 
     for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken;
          indexOfToken++) {
@@ -405,7 +405,7 @@ std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
   }
 
   std::stringstream errorInfo;
-  errorInfo << "generate ast failed,error near [" << startIndexChar << ","
-            << endIndexChar << "]:" << strTokenInfo;
+  errorInfo << "generate ast failed,error near [" << startIndexByte << ","
+            << endIndexByte << "):" << strTokenInfo;
   return errorInfo.str();
 }

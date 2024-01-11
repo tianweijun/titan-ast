@@ -35,7 +35,7 @@ public class GrammarCommentsTokenProcessor implements GrammarTokenProcessor {
         setSinglyComments(tokensIt);
       } else if (text.equals(startOfMultComments)) {
         token.type = GrammarTokenType.COMMENTS_TEXT;
-        setMultComments(tokensIt);
+        setMultComments(tokensIt, token.start);
       }
     }
   }
@@ -61,13 +61,17 @@ public class GrammarCommentsTokenProcessor implements GrammarTokenProcessor {
    * asterisk/?需要分割.
    *
    * @param tokensIt token流的遍历器
+   * @param indexOfStartMultComments /asterisk
    */
-  private void setMultComments(Iterator<GrammarToken> tokensIt) {
+  private void setMultComments(Iterator<GrammarToken> tokensIt, int indexOfStartMultComments) {
+    int endIndex = indexOfStartMultComments + startOfMultComments.length();
     StringBuilder contextInfo = new StringBuilder();
     boolean isEnd = false;
     while (tokensIt.hasNext()) {
       GrammarToken token = tokensIt.next();
-      contextInfo.append(token);
+      contextInfo.append(token.text);
+      endIndex = token.start + token.text.length();
+
       if (token.text.equals(endOfMultComments)) {
         token.type = GrammarTokenType.COMMENTS_TEXT;
         isEnd = true;
@@ -80,8 +84,12 @@ public class GrammarCommentsTokenProcessor implements GrammarTokenProcessor {
     if (!isEnd) {
       throw new AstRuntimeException(
           String.format(
-              "%s expect '%s',error near %s.",
-              startOfMultComments, endOfMultComments, contextInfo.toString()));
+              "%s expect '%s',error near [%d,%d):%s",
+              startOfMultComments,
+              endOfMultComments,
+              indexOfStartMultComments,
+              endIndex,
+              contextInfo.toString()));
     }
   }
 }

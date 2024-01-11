@@ -292,21 +292,21 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       startIndexOfToken = 0;
     }
     if (endIndexOfToken == 0) {
-      endIndexOfToken = Math.min(indexOfLastToken, 15);
+      endIndexOfToken = Math.min(indexOfLastToken, 1);
     } else {
       if (endIndexOfToken + 1 < indexOfLastToken) {
         endIndexOfToken += 1;
       }
     }
-    int startIndexChar = 0;
-    int endIndexChar = 0;
+    int startIndexByte = 0;
+    int endIndexByte = 0;
 
     StringBuilder tokenInfo = new StringBuilder();
     if (!tokenReducingSymbols.isEmpty()) {
       Token startToken = tokenReducingSymbols.get(startIndexOfToken);
       Token endToken = tokenReducingSymbols.get(endIndexOfToken);
-      startIndexChar = startToken.start;
-      endIndexChar = endToken.start;
+      startIndexByte = startToken.start;
+      endIndexByte = endToken.start + endToken.text.length();
 
       for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken; indexOfToken++) {
         Token token = tokenReducingSymbols.get(indexOfToken);
@@ -318,7 +318,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     }
 
     return String.format(
-        "generate ast failed,error near [%d,%d]:%s",
-        startIndexChar, endIndexChar, tokenInfo.toString());
+        "generate ast failed,error near [%d,%d):%s",
+        startIndexByte, endIndexByte, tokenInfo.toString());
   }
 }
