@@ -59,9 +59,11 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     while (!bottomUpBranchs.isEmpty()) {
       consumeBottomUpBranch();
     }
+
     if (result.isEmpty()) {
       throw new AstRuntimeException(getNoResultErrorInfo());
     }
+
     List<Ast> ret = new ArrayList<>(result.size());
     for (AutomataTmpAst tmpAst : result) {
       ret.add(tmpAst.toAst());
@@ -77,31 +79,16 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     if (triedBottomUpBranchs.contains(bottomUpBranch)) {
       return;
     }
+
     BacktrackingBottomUpBranch triedBottomUpBranch = bottomUpBranch.clone();
-    switch (bottomUpBranch.status) {
-      case CREATED:
-        reduceBottomUpBranch(bottomUpBranch);
-        bottomUpBranchs.addFirst(bottomUpBranch);
-        bottomUpBranchsShadow.add(bottomUpBranch);
-        break;
-      case REDUCED:
-        shiftBottomUpBranch(bottomUpBranch);
-        bottomUpBranchs.addFirst(bottomUpBranch);
-        bottomUpBranchsShadow.add(bottomUpBranch);
-        break;
-      case SHIFTED:
-        closeBottomUpBranch(bottomUpBranch);
-        bottomUpBranchs.addFirst(bottomUpBranch);
-        bottomUpBranchsShadow.add(bottomUpBranch);
-        break;
-      case NON_ACCEPTED:
-        break;
-      case ACCEPTED:
-        result.add(bottomUpBranch.reducingSymbols.getLast().astOfCurrentDfaState);
-        break;
-      default:
-    }
     triedBottomUpBranchs.add(triedBottomUpBranch);
+
+    if (isAcceptedBottomUpBranch(bottomUpBranch)) {
+      result.add(bottomUpBranch.reducingSymbols.getLast().astOfCurrentDfaState);
+      return;
+    }
+    reduceBottomUpBranch(bottomUpBranch);
+    shiftBottomUpBranch(bottomUpBranch);
   }
 
   private void shiftBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
@@ -115,7 +102,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       // 连通的
       if (null != nextDfaState) {
         BacktrackingBottomUpBranch terminalBottomUpBranch = bottomUpBranch.clone();
-        terminalBottomUpBranch.status = BacktrackingBottomUpBranch.Status.CREATED;
         // 归约的符号
         ReducingSymbol terminalReducingSymbol = new ReducingSymbol();
         terminalReducingSymbol.reducedGrammar = token.terminal;
@@ -127,7 +113,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
         addNewBacktrackingBottomUpBranch(terminalBottomUpBranch);
       }
     }
-    bottomUpBranch.status = BacktrackingBottomUpBranch.Status.SHIFTED;
   }
 
   private void reduceBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
@@ -138,7 +123,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
         doReduce(bottomUpBranch, closingProductionRule);
       }
     }
-    bottomUpBranch.status = BacktrackingBottomUpBranch.Status.REDUCED;
   }
 
   private void doReduce(
@@ -153,7 +137,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       // 连通的
       if (null != nextDfaState) {
         BacktrackingBottomUpBranch newBottomUpBranch = bottomUpBranch.clone();
-        newBottomUpBranch.status = BacktrackingBottomUpBranch.Status.CREATED;
         // 归约的符号
         ReducingSymbol nonterminalReducingSymbol = new ReducingSymbol();
         nonterminalReducingSymbol.reducedGrammar = closingProductionRule.grammar;
@@ -191,13 +174,12 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
         // 连通的
         if (null != nextDfaState) {
           BacktrackingBottomUpBranch newBottomUpBranch = bottomUpBranch.clone();
-          newBottomUpBranch.status = BacktrackingBottomUpBranch.Status.CREATED;
           // 被归约的符号出栈，同时建立语法树孩子节点
           AutomataTmpAst reducingAst =
               new AutomataTmpAst(closingProductionRule.grammar, closingProductionRule.alias);
-          for (int countOfReducingSymbol = 1;
-              countOfReducingSymbol <= countOfComsumedReducingSymbol;
-              countOfReducingSymbol++) {
+          for (int countOfReducingSymbols = 1;
+              countOfReducingSymbols <= countOfComsumedReducingSymbol;
+              countOfReducingSymbols++) {
             ReducingSymbol childReducingSymbol = newBottomUpBranch.reducingSymbols.removeLast();
             // 不用克隆孩子语法树，因为newBottomUpBranch已经克隆了原来分支的符号栈信息，
             // 现在又把这些产生式孩子元素丢弃，故这些孩子语法树直接拿来用，使其不被回收
@@ -218,16 +200,13 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     }
   }
 
-  private void closeBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
+  private boolean isAcceptedBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
     ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
     tokenReducingSymbolInputStream.nextReadIndex = topReducingSymbol.endIndexOfToken + 1;
-    bottomUpBranch.status = BacktrackingBottomUpBranch.Status.NON_ACCEPTED;
     // 可接受状态:栈中有两个归约，栈底是基准标志，栈顶是归约结果，并且源文件输入流全部识别了
-    if (tokenReducingSymbolInputStream.hasReadAll()
+    return tokenReducingSymbolInputStream.hasReadAll()
         && bottomUpBranch.reducingSymbols.size() == 2
-        && startGrammar.equals(topReducingSymbol.reducedGrammar)) {
-      bottomUpBranch.status = BacktrackingBottomUpBranch.Status.ACCEPTED;
-    }
+        && startGrammar.equals(topReducingSymbol.reducedGrammar);
   }
 
   private void clear() {

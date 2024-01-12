@@ -23,24 +23,16 @@ public class ProductionRuleSyntaxNfaReducingBranchLinker {
   }
 
   public void link() {
-    int oldCountStates = -1;
-    int newCountStates = 0;
-    while (newCountStates > oldCountStates) {
-      oldCountStates = newCountStates;
-      newCountStates = doLink();
-    }
+    doLink();
   }
 
-  private int doLink() {
-    int countStates = 0;
+  private void doLink() {
     for (LinkedList<ProductionRule> productionRules : nonterminalProductionRulesMap.values()) {
       for (ProductionRule productionRule : productionRules) {
         SyntaxNfa syntaxNfa = productionRule.rule.syntaxNfa;
         doLink(syntaxNfa.getStates());
-        countStates += syntaxNfa.getStates().size();
       }
     }
-    return countStates;
   }
 
   private void doLink(Set<SyntaxNfaState> froms) {

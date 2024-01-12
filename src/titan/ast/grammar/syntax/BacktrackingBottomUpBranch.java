@@ -11,7 +11,6 @@ import titan.ast.runtime.AstRuntimeException;
  */
 public class BacktrackingBottomUpBranch implements Cloneable {
 
-  public Status status = Status.CREATED;
   LinkedList<ReducingSymbol> reducingSymbols = new LinkedList<>();
 
   public BacktrackingBottomUpBranch clone() {
@@ -21,7 +20,6 @@ public class BacktrackingBottomUpBranch implements Cloneable {
     } catch (CloneNotSupportedException e) {
       throw new AstRuntimeException(e);
     }
-    copy.status = this.status;
     copy.reducingSymbols = new LinkedList<>();
     for (ReducingSymbol reducingSymbol : this.reducingSymbols) {
       copy.reducingSymbols.addLast(reducingSymbol.clone());
@@ -39,32 +37,22 @@ public class BacktrackingBottomUpBranch implements Cloneable {
       return false;
     }
     BacktrackingBottomUpBranch that = (BacktrackingBottomUpBranch) o;
-    return status == that.status && reducingSymbols.equals(that.reducingSymbols);
+    return reducingSymbols.equals(that.reducingSymbols);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(status, reducingSymbols);
+    return Objects.hash(reducingSymbols);
   }
 
   @Override
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("[").append(status.name()).append("]");
     for (ReducingSymbol reducingSymbol : reducingSymbols) {
       if (null != reducingSymbol.reducedGrammar) {
         stringBuilder.append("-").append(reducingSymbol.reducedGrammar.name);
       }
     }
     return stringBuilder.toString();
-  }
-
-  /** 自顶向上归约分支生命周期. */
-  public enum Status {
-    CREATED,
-    REDUCED,
-    SHIFTED,
-    NON_ACCEPTED,
-    ACCEPTED
   }
 }

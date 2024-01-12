@@ -56,9 +56,9 @@ bool ReducingSymbol::compare(const ReducingSymbol *o) const {
   return false;
 }
 size_t ReducingSymbol::hashCode() const {
-  size_t hashCode = (endIndexOfToken & 0x7F) << 21;
-  hashCode += (((long)reducedGrammar) & 0x7F) << 14;
-  hashCode += (((long)currentDfaState) & 0x7F) << 7;
-  hashCode += (astOfCurrentDfaState->hashCode() & 0x7F);
+  size_t hashCode = (endIndexOfToken & 0xFF) << 24;
+  hashCode += (((long)reducedGrammar) & 0xFF) << 16;
+  hashCode += (((long)currentDfaState) & 0xFF) << 8;
+  hashCode += (astOfCurrentDfaState->hashCode() & 0xFF);
   return hashCode;
 }

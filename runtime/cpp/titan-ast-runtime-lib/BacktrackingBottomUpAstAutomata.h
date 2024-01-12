@@ -46,7 +46,7 @@ private:
   bool addNewBacktrackingBottomUpBranch(
       BacktrackingBottomUpBranch *newBacktrackingBottomUpBranch);
   void consumeBottomUpBranch();
-  void closeBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
+  bool isAcceptedBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
   void shiftBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
   void reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
   void doReduce(BacktrackingBottomUpBranch *bottomUpBranch,

@@ -6,8 +6,7 @@
 #include <unordered_set>
 
 BacktrackingBottomUpBranch::BacktrackingBottomUpBranch()
-    : status(BacktrackingBottomUpBranchStatus::CREATED),
-      reducingSymbols(std::list<ReducingSymbol *>()) {}
+    : reducingSymbols(std::list<ReducingSymbol *>()) {}
 
 BacktrackingBottomUpBranch::~BacktrackingBottomUpBranch() {
   for (auto reducingSymbol : reducingSymbols) {
@@ -19,7 +18,7 @@ BacktrackingBottomUpBranch::~BacktrackingBottomUpBranch() {
 
 BacktrackingBottomUpBranch *BacktrackingBottomUpBranch::clone() const {
   auto *bottomUpBranch = new BacktrackingBottomUpBranch();
-  bottomUpBranch->status = this->status;
+
   for (auto reducingSymbol : reducingSymbols) {
     bottomUpBranch->reducingSymbols.push_back(reducingSymbol->clone());
   }
@@ -29,9 +28,7 @@ BacktrackingBottomUpBranch *BacktrackingBottomUpBranch::clone() const {
 // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
 bool BacktrackingBottomUpBranch::compare(
     const BacktrackingBottomUpBranch *o) const {
-  if (this->status != o->status) {
-    return this->status < o->status;
-  }
+
   if (this->reducingSymbols.size() != o->reducingSymbols.size()) {
     return this->reducingSymbols.size() < o->reducingSymbols.size();
   }
@@ -51,8 +48,7 @@ bool BacktrackingBottomUpBranch::compare(
 
 bool BacktrackingBottomUpBranch::equals(
     const BacktrackingBottomUpBranch *o) const {
-  if (this->status != o->status ||
-      this->reducingSymbols.size() != o->reducingSymbols.size()) {
+  if (this->reducingSymbols.size() != o->reducingSymbols.size()) {
     return false;
   }
   auto thisReducingSymbolsIt = this->reducingSymbols.begin();
@@ -70,13 +66,11 @@ bool BacktrackingBottomUpBranch::equals(
 }
 
 size_t BacktrackingBottomUpBranch::hashCode() const {
-  size_t statusHashCode = (static_cast<int>(status) & 0xF) << 28;
   size_t reducingSymbolsHashCode = 0;
   for (auto reducingSymbol : reducingSymbols) {
     reducingSymbolsHashCode += reducingSymbol->hashCode();
   }
-  reducingSymbolsHashCode = reducingSymbolsHashCode & 0xFFFFFFF;
-  return std::hash<size_t>()(statusHashCode + reducingSymbolsHashCode);
+  return std::hash<size_t>()(reducingSymbolsHashCode);
 }
 
 bool BacktrackingBottomUpBranch::operator==(

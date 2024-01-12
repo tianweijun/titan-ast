@@ -8,14 +8,6 @@
 #include "ReducingSymbol.h"
 #include <list>
 
-enum class BacktrackingBottomUpBranchStatus : int {
-  CREATED = 0,
-  REDUCED,
-  SHIFTED,
-  NON_ACCEPTED,
-  ACCEPTED
-};
-
 class BacktrackingBottomUpBranch {
 public:
   BacktrackingBottomUpBranch();
@@ -32,7 +24,6 @@ public:
   bool operator==(const BacktrackingBottomUpBranch &o) const;
   size_t hashCode() const;
 
-  BacktrackingBottomUpBranchStatus status;
   std::list<ReducingSymbol *> reducingSymbols;
 };
 
