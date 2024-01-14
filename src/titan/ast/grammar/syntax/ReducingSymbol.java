@@ -10,7 +10,7 @@ import titan.ast.target.AutomataTmpAst;
  *
  * @author tian wei jun
  */
-public class ReducingSymbol implements Cloneable {
+public class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
 
   // grammar
   public Grammar reducedGrammar = null;
@@ -60,5 +60,21 @@ public class ReducingSymbol implements Cloneable {
   @Override
   public String toString() {
     return null == astOfCurrentDfaState ? "" : astOfCurrentDfaState.toString();
+  }
+
+  @Override
+  public int compareTo(ReducingSymbol that) {
+    if (endIndexOfToken != that.endIndexOfToken) {
+      return endIndexOfToken - that.endIndexOfToken;
+    }
+    int compare = reducedGrammar.compareTo(that.reducedGrammar);
+    if (0 != compare) {
+      return compare;
+    }
+    compare = currentDfaState.compareTo(that.currentDfaState);
+    if (0 != compare) {
+      return compare;
+    }
+    return astOfCurrentDfaState.compareTo(that.astOfCurrentDfaState);
   }
 }

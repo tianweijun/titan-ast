@@ -1,5 +1,6 @@
 package titan.ast.grammar.syntax;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import titan.ast.runtime.AstRuntimeException;
@@ -9,7 +10,8 @@ import titan.ast.runtime.AstRuntimeException;
  *
  * @author tian wei jun
  */
-public class BacktrackingBottomUpBranch implements Cloneable {
+public class BacktrackingBottomUpBranch
+    implements Cloneable, Comparable<BacktrackingBottomUpBranch> {
 
   LinkedList<ReducingSymbol> reducingSymbols = new LinkedList<>();
 
@@ -54,5 +56,31 @@ public class BacktrackingBottomUpBranch implements Cloneable {
       }
     }
     return stringBuilder.toString();
+  }
+
+  @Override
+  public int compareTo(BacktrackingBottomUpBranch that) {
+    LinkedList<ReducingSymbol> thatReducingSymbols = that.reducingSymbols;
+    // endIndexOfToken
+    int thisEndIndexOfToken = this.reducingSymbols.getLast().endIndexOfToken;
+    int thatEndIndexOfToken = thatReducingSymbols.getLast().endIndexOfToken;
+    if (thisEndIndexOfToken != thatEndIndexOfToken) {
+      return thisEndIndexOfToken - thatEndIndexOfToken;
+    }
+    // reducingSymbols
+    if (this.reducingSymbols.size() != thatReducingSymbols.size()) {
+      return this.reducingSymbols.size() - thatReducingSymbols.size();
+    }
+    Iterator<ReducingSymbol> thisReducingSymbolsIt = this.reducingSymbols.iterator();
+    Iterator<ReducingSymbol> thatReducingSymbolsIt = thatReducingSymbols.iterator();
+    while (thisReducingSymbolsIt.hasNext()) {
+      ReducingSymbol thisReducingSymbol = thisReducingSymbolsIt.next();
+      ReducingSymbol thatReducingSymbol = thatReducingSymbolsIt.next();
+      int reducingSymbolCompare = thisReducingSymbol.compareTo(thatReducingSymbol);
+      if (0 != reducingSymbolCompare) {
+        return reducingSymbolCompare;
+      }
+    }
+    return 0;
   }
 }

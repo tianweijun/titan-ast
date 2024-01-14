@@ -1,11 +1,12 @@
 
 /*
 *
-* cyana language lexer
+* titan language lexer
 *
 */
 
 @TerminalGrammar begin ;
+
 Comment laziness()
     :   '/*'  AnyOneChar* '*/' -> skip
     ;
@@ -18,23 +19,37 @@ WordSpace
     :  [\s\t\r\n]+ -> skip
     ;
 
-// binary operator
-PathSeparator : '::' ;
-Arrow : '->' ;
-
-// unary operator
-Semi : ';' ;
 LeftBrace : '{' ;
 RightBrace : '}' ;
 LeftParen : '(' ;
 RightParen : ')' ;
-Comma : ',' ;
 
-// KeyWord
-Module : 'module' ;
-Use : 'use' ;
-Public : 'public' ;
-Return : 'return' ;
+Semi : ';' ;
+Comma : ',' ;
+Colon : ':' ;
+Dot : '.' ;
+
+Plus    : '+' ;
+Minus   : '-' ;
+Star    : '*' ;
+Slash   : '/' ;
+Mod     : '%' ;
+
+BitAnd : '&' ;
+BitOr : '|' ;
+BitXor : '^' ;
+BitNot : '~' ;
+
+Gt : '>' ;
+Lt : '<' ;
+
+Assign : '=' ;
+
+Or : '|' ;
+Not : '!' ;
+
+Question : '?' ;
+At : '@' ;
 
 IntegerLiteral :
   DecimalLiteral
@@ -101,8 +116,8 @@ HexadecimalDigit
     :   [0-9a-fA-F]
     ;
 
-IdentifierStart
-	  : [\x41-\x5A]   // A-Z [\u0041-\u005A]
+IdentifierStart :
+    [\x41-\x5A]   // A-Z [\u0041-\u005A]
 	  | [\x5F]          // _ [\u005F]
 	  | [\x61-\x7A]  // a-z [\u0061-\u007A]
 	  ;
@@ -118,3 +133,30 @@ AnyOneChar
     ;
 
 @TerminalFragmentGrammar end ;
+
+@RootKeyWord Identifier ;
+
+@KeyWord begin ;
+
+Crate : 'crate' ;
+Module : 'module' ;
+Use : 'use' ;
+This : 'this' ;
+SelfValue : 'self' ;
+SelfType : 'Self' ;
+Function : 'function' ;
+Public : 'public' ;
+Return : 'return' ;
+Let : 'let' ;
+For : 'for' ;
+In : 'in' ;
+Trait : 'trait' ;
+Block : 'block' ;
+Super : 'super' ;
+Struct : 'struct' ;
+Primitive : 'primitive' ;
+Enum : 'enum' ;
+Class : 'class' ;
+Reference : 'reference' ;
+
+@KeyWord end ;

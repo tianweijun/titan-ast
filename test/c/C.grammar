@@ -33,9 +33,9 @@ postfixExpression
     |   postfixExpression '[' expression ']'				#arr_postfixExp
     |   postfixExpression '(' argumentExpressionList? ')'   #functionCall_postfixExp
     |   postfixExpression '.' Identifier					#struct_postfixExp
-    |   postfixExpression '->' Identifier					#pointer_postfixExp
-    |   postfixExpression '++'								#inc_postfixExp
-    |   postfixExpression '--'								#dec_postfixExp
+    |   postfixExpression '-' '>' Identifier					#pointer_postfixExp
+    |   postfixExpression '+' '+'								#inc_postfixExp
+    |   postfixExpression '-' '-'								#dec_postfixExp
     |   '(' typeName ')' '{' initializerList '}'			#struct_postfixExp
     |   '(' typeName ')' '{' initializerList ',' '}'		#struct2_postfixExp
     |   '__extension__' '(' typeName ')' '{' initializerList '}'		#extensionStruct_postfixExp
@@ -49,13 +49,13 @@ argumentExpressionList
 
 unaryExpression
     :   postfixExpression
-    |   '++' unaryExpression
-    |   '--' unaryExpression
+    |   '+' '+' unaryExpression
+    |   '-' '-' unaryExpression
     |   unaryOperator castExpression
     |   'sizeof' unaryExpression
     |   'sizeof' '(' typeName ')'
     |   '_Alignof' '(' typeName ')'
-    |   '&&' Identifier // GCC extension address of label
+    |   '&' '&' Identifier // GCC extension address of label
     ;
 
 unaryOperator
@@ -84,22 +84,22 @@ additiveExpression
 
 shiftExpression
     :   additiveExpression
-    |   shiftExpression '<<' additiveExpression
-    |   shiftExpression '>>' additiveExpression
+    |   shiftExpression '<' '<' additiveExpression
+    |   shiftExpression '>' '>' additiveExpression
     ;
 
 relationalExpression
     :   shiftExpression
     |   relationalExpression '<' shiftExpression
     |   relationalExpression '>' shiftExpression
-    |   relationalExpression '<=' shiftExpression
-    |   relationalExpression '>=' shiftExpression
+    |   relationalExpression '<' '=' shiftExpression
+    |   relationalExpression '>' '=' shiftExpression
     ;
 
 equalityExpression
     :   relationalExpression
-    |   equalityExpression '==' relationalExpression
-    |   equalityExpression '!=' relationalExpression
+    |   equalityExpression '=' '=' relationalExpression
+    |   equalityExpression '!' '=' relationalExpression
     ;
 
 andExpression
@@ -119,12 +119,12 @@ inclusiveOrExpression
 
 logicalAndExpression
     :   inclusiveOrExpression
-    |   logicalAndExpression '&&' inclusiveOrExpression
+    |   logicalAndExpression '&' '&' inclusiveOrExpression
     ;
 
 logicalOrExpression
     :   logicalAndExpression
-    |   logicalOrExpression '||' logicalAndExpression
+    |   logicalOrExpression '|' '|' logicalAndExpression
     ;
 
 conditionalExpression
@@ -138,7 +138,7 @@ assignmentExpression
     ;
 
 assignmentOperator
-    :   '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|='
+    :   '=' | '*' '=' | '/' '=' | '%' '=' | '+' '=' | '-' '=' | '<' '<' '=' | '>' '>' '=' | '&' '=' | '^' '=' | '|' '='
     ;
 
 expression
@@ -363,7 +363,7 @@ typeQualifierList
 
 parameterTypeList
     :   parameterList
-    |   parameterList ',' '...'
+    |   parameterList ',' '.' '.' '.'
     ;
 
 parameterList
@@ -558,6 +558,8 @@ Constant
     |   CharacterConstant	// #characterConstant
     ;
 
+/*
+
 LeftShiftAssign : '<<=' ;
 RightShiftAssign : '>>=' ;
 Ellipsis : '...' ;
@@ -587,6 +589,8 @@ Equal : '==' ;
 NotEqual : '!=' ;
 
 Arrow : '->' ;
+
+*/
 
 LeftParen : '(' ;
 RightParen : ')' ;

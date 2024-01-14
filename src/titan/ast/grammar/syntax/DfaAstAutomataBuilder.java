@@ -22,16 +22,15 @@ public class DfaAstAutomataBuilder {
   public AstAutomata build() {
     NonterminalDfaBuilder nonterminalDfaBuilder = new NonterminalDfaBuilder();
     SyntaxDfa astDfa = nonterminalDfaBuilder.buildAstDfa();
-
-    clearTransientObjects();
-
     LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
     languageGrammar.astDfa = astDfa;
 
     AstAutomata astAutomata =
-        new BacktrackingBottomUpAstAutomata(astDfa, languageGrammar.getStart());
+        new DfaAstAutomataFactory(AstAutomataType.FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA)
+            .build();
     languageGrammar.astAutomata = astAutomata;
 
+    clearTransientObjects();
     return astAutomata;
   }
 

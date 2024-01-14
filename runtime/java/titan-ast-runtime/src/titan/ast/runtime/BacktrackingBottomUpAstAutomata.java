@@ -1,10 +1,11 @@
 package titan.ast.runtime;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TreeSet;
 
 /**
  * 按照可回溯方式构造ast的自动机.
@@ -12,13 +13,15 @@ import java.util.ListIterator;
  * @author tian wei jun
  */
 public class BacktrackingBottomUpAstAutomata implements AstAutomata {
+
   SyntaxDfa astDfa = null;
   Grammar startGrammar = null;
   TokenReducingSymbolInputStream tokenReducingSymbolInputStream = null;
-  LinkedList<BacktrackingBottomUpBranch> bottomUpBranchs = new LinkedList<>();
-  HashSet<BacktrackingBottomUpBranch> triedBottomUpBranchs = new HashSet<>();
+  TreeSet<BacktrackingBottomUpBranch> bottomUpBranchs =
+      new TreeSet<>(new BacktrackingBottomUpBranchComparator());
+  TreeSet<BacktrackingBottomUpBranch> triedBottomUpBranchs =
+      new TreeSet<>(new BacktrackingBottomUpBranchComparator());
   LinkedList<AutomataTmpAst> result = new LinkedList<>();
-  private HashSet<BacktrackingBottomUpBranch> bottomUpBranchsShadow = new HashSet<>();
 
   public BacktrackingBottomUpAstAutomata(SyntaxDfa astDfa, Grammar startGrammar) {
     this.astDfa = astDfa;
@@ -66,10 +69,9 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     return ret;
   }
 
-  private void consumeBottomUpBranch() {
-    BacktrackingBottomUpBranch bottomUpBranch = bottomUpBranchs.getFirst();
-    bottomUpBranchs.removeFirst();
-    bottomUpBranchsShadow.remove(bottomUpBranch);
+  void consumeBottomUpBranch() {
+    BacktrackingBottomUpBranch bottomUpBranch = bottomUpBranchs.pollFirst();
+
     if (triedBottomUpBranchs.contains(bottomUpBranch)) {
       return;
     }
@@ -85,7 +87,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     shiftBottomUpBranch(bottomUpBranch);
   }
 
-  private void shiftBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
+  void shiftBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
     ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
     // 将输入流定位到分支读取的位置
     tokenReducingSymbolInputStream.nextReadIndex = topReducingSymbol.endIndexOfToken + 1;
@@ -95,7 +97,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       SyntaxDfaState nextDfaState = topReducingSymbol.currentDfaState.edges.get(token.terminal);
       // 连通的
       if (null != nextDfaState) {
-        BacktrackingBottomUpBranch terminalBottomUpBranch = bottomUpBranch.clone();
         // 归约的符号
         ReducingSymbol terminalReducingSymbol = new ReducingSymbol();
         terminalReducingSymbol.reducedGrammar = token.terminal;
@@ -103,24 +104,22 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
         terminalReducingSymbol.currentDfaState = nextDfaState;
         terminalReducingSymbol.endIndexOfToken = tokenReducingSymbolInputStream.nextReadIndex - 1;
         // 归约的符号进栈
+        BacktrackingBottomUpBranch terminalBottomUpBranch = bottomUpBranch.clone();
         terminalBottomUpBranch.reducingSymbols.addLast(terminalReducingSymbol);
         addNewBacktrackingBottomUpBranch(terminalBottomUpBranch);
       }
     }
   }
 
-  private void reduceBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
+  void reduceBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
     ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
     SyntaxDfaState currentDfaState = topReducingSymbol.currentDfaState;
-    if (!currentDfaState.closingProductionRules.isEmpty()) {
-      for (ProductionRule closingProductionRule : currentDfaState.closingProductionRules) {
-        doReduce(bottomUpBranch, closingProductionRule);
-      }
+    for (ProductionRule closingProductionRule : currentDfaState.closingProductionRules) {
+      doReduce(bottomUpBranch, closingProductionRule);
     }
   }
 
-  private void doReduce(
-      BacktrackingBottomUpBranch bottomUpBranch, ProductionRule closingProductionRule) {
+  void doReduce(BacktrackingBottomUpBranch bottomUpBranch, ProductionRule closingProductionRule) {
     int endIndexOfToken = bottomUpBranch.reducingSymbols.getLast().endIndexOfToken;
     // 空归约
     if (FaStateType.isClosingTag(closingProductionRule.reducingDfa.start.type)) {
@@ -130,7 +129,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
           topReducingSymbolDfaState.edges.get(closingProductionRule.grammar);
       // 连通的
       if (null != nextDfaState) {
-        BacktrackingBottomUpBranch newBottomUpBranch = bottomUpBranch.clone();
         // 归约的符号
         ReducingSymbol nonterminalReducingSymbol = new ReducingSymbol();
         nonterminalReducingSymbol.reducedGrammar = closingProductionRule.grammar;
@@ -139,6 +137,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
         nonterminalReducingSymbol.currentDfaState = nextDfaState;
         nonterminalReducingSymbol.endIndexOfToken = endIndexOfToken;
         // 归约的符号进栈
+        BacktrackingBottomUpBranch newBottomUpBranch = bottomUpBranch.clone();
         newBottomUpBranch.reducingSymbols.addLast(nonterminalReducingSymbol);
         addNewBacktrackingBottomUpBranch(newBottomUpBranch);
       }
@@ -194,7 +193,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     }
   }
 
-  private boolean isAcceptedBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
+  boolean isAcceptedBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
     ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
     tokenReducingSymbolInputStream.nextReadIndex = topReducingSymbol.endIndexOfToken + 1;
     // 可接受状态:栈中有两个归约，栈底是基准标志，栈顶是归约结果，并且源文件输入流全部识别了
@@ -206,7 +205,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
   private void clear() {
     tokenReducingSymbolInputStream = null;
     bottomUpBranchs.clear();
-    bottomUpBranchsShadow.clear();
     triedBottomUpBranchs.clear();
     result.clear();
   }
@@ -233,7 +231,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     ReducingSymbol connectedSignOfStartGrammarReducingSymbol = new ReducingSymbol();
     connectedSignOfStartGrammarReducingSymbol.reducedGrammar = startGrammar;
     connectedSignOfStartGrammarReducingSymbol.astOfCurrentDfaState =
-        new AutomataTmpAst(startGrammar, null);
+        new AutomataTmpAst(startGrammar, "");
     connectedSignOfStartGrammarReducingSymbol.endIndexOfToken = -1;
     connectedSignOfStartGrammarReducingSymbol.currentDfaState = astDfa.start;
     return connectedSignOfStartGrammarReducingSymbol;
@@ -244,9 +242,21 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     if (triedBottomUpBranchs.contains(newBacktrackingBottomUpBranch)) {
       return;
     }
-    if (!bottomUpBranchsShadow.contains(newBacktrackingBottomUpBranch)) {
-      bottomUpBranchs.addFirst(newBacktrackingBottomUpBranch);
-      bottomUpBranchsShadow.add(newBacktrackingBottomUpBranch);
+    bottomUpBranchs.add(newBacktrackingBottomUpBranch);
+
+    if (!triedBottomUpBranchs.isEmpty()) {
+      int minEndIndexOfTask = bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+
+      int minEndIndexOfTriedBranch =
+          triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+      while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
+        triedBottomUpBranchs.pollFirst();
+        if (triedBottomUpBranchs.isEmpty()) {
+          break;
+        }
+        minEndIndexOfTriedBranch =
+            triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+      }
     }
   }
 
@@ -297,5 +307,14 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     return String.format(
         "generate ast failed,error near [%d,%d):%s",
         startIndexByte, endIndexByte, tokenInfo.toString());
+  }
+
+  public static class BacktrackingBottomUpBranchComparator
+      implements Comparator<BacktrackingBottomUpBranch> {
+
+    @Override
+    public int compare(BacktrackingBottomUpBranch o1, BacktrackingBottomUpBranch o2) {
+      return o1.compareTo(o2);
+    }
   }
 }

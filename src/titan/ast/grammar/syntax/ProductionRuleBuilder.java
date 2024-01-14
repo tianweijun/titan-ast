@@ -88,14 +88,13 @@ public class ProductionRuleBuilder {
                     productionRuleRegExp.lengthOfText)));
       case UNIT:
         switch (productionRuleRegExp.unitType) {
-          case GRAMMAR:
-            break;
-          case ONE_CHAR_OPTION_CHARSET:
           case SEQUENCE_CHARS:
             sequenceCharsOrOneCharOptionCharsetUnit2TerminalGrammarUnitRegExp(productionRuleRegExp);
             break;
+          case GRAMMAR:
           case EMPTY:
             break;
+          case ONE_CHAR_OPTION_CHARSET:
           case HELPER_OR:
           case HELPER_ALIAS:
             throw new AstRuntimeException(

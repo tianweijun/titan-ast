@@ -81,12 +81,12 @@ public class TextOfGrammarBuilder {
       String contentTokenText = statementContentTokens.getLast().text;
       // 设置开始语法，该标识语句放在任何状态下都可以，也不影响状态的改变
       if (firstTokenText.equals(PREFIX_START_GRAMMAR_STATEMENT)) {
-        languageGrammar.updateStart(contentTokenText);
+        languageGrammar.updateStartGrammarName(contentTokenText);
         return true;
       }
       // 设置RootKeyWord，该标识语句放在任何状态下都可以，也不影响状态的改变
       if (firstTokenText.equals(PREFIX_START_ROOT_KEY_WORD)) {
-        languageGrammar.updateRootKeyWord(contentTokenText);
+        languageGrammar.updateRootKeyWordGrammarName(contentTokenText);
         return true;
       }
       // 语法定义状态管理

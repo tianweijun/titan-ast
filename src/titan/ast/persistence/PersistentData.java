@@ -40,7 +40,7 @@ public class PersistentData {
   }
 
   public int startGrammar() {
-    Grammar start = astContext.languageGrammar.getStart();
+    Grammar start = astContext.languageGrammar.getStartGrammar();
     return grammarIntegerMap.get(start);
   }
 

@@ -1,5 +1,6 @@
 package titan.ast.target;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import titan.ast.grammar.Grammar;
@@ -11,7 +12,7 @@ import titan.ast.util.StringUtils;
  *
  * @author tian wei jun
  */
-public class AutomataTmpAst {
+public class AutomataTmpAst implements Comparable<AutomataTmpAst> {
 
   public Grammar grammar = null;
   public String alias = "";
@@ -91,5 +92,44 @@ public class AutomataTmpAst {
       }
     }
     return displayString;
+  }
+
+  @Override
+  public int compareTo(AutomataTmpAst that) {
+    int compare = grammar.compareTo(that.grammar);
+    if (0 != compare) {
+      return compare;
+    }
+    compare = alias.compareTo(that.alias);
+    if (0 != compare) {
+      return compare;
+    }
+    if (token == null && that.token != null) {
+      return -1;
+    }
+    if (token != null && that.token == null) {
+      return 1;
+    }
+    if (token != null) {
+      compare = token.compareTo(that.token);
+      if (0 != compare) {
+        return compare;
+      }
+    }
+    // children
+    if (children.size() != that.children.size()) {
+      return children.size() - that.children.size();
+    }
+    Iterator<AutomataTmpAst> thisChildrenIt = children.iterator();
+    Iterator<AutomataTmpAst> thatChildrenIt = that.children.iterator();
+    while (thisChildrenIt.hasNext()) {
+      AutomataTmpAst thisChild = thisChildrenIt.next();
+      AutomataTmpAst thatChild = thatChildrenIt.next();
+      compare = thisChild.compareTo(thatChild);
+      if (0 != compare) {
+        return compare;
+      }
+    }
+    return 0;
   }
 }

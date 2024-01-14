@@ -45,38 +45,38 @@ public class NonterminalNfa2DfaConverter {
    * 重复上述过程，直到所有第2，3列子集全部出现在第一列为止。 5.设置dfa边和终态的权重， 比较终态和边的权重，参照最大权重终边，若大于等于则是收敛字符集，若小于则转移字符集。
    */
   private SyntaxDfa createDfa(SyntaxNfa nfa) {
-    SyntaxNfaStateEpsilonClosureGetter tokenNfaStateEpsilonClosureGetter =
+    SyntaxNfaStateEpsilonClosureGetter nfaStateEpsilonClosureGetter =
         new SyntaxNfaStateEpsilonClosureGetter();
-    TreeSet<SyntaxNfaState> startTokenNfaStates = tokenNfaStateEpsilonClosureGetter.get(nfa.start);
+    TreeSet<SyntaxNfaState> startNfaStates = nfaStateEpsilonClosureGetter.get(nfa.start);
 
     SyntaxDfa dfa = new SyntaxDfa();
-    SyntaxDfaState startTokenDfaState = new SyntaxDfaState(startTokenNfaStates);
-    dfa.start = startTokenDfaState;
+    SyntaxDfaState startDfaState = new SyntaxDfaState(startNfaStates);
+    dfa.start = startDfaState;
 
-    LinkedHashSet<SyntaxDfaState> waitToBuildTokenDfaStates = new LinkedHashSet<>();
+    LinkedHashSet<SyntaxDfaState> waitToBuildDfaStates = new LinkedHashSet<>();
     LinkedHashSet<SyntaxDfaState> beBeuildedDfaStates = new LinkedHashSet<>();
 
-    waitToBuildTokenDfaStates.add(startTokenDfaState);
-    while (!waitToBuildTokenDfaStates.isEmpty()) {
-      SyntaxDfaState state = waitToBuildTokenDfaStates.iterator().next();
-      waitToBuildTokenDfaStates.remove(state);
+    waitToBuildDfaStates.add(startDfaState);
+    while (!waitToBuildDfaStates.isEmpty()) {
+      SyntaxDfaState state = waitToBuildDfaStates.iterator().next();
+      waitToBuildDfaStates.remove(state);
       beBeuildedDfaStates.add(state);
 
       HashSet<Grammar> charsOfEdges = getCharsOfEdges(state.nfaStates);
       for (Grammar ch : charsOfEdges) {
         TreeSet<SyntaxNfaState> movDfaChEpsilonClosure =
-            tokenNfaStateEpsilonClosureGetter.move(state.nfaStates, ch);
+            nfaStateEpsilonClosureGetter.move(state.nfaStates, ch);
         // 空集，跳过
         if (null == movDfaChEpsilonClosure || movDfaChEpsilonClosure.isEmpty()) {
           continue;
         }
         // 非空
         SyntaxDfaState findedDfaState =
-            findDfaState(movDfaChEpsilonClosure, waitToBuildTokenDfaStates, beBeuildedDfaStates);
+            findDfaState(movDfaChEpsilonClosure, waitToBuildDfaStates, beBeuildedDfaStates);
         SyntaxDfaState movDfaChEpsilonClosureDfaState;
         if (null == findedDfaState) { // 原先没有的新状态，压入
           movDfaChEpsilonClosureDfaState = new SyntaxDfaState(movDfaChEpsilonClosure);
-          waitToBuildTokenDfaStates.add(movDfaChEpsilonClosureDfaState);
+          waitToBuildDfaStates.add(movDfaChEpsilonClosureDfaState);
         } else {
           movDfaChEpsilonClosureDfaState = findedDfaState;
         }

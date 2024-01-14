@@ -82,7 +82,7 @@ public class KeyWordAutomataBuilder {
   }
 
   private void setRootKeyWord() {
-    String rootKeyWordName = languageGrammar.rootKeyWord;
+    String rootKeyWordName = languageGrammar.rootKeyWordGrammarName;
     Grammar rootKeyWord = languageGrammar.terminals.get(rootKeyWordName);
     if (null == rootKeyWord) {
       throw new AstRuntimeException(

@@ -35,19 +35,19 @@ public class TerminalTokenNfa2DfaConverter {
   private void createDfa() {
     TokenNfaStateEpsilonClosureGetter nfaStateEpsilonClosureGetter =
         new TokenNfaStateEpsilonClosureGetter();
-    TreeSet<TokenNfaState> startTokenNfaStates = nfaStateEpsilonClosureGetter.get(nfa.start);
+    TreeSet<TokenNfaState> startNfaStates = nfaStateEpsilonClosureGetter.get(nfa.start);
 
     dfa = new TokenDfa();
-    TokenDfaState startTokenDfaState = new TokenDfaState(startTokenNfaStates);
-    dfa.start = startTokenDfaState;
+    TokenDfaState startDfaState = new TokenDfaState(startNfaStates);
+    dfa.start = startDfaState;
 
-    LinkedHashSet<TokenDfaState> waitToBuildTokenDfaStates = new LinkedHashSet<>();
+    LinkedHashSet<TokenDfaState> waitToBuildDfaStates = new LinkedHashSet<>();
     LinkedHashSet<TokenDfaState> beBeuildedDfaStates = new LinkedHashSet<>();
 
-    waitToBuildTokenDfaStates.add(startTokenDfaState);
-    while (!waitToBuildTokenDfaStates.isEmpty()) {
-      TokenDfaState beBuildedDfaState = waitToBuildTokenDfaStates.iterator().next();
-      waitToBuildTokenDfaStates.remove(beBuildedDfaState);
+    waitToBuildDfaStates.add(startDfaState);
+    while (!waitToBuildDfaStates.isEmpty()) {
+      TokenDfaState beBuildedDfaState = waitToBuildDfaStates.iterator().next();
+      waitToBuildDfaStates.remove(beBuildedDfaState);
       beBeuildedDfaStates.add(beBuildedDfaState);
 
       HashSet<Integer> charsOfEdges = getCharsOfEdges(beBuildedDfaState.nfaStates);
@@ -60,11 +60,11 @@ public class TerminalTokenNfa2DfaConverter {
         }
         // 非空
         TokenDfaState findedDfaState =
-            findDfaState(movDfaChEpsilonClosure, waitToBuildTokenDfaStates, beBeuildedDfaStates);
+            findDfaState(movDfaChEpsilonClosure, waitToBuildDfaStates, beBeuildedDfaStates);
         TokenDfaState movDfaChEpsilonClosureDfaState;
         if (null == findedDfaState) { // 原先没有的新状态，压入
           movDfaChEpsilonClosureDfaState = new TokenDfaState(movDfaChEpsilonClosure);
-          waitToBuildTokenDfaStates.add(movDfaChEpsilonClosureDfaState);
+          waitToBuildDfaStates.add(movDfaChEpsilonClosureDfaState);
         } else {
           movDfaChEpsilonClosureDfaState = findedDfaState;
         }

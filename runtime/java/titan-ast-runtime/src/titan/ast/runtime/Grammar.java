@@ -5,7 +5,8 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class Grammar {
+public class Grammar implements Comparable<Grammar> {
+
   String name = "";
   GrammarType type = GrammarType.TERMINAL;
   GrammarAction action = GrammarAction.TEXT;
@@ -25,5 +26,13 @@ public class Grammar {
   @Override
   public String toString() {
     return name;
+  }
+
+  @Override
+  public int compareTo(Grammar that) {
+    if (type != that.type) {
+      return type.ordinal() - that.type.ordinal();
+    }
+    return name.compareTo(that.name);
   }
 }

@@ -40,16 +40,15 @@ public class DfaTokenAutomataBuilder {
     // terminal
     TerminalDfaBuilder terminalDfaBuilder =
         new TerminalDfaBuilder(languageGrammar.terminals, languageGrammar.terminalFragments);
-    TokenDfa tokenDfa = terminalDfaBuilder.build();
-    languageGrammar.tokenDfa = tokenDfa;
+    languageGrammar.tokenDfa = terminalDfaBuilder.build();
 
     buildKeyWordAutomata();
     buildUnitRegExpTerminalsMap();
-    clearTransientObjects();
 
     DfaTokenAutomata dfaTokenAutomata = DfaTokenAutomataFactory.create(languageGrammar);
     languageGrammar.tokenAutomata = dfaTokenAutomata;
 
+    clearTransientObjects();
     return dfaTokenAutomata;
   }
 

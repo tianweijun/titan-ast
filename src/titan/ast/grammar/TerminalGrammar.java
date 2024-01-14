@@ -20,4 +20,12 @@ public class TerminalGrammar extends Grammar {
       lookaheadMatchingMode = LookaheadMatchingMode.GREEDINESS;
     }
   }
+
+  @Override
+  public int compareTo(Grammar that) {
+    if (type != that.type) {
+      return type.ordinal() - that.type.ordinal();
+    }
+    return name.compareTo(that.name);
+  }
 }

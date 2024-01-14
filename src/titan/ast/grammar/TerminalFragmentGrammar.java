@@ -11,4 +11,12 @@ public class TerminalFragmentGrammar extends Grammar {
     super(name);
     this.type = GrammarType.TERMINAL_FRAGMENT;
   }
+
+  @Override
+  public int compareTo(Grammar that) {
+    if (type != that.type) {
+      return type.ordinal() - that.type.ordinal();
+    }
+    return name.compareTo(that.name);
+  }
 }

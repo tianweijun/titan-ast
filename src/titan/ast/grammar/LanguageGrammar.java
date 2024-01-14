@@ -19,7 +19,7 @@ import titan.ast.util.StringUtils;
  */
 public class LanguageGrammar {
 
-  public String start = "compilationUnit";
+  public String startGrammarName = "compilationUnit";
   public LinkedHashMap<String, Grammar> terminalFragments = new LinkedHashMap<>();
   public LinkedHashMap<String, Grammar> terminals = new LinkedHashMap<>();
   public LinkedHashMap<String, Grammar> nonterminals = new LinkedHashMap<>();
@@ -33,7 +33,7 @@ public class LanguageGrammar {
   public AstAutomata astAutomata;
 
   // keyword
-  public String rootKeyWord = null;
+  public String rootKeyWordGrammarName = null;
   public LinkedHashSet<Grammar> keyWords = new LinkedHashSet<>();
   public KeyWordAutomata keyWordAutomata = null;
 
@@ -49,14 +49,14 @@ public class LanguageGrammar {
   private void initAugmentedNonterminal() {
     augmentedNonterminal = new NonterminaltGrammar("augmentedNonterminal");
     augmentedNonterminal.type = GrammarType.NONTERMINAL;
-    augmentedNonterminal.text.add(new GrammarToken(GrammarTokenType.TEXT, start));
+    augmentedNonterminal.text.add(new GrammarToken(GrammarTokenType.TEXT, startGrammarName));
     nonterminals.put(augmentedNonterminal.name, augmentedNonterminal);
   }
 
-  public void updateStart(String start) {
-    this.start = start;
+  public void updateStartGrammarName(String startGrammarName) {
+    this.startGrammarName = startGrammarName;
     augmentedNonterminal.text.clear();
-    augmentedNonterminal.text.add(new GrammarToken(GrammarTokenType.TEXT, start));
+    augmentedNonterminal.text.add(new GrammarToken(GrammarTokenType.TEXT, startGrammarName));
   }
 
   private void initEpsilon() {
@@ -114,12 +114,12 @@ public class LanguageGrammar {
     return !isNotUnique;
   }
 
-  public Grammar getStart() {
-    return nonterminals.get(start);
+  public Grammar getStartGrammar() {
+    return nonterminals.get(startGrammarName);
   }
 
-  public void updateRootKeyWord(String rootKeyWord) {
-    this.rootKeyWord = rootKeyWord;
+  public void updateRootKeyWordGrammarName(String rootKeyWordGrammarName) {
+    this.rootKeyWordGrammarName = rootKeyWordGrammarName;
   }
 
   public void addKeyWord(Grammar keyWord) {
@@ -131,6 +131,6 @@ public class LanguageGrammar {
   }
 
   public boolean isKeyWordEmpty() {
-    return !(StringUtils.isNotBlank(rootKeyWord) && !keyWords.isEmpty());
+    return !(StringUtils.isNotBlank(rootKeyWordGrammarName) && !keyWords.isEmpty());
   }
 }

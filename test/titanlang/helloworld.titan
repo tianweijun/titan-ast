@@ -1,10 +1,18 @@
-
 module entry {
-  use std::io;
+  use std::Io;
 
-  public  main() -> i32 {
-      printfln("hello world");
+  public function  main() -> i32 {
+      let num: i32 = 100 ;
+      printfln("1+2+3+...+%d=%d\n",num,sum(num));
       return 0;
   }
 
+  @Inline @inline
+  public function sum(num: i32) -> i32 {
+      let sum: i32 = 0;
+      for i in 1..=num {
+          sum += i;
+      }
+      return sum;
+  }
 }

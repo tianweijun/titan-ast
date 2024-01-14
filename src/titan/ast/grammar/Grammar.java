@@ -9,7 +9,7 @@ import titan.ast.grammar.io.GrammarToken;
  *
  * @author tian wei jun
  */
-public abstract class Grammar {
+public abstract class Grammar implements Comparable<Grammar> {
 
   public GrammarType type = GrammarType.TERMINAL;
   public String name = "";
@@ -54,6 +54,14 @@ public abstract class Grammar {
   }
 
   @Override
+  public int compareTo(Grammar that) {
+    if (type != that.type) {
+      return type.ordinal() - that.type.ordinal();
+    }
+    return name.compareTo(that.name);
+  }
+
+  @Override
   public String toString() {
     String info = name;
     if (null == info) {
@@ -64,5 +72,9 @@ public abstract class Grammar {
 
   public boolean isNonterminal() {
     return type == GrammarType.NONTERMINAL;
+  }
+
+  public boolean isTerminal() {
+    return type == GrammarType.TERMINAL;
   }
 }
