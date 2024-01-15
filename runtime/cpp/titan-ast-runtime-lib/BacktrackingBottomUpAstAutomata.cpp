@@ -22,18 +22,22 @@ bool BacktrackingBottomUpEqual::operator()(
   return t1->equals(t2);
 }
 
+bool BacktrackingBottomUpCompare::operator()(
+    const BacktrackingBottomUpBranch *t1,
+    const BacktrackingBottomUpBranch *t2) const {
+
+  return t1->compare(t2);
+}
+
 BacktrackingBottomUpAstAutomata::BacktrackingBottomUpAstAutomata(
     const SyntaxDfa *astDfa, const Grammar *startGrammar,
     Grammar **innerGrammars, int countOfInnerGrammars)
     : tokenReducingSymbolInputStream(
           TokenReducingSymbolInputStream(innerGrammars, countOfInnerGrammars)),
-      bottomUpBranchs(std::list<BacktrackingBottomUpBranch *>()),
-      bottomUpBranchsShadow(std::unordered_set<BacktrackingBottomUpBranch *,
-                                               BacktrackingBottomUpHash,
-                                               BacktrackingBottomUpEqual>()),
-      triedBottomUpBranchs(std::unordered_set<BacktrackingBottomUpBranch *,
-                                              BacktrackingBottomUpHash,
-                                              BacktrackingBottomUpEqual>()),
+      bottomUpBranchs(std::set<BacktrackingBottomUpBranch *,
+                               BacktrackingBottomUpCompare>()),
+      triedBottomUpBranchs(std::set<BacktrackingBottomUpBranch *,
+                                    BacktrackingBottomUpCompare>()),
       astDfa(astDfa), startGrammar(startGrammar), result(std::list<Ast *>()) {}
 
 BacktrackingBottomUpAstAutomata::~BacktrackingBottomUpAstAutomata() {
@@ -51,7 +55,6 @@ void BacktrackingBottomUpAstAutomata::clear() {
     backtrackingBottomUpBranch = nullptr;
   }
   bottomUpBranchs.clear();
-  bottomUpBranchsShadow.clear();
 
   for (auto backtrackingBottomUpBranch : triedBottomUpBranchs) {
     delete backtrackingBottomUpBranch;
@@ -98,9 +101,8 @@ BacktrackingBottomUpAstAutomata::buildAst(std::list<Token *> *sourceTokens) {
 }
 
 void BacktrackingBottomUpAstAutomata::consumeBottomUpBranch() {
-  BacktrackingBottomUpBranch *bottomUpBranch = bottomUpBranchs.front();
-  bottomUpBranchs.pop_front();
-  bottomUpBranchsShadow.erase(bottomUpBranch);
+  BacktrackingBottomUpBranch *bottomUpBranch = *bottomUpBranchs.begin();
+  bottomUpBranchs.erase(bottomUpBranch);
   auto triedBottomUpBranchsIt = triedBottomUpBranchs.find(bottomUpBranch);
   if (triedBottomUpBranchsIt != triedBottomUpBranchs.end()) {
     delete bottomUpBranch;
@@ -327,14 +329,29 @@ bool BacktrackingBottomUpAstAutomata::addNewBacktrackingBottomUpBranch(
     return false;
   }
 
-  auto findBottomUpBranchsShadowIt =
-      triedBottomUpBranchs.find(newBacktrackingBottomUpBranch);
-  if (findBottomUpBranchsShadowIt == bottomUpBranchsShadow.end()) {
-    bottomUpBranchs.push_front(newBacktrackingBottomUpBranch);
-    bottomUpBranchsShadow.insert(newBacktrackingBottomUpBranch);
-    return true;
+  bool hasInsert = bottomUpBranchs.insert(newBacktrackingBottomUpBranch).second;
+  if (hasInsert) {
+    if (!triedBottomUpBranchs.empty()) {
+      int minEndIndexOfTask =
+          (*bottomUpBranchs.begin())->reducingSymbols.back()->endIndexOfToken;
+
+      auto firstTriedBranch = *triedBottomUpBranchs.begin();
+      int minEndIndexOfTriedBranch =
+          firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
+      while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
+        triedBottomUpBranchs.erase(firstTriedBranch);
+        delete firstTriedBranch;
+        if (triedBottomUpBranchs.empty()) {
+          break;
+        }
+        firstTriedBranch = *triedBottomUpBranchs.begin();
+        minEndIndexOfTriedBranch =
+            firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
+      }
+      //std::cout<<minEndIndexOfTask<<":"<<bottomUpBranchs.size()<<" "<<triedBottomUpBranchs.size()<<std::endl;
+    }
   }
-  return false;
+  return hasInsert;
 }
 std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
   auto sizeOfTokens = tokenReducingSymbolInputStream.sizeOfTokenReducingSymbols;

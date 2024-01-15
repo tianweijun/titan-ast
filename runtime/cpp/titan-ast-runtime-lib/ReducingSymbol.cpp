@@ -42,18 +42,22 @@ bool ReducingSymbol::compare(const ReducingSymbol *o) const {
   }
 
   if (this->reducedGrammar != o->reducedGrammar) {
-    return this->reducedGrammar < o->reducedGrammar;
+    return reinterpret_cast<uintptr_t>(this->reducedGrammar) <
+           reinterpret_cast<uintptr_t>(o->reducedGrammar);
   }
 
   if (this->currentDfaState != o->currentDfaState) {
-    return this->currentDfaState < o->currentDfaState;
+    return reinterpret_cast<uintptr_t>(this->currentDfaState) <
+           reinterpret_cast<uintptr_t>(o->currentDfaState);
   }
 
+  /*
   if (!this->astOfCurrentDfaState->equals(o->astOfCurrentDfaState)) {
     return this->astOfCurrentDfaState->compare(o->astOfCurrentDfaState);
   }
+   */
 
-  return false;
+  return this->astOfCurrentDfaState->compare(o->astOfCurrentDfaState);
 }
 size_t ReducingSymbol::hashCode() const {
   size_t hashCode = (endIndexOfToken & 0xFF) << 24;

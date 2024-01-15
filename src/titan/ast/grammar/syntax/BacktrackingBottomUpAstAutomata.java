@@ -247,20 +247,21 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     if (triedBottomUpBranchs.contains(newBacktrackingBottomUpBranch)) {
       return;
     }
-    bottomUpBranchs.add(newBacktrackingBottomUpBranch);
 
-    if (!triedBottomUpBranchs.isEmpty()) {
-      int minEndIndexOfTask = bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+    if (bottomUpBranchs.add(newBacktrackingBottomUpBranch)) {
+      if (!triedBottomUpBranchs.isEmpty()) {
+        int minEndIndexOfTask = bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
 
-      int minEndIndexOfTriedBranch =
-          triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
-      while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
-        triedBottomUpBranchs.pollFirst();
-        if (triedBottomUpBranchs.isEmpty()) {
-          break;
-        }
-        minEndIndexOfTriedBranch =
+        int minEndIndexOfTriedBranch =
             triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+        while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
+          triedBottomUpBranchs.pollFirst();
+          if (triedBottomUpBranchs.isEmpty()) {
+            break;
+          }
+          minEndIndexOfTriedBranch =
+              triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+        }
       }
     }
   }

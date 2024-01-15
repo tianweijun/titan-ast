@@ -11,8 +11,8 @@ void doTask(Ast **result, RuntimeAutomataAstApplication *runtimeAstApplication,
 void testMultithreadedApp(int taskCount);
 
 int main(int argc, char *argv[]) {
-  //testSinglethreadedApp();
-  testMultithreadedApp(3);
+  testSinglethreadedApp();
+  //testMultithreadedApp(3);
   return 0;
 }
 

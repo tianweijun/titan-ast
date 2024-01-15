@@ -12,13 +12,19 @@
 #include "Token.h"
 #include "TokenReducingSymbolInputStream.h"
 #include <list>
-#include <unordered_set>
+#include <set>
 
 class BacktrackingBottomUpHash {
 public:
   size_t operator()(const BacktrackingBottomUpBranch *t) const;
 };
 class BacktrackingBottomUpEqual {
+public:
+  bool operator()(const BacktrackingBottomUpBranch *t1,
+                  const BacktrackingBottomUpBranch *t2) const;
+};
+
+class BacktrackingBottomUpCompare {
 public:
   bool operator()(const BacktrackingBottomUpBranch *t1,
                   const BacktrackingBottomUpBranch *t2) const;
@@ -56,12 +62,9 @@ private:
 
 private:
   TokenReducingSymbolInputStream tokenReducingSymbolInputStream;
-  std::list<BacktrackingBottomUpBranch *> bottomUpBranchs;
-  std::unordered_set<BacktrackingBottomUpBranch *, BacktrackingBottomUpHash,
-                     BacktrackingBottomUpEqual>
-      bottomUpBranchsShadow;
-  std::unordered_set<BacktrackingBottomUpBranch *, BacktrackingBottomUpHash,
-                     BacktrackingBottomUpEqual>
+  std::set<BacktrackingBottomUpBranch *, BacktrackingBottomUpCompare>
+      bottomUpBranchs;
+  std::set<BacktrackingBottomUpBranch *, BacktrackingBottomUpCompare>
       triedBottomUpBranchs;
 
   const SyntaxDfa *astDfa;

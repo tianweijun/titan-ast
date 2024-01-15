@@ -11,15 +11,14 @@ import java.util.Map;
  */
 public class SyntaxDfaState implements Comparable<SyntaxDfaState> {
 
-  private static int syntaxDfaStateId = 0;
   public int id = 0;
   public int type = FaStateType.NONE.getValue();
   // 转移
   public Map<Grammar, SyntaxDfaState> edges = new LinkedHashMap<>();
   public LinkedList<ProductionRule> closingProductionRules = new LinkedList<>();
 
-  public SyntaxDfaState() {
-    id = ++syntaxDfaStateId;
+  public SyntaxDfaState(int id) {
+    this.id = id;
   }
 
   @Override

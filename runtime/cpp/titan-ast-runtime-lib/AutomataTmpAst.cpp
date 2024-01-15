@@ -71,14 +71,40 @@ bool AutomataTmpAst::equals(const AutomataTmpAst *o) const {
 
 bool AutomataTmpAst::compare(const AutomataTmpAst *o) const {
   if (this->grammar != o->grammar) {
-    return this->grammar < o->grammar;
+    return reinterpret_cast<uintptr_t>(this->grammar) <
+           reinterpret_cast<uintptr_t>(o->grammar);
   }
-  if (this->alias != o->alias) {
-    return this->alias < o->alias;
+  if (nullptr == this->alias) {
+    if (nullptr == o->alias) {
+    } else {
+      return true;
+    }
+  } else {
+    if (nullptr == o->alias) {
+      return false;
+    } else {
+      if (*this->alias != *o->alias) {
+        return (*this->alias) < (*o->alias);
+      }
+    }
   }
-  if (this->token != o->token) {
-    return this->token < o->token;
+
+  if (nullptr == this->token) {
+    if (nullptr == o->token) {
+    } else {
+      return true;
+    }
+  } else {
+    if (nullptr == o->token) {
+      return false;
+    } else {
+      if (this->token != o->token) {
+        return reinterpret_cast<uintptr_t>(this->token) <
+               reinterpret_cast<uintptr_t>(o->token);
+      }
+    }
   }
+
   if (this->children.size() != o->children.size()) {
     return this->children.size() < o->children.size();
   }

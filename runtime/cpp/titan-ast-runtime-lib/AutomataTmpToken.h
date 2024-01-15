@@ -23,6 +23,8 @@ public:
 
   AstToken toAstToken() const;
   void shallowCopy(Token *token);
+  bool equals(const AutomataTmpToken *o) const;
+  bool compare(const AutomataTmpToken *o) const;
 
   Grammar *terminal;
   int start;

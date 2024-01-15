@@ -28,6 +28,11 @@ BacktrackingBottomUpBranch *BacktrackingBottomUpBranch::clone() const {
 // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
 bool BacktrackingBottomUpBranch::compare(
     const BacktrackingBottomUpBranch *o) const {
+  if (this->reducingSymbols.back()->endIndexOfToken !=
+      o->reducingSymbols.back()->endIndexOfToken) {
+    return this->reducingSymbols.back()->endIndexOfToken <
+           o->reducingSymbols.back()->endIndexOfToken;
+  }
 
   if (this->reducingSymbols.size() != o->reducingSymbols.size()) {
     return this->reducingSymbols.size() < o->reducingSymbols.size();

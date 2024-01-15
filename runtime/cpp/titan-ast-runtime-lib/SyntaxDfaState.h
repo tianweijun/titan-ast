@@ -18,10 +18,16 @@ public:
   SyntaxDfaState(const SyntaxDfaState &&syntaxDfaState) = delete;
   ~SyntaxDfaState();
 
+  int id;
   int type;
   // 转移
   std::map<const Grammar *, SyntaxDfaState *> edges;
   std::list<ProductionRule *> closingProductionRules;
+  bool equals(const SyntaxDfaState *o) const;
+  bool compare(const SyntaxDfaState *o) const;
+
+public:
+  static int syntaxDfaStateId;
 };
 
 #endif // AST__SYNTAXDFASTATE_H_
