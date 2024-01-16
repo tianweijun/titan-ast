@@ -11,38 +11,37 @@ import titan.ast.grammar.Grammar;
  */
 public class FollowFilterBacktrackingBottomUpAstAutomata extends BacktrackingBottomUpAstAutomata {
   Map<Grammar, Set<Grammar>> nonterminalFollowMap;
+  Grammar eof;
 
   public FollowFilterBacktrackingBottomUpAstAutomata(
-      SyntaxDfa astDfa, Grammar startGrammar, Map<Grammar, Set<Grammar>> nonterminalFollowMap) {
+      SyntaxDfa astDfa,
+      Grammar startGrammar,
+      Map<Grammar, Set<Grammar>> nonterminalFollowMap,
+      Grammar eof) {
     super(astDfa, startGrammar);
     this.nonterminalFollowMap = nonterminalFollowMap;
+    this.eof = eof;
   }
 
-  /*
   @Override
   void reduceBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
     ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
     tokenReducingSymbolInputStream.nextReadIndex = topReducingSymbol.endIndexOfToken + 1;
 
-    SyntaxDfaState currentDfaState = topReducingSymbol.currentDfaState;
-    if (tokenReducingSymbolInputStream.hasReadAll()) { // token已经读取完了，尝试规约
-      for (ProductionRule closingProductionRule : currentDfaState.closingProductionRules) {
-        doReduce(bottomUpBranch, closingProductionRule);
-      }
-      return;
+    Grammar terminalOfNextToken = null; // 下一个token的语法名字
+    if (tokenReducingSymbolInputStream.hasReadAll()) { // token读完了,相当于eof
+      terminalOfNextToken = eof;
+    } else {
+      terminalOfNextToken = tokenReducingSymbolInputStream.read().terminal;
     }
     // 还有token没有规约，判断token是不是在follow集里决定是否规约
-    Token nextToken = tokenReducingSymbolInputStream.read();
-    Grammar followOfText = nextToken.terminal;
-    for (ProductionRule closingProductionRule : currentDfaState.closingProductionRules) {
+    for (ProductionRule closingProductionRule :
+        topReducingSymbol.currentDfaState.closingProductionRules) {
       Grammar nonterminal = closingProductionRule.grammar;
       Set<Grammar> follow = nonterminalFollowMap.get(nonterminal);
-      if (follow.contains(followOfText)) {
-        doReduce(bottomUpBranch, closingProductionRule);
-      } else {
-        ++count;
+      if (follow.contains(terminalOfNextToken)) {
         doReduce(bottomUpBranch, closingProductionRule);
       }
     }
-  }*/
+  }
 }

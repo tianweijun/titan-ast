@@ -25,6 +25,7 @@ public class LanguageGrammar {
   public LinkedHashMap<String, Grammar> nonterminals = new LinkedHashMap<>();
 
   public Grammar epsilon;
+  public Grammar eof;
   public Grammar augmentedNonterminal;
 
   public TokenDfa tokenDfa;
@@ -43,6 +44,7 @@ public class LanguageGrammar {
 
   public void init() {
     initEpsilon();
+    initEof();
     initAugmentedNonterminal();
   }
 
@@ -62,6 +64,11 @@ public class LanguageGrammar {
   private void initEpsilon() {
     epsilon = new TerminalGrammar("Epsilon");
     epsilon.type = GrammarType.TERMINAL;
+  }
+
+  private void initEof() {
+    eof = new TerminalGrammar("Eof");
+    eof.type = GrammarType.TERMINAL;
   }
 
   public void addGrammar(Grammar grammar) {
@@ -92,6 +99,9 @@ public class LanguageGrammar {
   private boolean isUnique(Grammar grammar) {
     // default grammar
     if (grammar.type == GrammarType.TERMINAL && epsilon.name.equals(grammar.name)) {
+      return false;
+    }
+    if (grammar.type == GrammarType.TERMINAL && eof.name.equals(grammar.name)) {
       return false;
     }
     // diy  grammar

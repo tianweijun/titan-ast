@@ -1,7 +1,9 @@
 
-@StartGrammar expression ;
+@StartGrammar expressionStatement ;
 
 @NonterminalGrammar begin ;
+
+expressionStatement : expression ';' ;
 
 expression : assignmentExpression ;
 
@@ -22,6 +24,7 @@ Var : 'var' ;
 Method : 'method' ;
 OpenBracket : '(' ;
 ClosingBracket : ')' ;
+Semi : ';' ;
 
 
  WS

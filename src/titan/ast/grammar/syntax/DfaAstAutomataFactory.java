@@ -10,37 +10,51 @@ import titan.ast.grammar.LanguageGrammar;
  */
 public class DfaAstAutomataFactory {
 
-  private AstAutomataType type;
+  private AstAutomataType desiredType;
 
   public DfaAstAutomataFactory(AstAutomataType type) {
-    this.type = type;
+    this.desiredType = type;
   }
 
-  public void setType(AstAutomataType type) {
-    this.type = type;
+  public void setDesiredType(AstAutomataType desiredType) {
+    this.desiredType = desiredType;
   }
 
   public AstAutomata build() {
-    AstContext astContext = AstContext.get();
-    LanguageGrammar languageGrammar = astContext.languageGrammar;
     AstAutomata astAutomata = null;
-    switch (type) {
+
+    AstContext astContext = AstContext.get();
+    switch (desiredType) {
       case BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
-        astAutomata =
-            new BacktrackingBottomUpAstAutomata(
-                languageGrammar.astDfa, languageGrammar.getStartGrammar());
+        astAutomata = getBacktrackingBottomUpAstAutomata(astContext);
         break;
       case FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
-        /*
-        astAutomata =
-            new FollowFilterBacktrackingBottomUpAstAutomataBuilder(
-                    languageGrammar, astContext.nonterminalProductionRulesMap)
-                .build();*/
-        astAutomata =
-            new BacktrackingBottomUpAstAutomata(
-                languageGrammar.astDfa, languageGrammar.getStartGrammar());
-
+        astAutomata = getDesiredFollowFilterAstAutomata(astContext);
         break;
+    }
+    return astAutomata;
+  }
+
+  private AstAutomata getBacktrackingBottomUpAstAutomata(AstContext astContext) {
+    LanguageGrammar languageGrammar = astContext.languageGrammar;
+    return new BacktrackingBottomUpAstAutomata(
+        languageGrammar.astDfa, languageGrammar.getStartGrammar());
+  }
+
+  private AstAutomata getDesiredFollowFilterAstAutomata(AstContext astContext) {
+    AstAutomata astAutomata = null;
+
+    LanguageGrammar languageGrammar = astContext.languageGrammar;
+    FollowFilterBacktrackingBottomUpAstAutomata followFilterAstAutomata =
+        new FollowFilterBacktrackingBottomUpAstAutomataBuilder(
+                languageGrammar, astContext.nonterminalProductionRulesMap)
+            .build();
+    if (!followFilterAstAutomata.nonterminalFollowMap.isEmpty()) {
+      astAutomata = followFilterAstAutomata;
+    } else {
+      astAutomata =
+          new BacktrackingBottomUpAstAutomata(
+              languageGrammar.astDfa, languageGrammar.getStartGrammar());
     }
     return astAutomata;
   }
