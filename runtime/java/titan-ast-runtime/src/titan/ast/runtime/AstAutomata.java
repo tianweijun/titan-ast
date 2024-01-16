@@ -8,6 +8,7 @@ import java.util.List;
  * @author tian wei jun
  */
 public interface AstAutomata {
+  AstAutomataType getType();
 
   Ast buildAst(List<Token> sourceTokens);
 

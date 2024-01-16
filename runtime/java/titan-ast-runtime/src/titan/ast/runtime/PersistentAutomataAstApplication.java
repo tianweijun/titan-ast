@@ -11,7 +11,7 @@ import java.util.List;
 public class PersistentAutomataAstApplication implements Cloneable {
   PersistentObject persistentObject;
   TokenAutomata tokenAutomata;
-  BacktrackingBottomUpAstAutomata astAutomata;
+  AstAutomata astAutomata;
 
   public PersistentAutomataAstApplication(String persistentDataFilePath) {
     PersistentData persistentData = new PersistentData(persistentDataFilePath);
@@ -26,8 +26,7 @@ public class PersistentAutomataAstApplication implements Cloneable {
   public void buildContext(PersistentData persistentData) {
     persistentObject = new PersistentObject(persistentData);
     tokenAutomata = new TokenAutomataBuilder().build(persistentObject);
-    astAutomata =
-        new BacktrackingBottomUpAstAutomata(persistentObject.astDfa, persistentObject.startGrammar);
+    astAutomata = persistentObject.astAutomata;
   }
 
   public List<Ast> buildAsts(String sourceCodeFilePath) {
@@ -60,8 +59,7 @@ public class PersistentAutomataAstApplication implements Cloneable {
     }
     app.persistentObject = this.persistentObject;
     tokenAutomata = new TokenAutomataBuilder().build(persistentObject);
-    astAutomata =
-        new BacktrackingBottomUpAstAutomata(persistentObject.astDfa, persistentObject.startGrammar);
+    astAutomata = new AstAutomataBuilder().clone(astAutomata);
     return app;
   }
 }

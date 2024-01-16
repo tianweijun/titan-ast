@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
+import titan.ast.grammar.syntax.AstAutomata;
 import titan.ast.grammar.syntax.ProductionRule;
 import titan.ast.grammar.syntax.SyntaxDfa;
 import titan.ast.grammar.syntax.SyntaxDfaState;
@@ -32,16 +33,14 @@ public class PersistentData {
   // public Grammar start;
   public LinkedHashMap<ProductionRule, Integer> productionRuleIntegerMap;
   // KeyWordAutomata
+  // AstAutomata
+  AstAutomata astAutomata;
   // ----------data end-----------
   AstContext astContext;
 
   public void init() {
     astContext = AstContext.get();
-  }
-
-  public int startGrammar() {
-    Grammar start = astContext.languageGrammar.getStartGrammar();
-    return grammarIntegerMap.get(start);
+    astAutomata = astContext.languageGrammar.astAutomata;
   }
 
   public int[] initTokenDfaStates(TokenDfa tokenDfa) {
@@ -79,12 +78,17 @@ public class PersistentData {
 
   public void initGrammars() {
     LanguageGrammar languageGrammar = astContext.languageGrammar;
-    int countOfGrammars = languageGrammar.terminals.size() + languageGrammar.nonterminals.size();
+    int countOfGrammars =
+        languageGrammar.terminals.size() + languageGrammar.nonterminals.size() + 2;
     grammarIntegerMap = new LinkedHashMap<>(countOfGrammars);
     int intSymbolOfGrammar = 0;
+
     for (Grammar terminal : languageGrammar.terminals.values()) {
       grammarIntegerMap.put(terminal, intSymbolOfGrammar++);
     }
+    grammarIntegerMap.put(languageGrammar.epsilon, intSymbolOfGrammar++);
+    grammarIntegerMap.put(languageGrammar.eof, intSymbolOfGrammar++);
+
     for (Grammar nonterminal : languageGrammar.nonterminals.values()) {
       grammarIntegerMap.put(nonterminal, intSymbolOfGrammar++);
     }
@@ -96,6 +100,7 @@ public class PersistentData {
     int capacity =
         languageGrammar.terminals.size()
             + languageGrammar.nonterminals.size()
+            + 2
             + keyWordAutomata.textTerminalMap.size();
     stringPool = new LinkedHashMap<>(capacity);
     int indexOfString = 0;
@@ -105,6 +110,12 @@ public class PersistentData {
       if (!stringPool.containsKey(name)) {
         stringPool.put(name, indexOfString++);
       }
+    }
+    if (!stringPool.containsKey(languageGrammar.epsilon.name)) {
+      stringPool.put(languageGrammar.epsilon.name, indexOfString++);
+    }
+    if (!stringPool.containsKey(languageGrammar.eof.name)) {
+      stringPool.put(languageGrammar.eof.name, indexOfString++);
     }
     // nonterminals
     for (Grammar nonterminal : languageGrammar.nonterminals.values()) {

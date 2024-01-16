@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * PersistentData对应在文件中的对象.
@@ -172,11 +175,6 @@ public class PersistentData {
     return tokenDfa;
   }
 
-  public Grammar getStartGrammarByInputStream() {
-    int indexOfStartGrammar = readInt();
-    return grammars[indexOfStartGrammar];
-  }
-
   public void getProductionRulesByInputStream() {
     int countOfProductionRules = readInt();
     ProductionRule[] productionRules = new ProductionRule[countOfProductionRules];
@@ -273,5 +271,31 @@ public class PersistentData {
   public void compact() {
     closeInputStream();
     intByteBuffer = null;
+  }
+
+  public AstAutomataType getAstAutomataTypeByInputStream() {
+    int original = readInt();
+    return AstAutomataType.values()[original];
+  }
+
+  public Map<Grammar, Set<Grammar>> getNonterminalFollowMapByInputStream() {
+    int size = readInt();
+    Map<Grammar, Set<Grammar>> nonterminalFollowMap = new HashMap<>(size);
+    for (int indexOfNonterminal = 0; indexOfNonterminal < size; indexOfNonterminal++) {
+      Grammar nonterminal = getGrammarByInputStream();
+      int sizeOfFollow = readInt();
+      Set<Grammar> follow = new HashSet<>(sizeOfFollow);
+      for (int indexOfFollow = 0; indexOfFollow < sizeOfFollow; indexOfFollow++) {
+        follow.add(getGrammarByInputStream());
+      }
+      nonterminalFollowMap.put(nonterminal, follow);
+    }
+
+    return nonterminalFollowMap;
+  }
+
+  public Grammar getGrammarByInputStream() {
+    int indexOfGrammar = readInt();
+    return grammars[indexOfGrammar];
   }
 }

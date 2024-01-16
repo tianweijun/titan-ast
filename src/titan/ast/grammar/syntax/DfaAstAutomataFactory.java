@@ -42,20 +42,9 @@ public class DfaAstAutomataFactory {
   }
 
   private AstAutomata getDesiredFollowFilterAstAutomata(AstContext astContext) {
-    AstAutomata astAutomata = null;
-
     LanguageGrammar languageGrammar = astContext.languageGrammar;
-    FollowFilterBacktrackingBottomUpAstAutomata followFilterAstAutomata =
-        new FollowFilterBacktrackingBottomUpAstAutomataBuilder(
-                languageGrammar, astContext.nonterminalProductionRulesMap)
-            .build();
-    if (!followFilterAstAutomata.nonterminalFollowMap.isEmpty()) {
-      astAutomata = followFilterAstAutomata;
-    } else {
-      astAutomata =
-          new BacktrackingBottomUpAstAutomata(
-              languageGrammar.astDfa, languageGrammar.getStartGrammar());
-    }
-    return astAutomata;
+    return new FollowFilterBacktrackingBottomUpAstAutomataBuilder(
+            languageGrammar, astContext.nonterminalProductionRulesMap)
+        .build();
   }
 }

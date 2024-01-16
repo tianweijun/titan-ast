@@ -28,6 +28,11 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     this.startGrammar = startGrammar;
   }
 
+  @Override
+  public AstAutomataType getType() {
+    return AstAutomataType.BACKTRACKING_BOTTOM_UP_AST_AUTOMATA;
+  }
+
   /**
    * 按照所有可能的产生式归约.
    *
@@ -242,7 +247,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     if (triedBottomUpBranchs.contains(newBacktrackingBottomUpBranch)) {
       return;
     }
-    if (bottomUpBranchs.add(newBacktrackingBottomUpBranch)){
+    if (bottomUpBranchs.add(newBacktrackingBottomUpBranch)) {
       if (!triedBottomUpBranchs.isEmpty()) {
         int minEndIndexOfTask = bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
 

@@ -11,6 +11,8 @@ import titan.ast.target.Token;
  */
 public interface AstAutomata {
 
+  AstAutomataType getType();
+
   Ast buildAst(List<Token> sourceTokens);
 
   List<Ast> buildAsts(List<Token> sourceTokens);

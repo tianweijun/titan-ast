@@ -19,8 +19,8 @@ import titan.ast.target.Token;
  * @author tian wei jun
  */
 public class BacktrackingBottomUpAstAutomata implements AstAutomata {
-  SyntaxDfa astDfa = null;
-  Grammar startGrammar = null;
+  public SyntaxDfa astDfa = null;
+  public Grammar startGrammar = null;
   TokenReducingSymbolInputStream tokenReducingSymbolInputStream = null;
   TreeSet<BacktrackingBottomUpBranch> bottomUpBranchs =
       new TreeSet<>(new BacktrackingBottomUpBranchComparator());
@@ -31,6 +31,11 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
   public BacktrackingBottomUpAstAutomata(SyntaxDfa astDfa, Grammar startGrammar) {
     this.astDfa = astDfa;
     this.startGrammar = startGrammar;
+  }
+
+  @Override
+  public AstAutomataType getType() {
+    return AstAutomataType.BACKTRACKING_BOTTOM_UP_AST_AUTOMATA;
   }
 
   /**

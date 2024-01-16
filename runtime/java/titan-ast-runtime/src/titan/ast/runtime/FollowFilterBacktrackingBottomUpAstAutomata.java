@@ -1,8 +1,7 @@
-package titan.ast.grammar.syntax;
+package titan.ast.runtime;
 
 import java.util.Map;
 import java.util.Set;
-import titan.ast.grammar.Grammar;
 
 /**
  * 按照可回溯方式构造ast的自动机.
@@ -11,7 +10,7 @@ import titan.ast.grammar.Grammar;
  */
 public class FollowFilterBacktrackingBottomUpAstAutomata extends BacktrackingBottomUpAstAutomata {
   public Map<Grammar, Set<Grammar>> nonterminalFollowMap;
-  public Grammar eof;
+  Grammar eof;
 
   public FollowFilterBacktrackingBottomUpAstAutomata(
       SyntaxDfa astDfa,

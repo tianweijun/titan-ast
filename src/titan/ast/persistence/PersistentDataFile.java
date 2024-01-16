@@ -12,7 +12,12 @@ import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarType;
 import titan.ast.grammar.TerminalGrammar;
+import titan.ast.grammar.syntax.AstAutomata;
+import titan.ast.grammar.syntax.AstAutomataType;
+import titan.ast.grammar.syntax.BacktrackingBottomUpAstAutomata;
+import titan.ast.grammar.syntax.FollowFilterBacktrackingBottomUpAstAutomata;
 import titan.ast.grammar.syntax.ProductionRule;
+import titan.ast.grammar.syntax.SyntaxDfa;
 import titan.ast.grammar.token.KeyWordAutomata;
 import titan.ast.runtime.AstRuntimeException;
 import titan.ast.util.StringUtils;
@@ -40,20 +45,64 @@ public class PersistentDataFile {
       writeStringPool();
       writeGrammars();
       writeKeyWordAutomata();
-      writeTokenDfaStates();
-      writeInt(persistentData.startGrammar());
+      writeTokenDfa();
       writeProductionRules();
-      writeAstDfa();
+      writeAstAutomata();
 
     } catch (IOException e) {
       throw new AstRuntimeException(e);
     }
   }
 
-  private void writeAstDfa() {
-    int[] astDfa = persistentData.getSyntaxDfaStates(AstContext.get().languageGrammar.astDfa);
-    for (int dataOfAstDfa : astDfa) {
-      writeInt(dataOfAstDfa);
+  private void writeAstAutomata() {
+    AstAutomata astAutomata = persistentData.astAutomata;
+
+    AstAutomataType astAutomataType = astAutomata.getType();
+    writeInt(astAutomataType.ordinal());
+
+    switch (astAutomataType) {
+      case BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+        writeBacktrackingBottomUpAstAutomata((BacktrackingBottomUpAstAutomata) astAutomata);
+        break;
+      case FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+        writeFollowFilterBacktrackingBottomUpAstAutomata(
+            (FollowFilterBacktrackingBottomUpAstAutomata) astAutomata);
+        break;
+      default:
+    }
+  }
+
+  private void writeFollowFilterBacktrackingBottomUpAstAutomata(
+      FollowFilterBacktrackingBottomUpAstAutomata astAutomata) {
+    LinkedHashMap<Grammar, Integer> grammarIntegerMap = persistentData.grammarIntegerMap;
+
+    writeInt(grammarIntegerMap.get(astAutomata.startGrammar));
+    writeAstDfa(astAutomata.astDfa);
+
+    // follow
+    writeInt(grammarIntegerMap.get(astAutomata.eof));
+    writeInt(astAutomata.nonterminalFollowMap.size());
+    for (Entry<Grammar, Set<Grammar>> entry : astAutomata.nonterminalFollowMap.entrySet()) {
+      writeInt(grammarIntegerMap.get(entry.getKey()));
+
+      Set<Grammar> follows = entry.getValue();
+      writeInt(follows.size());
+      for (Grammar nonterminalFollow : follows) {
+        writeInt(grammarIntegerMap.get(nonterminalFollow));
+      }
+    }
+  }
+
+  private void writeBacktrackingBottomUpAstAutomata(BacktrackingBottomUpAstAutomata astAutomata) {
+    LinkedHashMap<Grammar, Integer> grammarIntegerMap = persistentData.grammarIntegerMap;
+    writeInt(grammarIntegerMap.get(astAutomata.startGrammar));
+    writeAstDfa(astAutomata.astDfa);
+  }
+
+  private void writeAstDfa(SyntaxDfa astDfa) {
+    int[] dataOfAstDfa = persistentData.getSyntaxDfaStates(astDfa);
+    for (int data : dataOfAstDfa) {
+      writeInt(data);
     }
   }
 
@@ -77,11 +126,11 @@ public class PersistentDataFile {
     }
   }
 
-  private void writeTokenDfaStates() {
-    int[] tokenDfaStates =
+  private void writeTokenDfa() {
+    int[] tokenDfaData =
         persistentData.initTokenDfaStates(AstContext.get().languageGrammar.tokenDfa);
-    for (int dataOfTokenDfaState : tokenDfaStates) {
-      writeInt(dataOfTokenDfaState);
+    for (int data : tokenDfaData) {
+      writeInt(data);
     }
   }
 
