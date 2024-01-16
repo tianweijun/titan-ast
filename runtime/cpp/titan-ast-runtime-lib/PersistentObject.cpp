@@ -3,20 +3,40 @@
 //
 
 #include "PersistentObject.h"
+#include "AstAutomataType.h"
 
 PersistentObject::PersistentObject()
     : persistentData(nullptr), keyWordAutomata(nullptr), tokenDfa(nullptr),
-      astDfa(nullptr), startGrammar(nullptr) {}
+      astAutomataType(AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA),
+      astDfa(nullptr), startGrammar(nullptr), eofGrammar(nullptr),
+      nonterminalFollowMap(nullptr) {}
 
 PersistentObject::PersistentObject(PersistentData *persistentData)
     : persistentData(persistentData), keyWordAutomata(nullptr),
-      tokenDfa(nullptr), astDfa(nullptr), startGrammar(nullptr) {
+      astAutomataType(AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA),
+      tokenDfa(nullptr), astDfa(nullptr), startGrammar(nullptr),
+      eofGrammar(nullptr), nonterminalFollowMap(nullptr) {
+  init();
+}
+
+void PersistentObject::initByPersistentData(PersistentData *persistentData) {
+  this->persistentData = persistentData;
   init();
 }
 
 PersistentObject::~PersistentObject() {
   delete astDfa;
   astDfa = nullptr;
+
+  if (nullptr != nonterminalFollowMap) {
+    for (auto iter = nonterminalFollowMap->begin();
+         iter != nonterminalFollowMap->end(); iter++) {
+      auto follows = iter->second;
+      delete follows;
+    }
+  }
+  delete nonterminalFollowMap;
+  nonterminalFollowMap = nullptr;
 
   delete tokenDfa;
   tokenDfa = nullptr;
@@ -35,11 +55,45 @@ void PersistentObject::init() {
   initGrammars();
   initKeyWordAutomata();
   initTokenDfa();
-  initStartGrammar();
   initProductionRules();
-  initAstDfa();
+  initAstAutomata();
 
   persistentData->compact();
+}
+
+void PersistentObject::initAstAutomata() {
+  astAutomataType = persistentData->getAstAutomataTypeByInputStream();
+  switch (astAutomataType) {
+  case AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+    initBacktrackingBottomUpAstAutomata();
+    break;
+  case AstAutomataType::FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+    initFollowFilterBacktrackingBottomUpAstAutomata();
+    break;
+  }
+}
+
+void PersistentObject::initFollowFilterBacktrackingBottomUpAstAutomata() {
+  initStartGrammar();
+  initAstDfa();
+  initEofGrammar();
+  initNonterminalFollowMap();
+}
+
+void PersistentObject::initNonterminalFollowMap() {
+  nonterminalFollowMap = reinterpret_cast<
+      const std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+                     PtrGrammarCompare> *>(
+      persistentData->getNonterminalFollowMapByInputStream());
+}
+
+void PersistentObject::initEofGrammar() {
+  eofGrammar = persistentData->getGrammarByInputStream();
+}
+
+void PersistentObject::initBacktrackingBottomUpAstAutomata() {
+  initStartGrammar();
+  initAstDfa();
 }
 
 void PersistentObject::initAstDfa() {
@@ -51,7 +105,7 @@ void PersistentObject::initProductionRules() const {
 }
 
 void PersistentObject::initStartGrammar() {
-  startGrammar = persistentData->getStartGrammarByInputStream();
+  startGrammar = persistentData->getGrammarByInputStream();
 }
 
 void PersistentObject::initTokenDfa() {

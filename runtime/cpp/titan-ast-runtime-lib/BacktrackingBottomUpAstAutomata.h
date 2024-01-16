@@ -6,6 +6,7 @@
 #define AST__BACKTRACKINGBOTTOMUPASTAUTOMATA_H_
 
 #include "Ast.h"
+#include "AstAutomata.h"
 #include "BacktrackingBottomUpBranch.h"
 #include "Grammar.h"
 #include "SyntaxDfa.h"
@@ -30,7 +31,7 @@ public:
                   const BacktrackingBottomUpBranch *t2) const;
 };
 
-class BacktrackingBottomUpAstAutomata {
+class BacktrackingBottomUpAstAutomata : public AstAutomata {
 public:
   BacktrackingBottomUpAstAutomata(const SyntaxDfa *astDfa,
                                   const Grammar *startGrammar,
@@ -40,11 +41,21 @@ public:
                                       backtrackingBottomUpAstAutomata) = delete;
   BacktrackingBottomUpAstAutomata(const BacktrackingBottomUpAstAutomata &&
                                       backtrackingBottomUpAstAutomata) = delete;
-  ~BacktrackingBottomUpAstAutomata();
+  ~BacktrackingBottomUpAstAutomata() override;
 
-  const Ast *buildAst(std::list<Token *> *sourceTokens);
+  AstAutomataType getType() override;
 
-  const std::list<Ast *> *buildAsts(std::list<Token *> *sourceTokens);
+  const Ast *buildAst(std::list<Token *> *sourceTokens) override;
+
+  const std::list<Ast *> *buildAsts(std::list<Token *> *sourceTokens) override;
+
+protected:
+  virtual void reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
+
+  void doReduce(BacktrackingBottomUpBranch *bottomUpBranch,
+                ProductionRule *closingProductionRule);
+
+  TokenReducingSymbolInputStream tokenReducingSymbolInputStream;
 
 private:
   void init(std::list<Token *> *sourceTokens);
@@ -54,14 +65,10 @@ private:
   void consumeBottomUpBranch();
   bool isAcceptedBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
   void shiftBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
-  void reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
-  void doReduce(BacktrackingBottomUpBranch *bottomUpBranch,
-                ProductionRule *closingProductionRule);
   void clear();
   std::string getNoResultErrorInfo();
 
 private:
-  TokenReducingSymbolInputStream tokenReducingSymbolInputStream;
   std::set<BacktrackingBottomUpBranch *, BacktrackingBottomUpCompare>
       bottomUpBranchs;
   std::set<BacktrackingBottomUpBranch *, BacktrackingBottomUpCompare>

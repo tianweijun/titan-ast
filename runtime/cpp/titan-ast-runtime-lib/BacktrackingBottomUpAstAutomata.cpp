@@ -348,7 +348,8 @@ bool BacktrackingBottomUpAstAutomata::addNewBacktrackingBottomUpBranch(
         minEndIndexOfTriedBranch =
             firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
       }
-      //std::cout<<minEndIndexOfTask<<":"<<bottomUpBranchs.size()<<" "<<triedBottomUpBranchs.size()<<std::endl;
+      // std::cout<<minEndIndexOfTask<<":"<<bottomUpBranchs.size()<<"
+      // "<<triedBottomUpBranchs.size()<<std::endl;
     }
   }
   return hasInsert;
@@ -406,4 +407,7 @@ std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
   errorInfo << "generate ast failed,error near [" << startIndexByte << ","
             << endIndexByte << "):" << strTokenInfo;
   return errorInfo.str();
+}
+AstAutomataType BacktrackingBottomUpAstAutomata::getType() {
+  return AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA;
 }

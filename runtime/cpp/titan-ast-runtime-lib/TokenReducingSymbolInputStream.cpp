@@ -4,13 +4,9 @@
 
 #include "TokenReducingSymbolInputStream.h"
 
-bool GrammarCompare::operator()(const Grammar *t1, const Grammar *t2) {
-  return t1->compare(*t2);
-}
-
 TokenReducingSymbolInputStream::TokenReducingSymbolInputStream(
     Grammar **innerGrammars, int countOfInnerGrammars)
-    : innerGrammars(std::set<Grammar *, GrammarCompare>()),
+    : innerGrammars(std::set<Grammar *, PtrGrammarContentCompare>()),
       tokenReducingSymbols(nullptr), nextReadIndex(0),
       sizeOfTokenReducingSymbols(0) {
   for (int i = 0; i < countOfInnerGrammars; i++) {

@@ -3,6 +3,7 @@
 //
 
 #include "PersistentAutomataAstApplication.h"
+#include "AstAutomataBuilder.h"
 #include "AstRuntimeException.h"
 #include "TokenAutomataBuilder.h"
 #include <list>
@@ -38,14 +39,14 @@ void PersistentAutomataAstApplication::buildContext(
     delete persistentData;
     return;
   }
-  persistentObject.reset(new PersistentObject(persistentData));
   PersistentObject *ptrPersistentObject = persistentObject.get();
+  ptrPersistentObject->initByPersistentData(persistentData);
+
   TokenAutomataBuilder tokenAutomataBuilder;
   tokenAutomata = tokenAutomataBuilder.build(ptrPersistentObject);
-  astAutomata = new BacktrackingBottomUpAstAutomata(
-      ptrPersistentObject->astDfa, ptrPersistentObject->startGrammar,
-      ptrPersistentObject->persistentData->grammars,
-      ptrPersistentObject->persistentData->sizeOfGramamrs);
+
+  AstAutomataBuilder astAutomataBuilder;
+  astAutomata = astAutomataBuilder.build(ptrPersistentObject);
 }
 
 const Ast *PersistentAutomataAstApplication::buildAst(
@@ -85,12 +86,12 @@ PersistentAutomataAstApplication::clone() const {
   cloneLock.unlock();
 
   PersistentObject *ptrPersistentObject = app->persistentObject.get();
+
   TokenAutomataBuilder tokenAutomataBuilder;
   app->tokenAutomata = tokenAutomataBuilder.build(ptrPersistentObject);
-  app->astAutomata = new BacktrackingBottomUpAstAutomata(
-      ptrPersistentObject->astDfa, ptrPersistentObject->startGrammar,
-      ptrPersistentObject->persistentData->grammars,
-      ptrPersistentObject->persistentData->sizeOfGramamrs);
+
+  AstAutomataBuilder astAutomataBuilder;
+  app->astAutomata = astAutomataBuilder.build(ptrPersistentObject);
   return app;
 }
 const std::list<Ast *> *PersistentAutomataAstApplication::buildAsts(

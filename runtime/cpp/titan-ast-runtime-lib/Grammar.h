@@ -53,4 +53,18 @@ public:
   ~NonterminaltGrammar();
 };
 
+class PtrGrammarCompare {
+public:
+  bool operator()(const Grammar *t1, const Grammar *t2) const {
+    return reinterpret_cast<uintptr_t>(t1) < reinterpret_cast<uintptr_t>(t2);
+  }
+};
+
+class PtrGrammarContentCompare {
+public:
+  bool operator()(const Grammar *t1, const Grammar *t2) const {
+    return t1->compare(*t2);
+  }
+};
+
 #endif // AST__RUNTIME__GRAMMAR_H_

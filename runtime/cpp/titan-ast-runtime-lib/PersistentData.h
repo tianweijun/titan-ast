@@ -4,6 +4,7 @@
 
 #ifndef AST__RUNTIME__PERSISTENTDATA_H_
 #define AST__RUNTIME__PERSISTENTDATA_H_
+#include "AstAutomataType.h"
 #include "ByteBuffer.h"
 #include "Grammar.h"
 #include "KeyWordAutomata.h"
@@ -11,6 +12,7 @@
 #include "TokenDfa.h"
 #include "TokenDfaState.h"
 #include <fstream>
+#include <set>
 #include <string>
 
 class PersistentData {
@@ -33,13 +35,18 @@ public:
 
   SyntaxDfa *getSyntaxDfaByInputStream();
   void getProductionRulesByInputStream();
-  Grammar *getStartGrammarByInputStream();
+  Grammar *getGrammarByInputStream();
   TokenDfa *getTokenDfaByInputStream();
   KeyWordAutomata *getKeyWordAutomataByInputStream();
   Grammar **getGrammarsByInputStream();
   Grammar *newGrammarByType(GrammarType type);
   std::string *readByteString(int countOfStringBytes);
   std::string **getStringPoolByInputStream();
+  AstAutomataType getAstAutomataTypeByInputStream();
+  std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+           PtrGrammarCompare> *
+  getNonterminalFollowMapByInputStream();
+
   void doRead(byte bytes[], int offset, int length);
   int readInt();
   void compact();

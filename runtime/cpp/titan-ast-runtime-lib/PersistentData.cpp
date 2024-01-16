@@ -110,9 +110,9 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
   return syntaxDfa;
 }
 
-Grammar *PersistentData::getStartGrammarByInputStream() {
-  int indexOfStartGrammar = readInt();
-  return grammars[indexOfStartGrammar];
+Grammar *PersistentData::getGrammarByInputStream() {
+  int indexOfGrammar = readInt();
+  return grammars[indexOfGrammar];
 }
 
 TokenDfa *PersistentData::getTokenDfaByInputStream() {
@@ -248,3 +248,31 @@ void PersistentData::doRead(byte bytes[], int offset, int length) {
 }
 
 void PersistentData::compact() { inputStream.close(); }
+
+AstAutomataType PersistentData::getAstAutomataTypeByInputStream() {
+  auto type = AstAutomataType(readInt());
+  return type;
+}
+
+std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *, PtrGrammarCompare>
+    *PersistentData::getNonterminalFollowMapByInputStream() {
+  int size = readInt();
+  auto *nonterminalFollowMap =
+      new std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+                   PtrGrammarCompare>();
+  for (int indexOfNonterminal = 0; indexOfNonterminal < size;
+       indexOfNonterminal++) {
+    Grammar *nonterminal = getGrammarByInputStream();
+
+    int sizeOfFollow = readInt();
+    auto follow = new std::set<const Grammar *, PtrGrammarCompare>();
+    for (int indexOfFollow = 0; indexOfFollow < sizeOfFollow; indexOfFollow++) {
+      follow->insert(getGrammarByInputStream());
+    }
+
+    std::pair<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *> pair(
+        nonterminal, follow);
+    nonterminalFollowMap->insert(pair);
+  }
+  return nonterminalFollowMap;
+}

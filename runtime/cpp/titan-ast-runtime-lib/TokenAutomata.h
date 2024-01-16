@@ -9,8 +9,8 @@
 #include <list>
 class TokenAutomata {
 public:
-  virtual std::list<Token *> *buildToken(const std::string *sourceFilePath) = 0;
   virtual ~TokenAutomata() = default;
+  virtual std::list<Token *> *buildToken(const std::string *sourceFilePath) = 0;
 };
 
 #endif // AST_RUNTIME_RUNTIME_TOKENAUTOMATA_H_

@@ -10,11 +10,6 @@
 #include <list>
 #include <set>
 
-class GrammarCompare {
-public:
-  bool operator()(const Grammar *t1, const Grammar *t2);
-};
-
 class TokenReducingSymbolInputStream {
 public:
   TokenReducingSymbolInputStream(Grammar **innerGrammars,
@@ -32,7 +27,7 @@ public:
   void init(std::list<Token *> *sourceTokens);
 
 private:
-  std::set<Grammar *, GrammarCompare> innerGrammars;
+  std::set<Grammar *, PtrGrammarContentCompare> innerGrammars;
 };
 
 #endif // AST__TOKENREDUCINGSYMBOLINPUTSTREAM_H_

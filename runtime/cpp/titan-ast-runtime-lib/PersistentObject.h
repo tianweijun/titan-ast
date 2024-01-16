@@ -26,16 +26,29 @@ private:
   void initGrammars() const;
   void initKeyWordAutomata();
   void initTokenDfa();
-  void initStartGrammar();
   void initProductionRules() const;
+
+  void initAstAutomata();
+  void initBacktrackingBottomUpAstAutomata();
+  void initStartGrammar();
   void initAstDfa();
+  void initFollowFilterBacktrackingBottomUpAstAutomata();
+  void initEofGrammar();
+  void initNonterminalFollowMap();
 
 public:
   PersistentData *persistentData;
   const KeyWordAutomata *keyWordAutomata;
   const TokenDfa *tokenDfa;
+
+  AstAutomataType astAutomataType;
   const SyntaxDfa *astDfa;
   const Grammar *startGrammar;
+
+  const Grammar *eofGrammar;
+  const std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+                 PtrGrammarCompare> *nonterminalFollowMap;
+  void initByPersistentData(PersistentData *persistentData);
 };
 
 #endif // AST__PERSISTENTOBJECT_H_

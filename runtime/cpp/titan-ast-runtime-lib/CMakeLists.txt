@@ -45,4 +45,8 @@ add_library(titan-ast-runtime-lib SHARED Ast.cpp Ast.h
         Runtime.h KeyWordAutomata.cpp KeyWordAutomata.h TokenAutomata.h
         KeyWordDfaTokenAutomata.h KeyWordDfaTokenAutomata.cpp
         TokenAutomataBuilder.cpp TokenAutomataBuilder.h
+        AstAutomata.h
+        AstAutomataType.h AstAutomataBuilder.cpp
+        AstAutomataBuilder.h FollowFilterBacktrackingBottomUpAstAutomata.cpp
+        FollowFilterBacktrackingBottomUpAstAutomata.h
         )

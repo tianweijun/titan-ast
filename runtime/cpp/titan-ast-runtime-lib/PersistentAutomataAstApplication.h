@@ -37,7 +37,7 @@ public:
 private:
   std::shared_ptr<PersistentObject> persistentObject;
   TokenAutomata *tokenAutomata;
-  BacktrackingBottomUpAstAutomata *astAutomata;
+  AstAutomata *astAutomata;
 
   static std::mutex cloneLock;
 };
