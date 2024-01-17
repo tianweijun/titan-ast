@@ -1,6 +1,5 @@
 package titan.ast.test.diy;
 
-import java.util.List;
 import titan.ast.grammar.GrammarFileAutomataAstApplication;
 import titan.ast.target.Ast;
 
@@ -21,9 +20,7 @@ public class DiyShowGraphicalViewOfAstByGrammarFileTest {
         new GrammarFileAutomataAstApplication();
     grammarFileAutomataAstApplication.setContext(testArgs[1]);
 
-    List<Ast> asts = grammarFileAutomataAstApplication.buildAsts(testArgs[3]);
-    for (Ast ast : asts) {
-      grammarFileAutomataAstApplication.displayGraphicalViewOfAst(ast);
-    }
+    Ast ast = grammarFileAutomataAstApplication.buildAst(testArgs[3]);
+    grammarFileAutomataAstApplication.displayGraphicalViewOfAst(ast);
   }
 }

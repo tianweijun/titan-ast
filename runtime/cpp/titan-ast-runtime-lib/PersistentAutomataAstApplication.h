@@ -31,9 +31,6 @@ public:
   const Ast *buildAst(const std::string *sourceCodeFilePath) const;
   const PersistentAutomataAstApplication *clone() const;
 
-  const std::list<Ast *> *
-  buildAsts(const std::string *sourceCodeFilePath) const;
-
 private:
   std::shared_ptr<PersistentObject> persistentObject;
   TokenAutomata *tokenAutomata;

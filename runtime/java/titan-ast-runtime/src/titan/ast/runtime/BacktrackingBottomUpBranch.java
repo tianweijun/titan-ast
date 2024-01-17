@@ -9,8 +9,8 @@ import java.util.Objects;
  *
  * @author tian wei jun
  */
-public class BacktrackingBottomUpBranch implements Cloneable,
-    Comparable<BacktrackingBottomUpBranch> {
+public class BacktrackingBottomUpBranch
+    implements Cloneable, Comparable<BacktrackingBottomUpBranch> {
 
   LinkedList<ReducingSymbol> reducingSymbols = new LinkedList<>();
 
@@ -47,6 +47,18 @@ public class BacktrackingBottomUpBranch implements Cloneable,
   }
 
   @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (ReducingSymbol reducingSymbol : reducingSymbols) {
+      stringBuilder
+          .append("-")
+          .append(reducingSymbol.astOfCurrentDfaState.grammar.name)
+          .append(" ");
+    }
+    return stringBuilder.toString();
+  }
+
+  @Override
   public int compareTo(BacktrackingBottomUpBranch that) {
     LinkedList<ReducingSymbol> thatReducingSymbols = that.reducingSymbols;
     // endIndexOfToken
@@ -70,16 +82,5 @@ public class BacktrackingBottomUpBranch implements Cloneable,
       }
     }
     return 0;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    for (ReducingSymbol reducingSymbol : reducingSymbols) {
-      if (null != reducingSymbol.reducedGrammar) {
-        stringBuilder.append("-").append(reducingSymbol.reducedGrammar.name);
-      }
-    }
-    return stringBuilder.toString();
   }
 }

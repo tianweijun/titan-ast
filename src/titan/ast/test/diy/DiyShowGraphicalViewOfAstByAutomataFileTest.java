@@ -1,6 +1,5 @@
 package titan.ast.test.diy;
 
-import java.util.List;
 import titan.ast.logger.Logger;
 import titan.ast.runtime.Ast;
 import titan.ast.runtime.RuntimeAutomataAstApplication;
@@ -24,10 +23,8 @@ public class DiyShowGraphicalViewOfAstByAutomataFileTest {
         new RuntimeAutomataAstApplication();
     runtimeAutomataAstApplication.setContext(testArgs[1]);
 
-    List<Ast> asts = runtimeAutomataAstApplication.buildAsts(testArgs[3]);
-    for (Ast ast : asts) {
-      runtimeAutomataAstApplication.displayGraphicalViewOfAst(ast);
-    }
+    Ast ast = runtimeAutomataAstApplication.buildAst(testArgs[3]);
+    runtimeAutomataAstApplication.displayGraphicalViewOfAst(ast);
 
     Logger.info("ShowGraphicalViewOfAstByAutomataFileTest", "run end");
   }

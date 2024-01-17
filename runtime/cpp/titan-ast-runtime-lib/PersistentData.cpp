@@ -254,11 +254,13 @@ AstAutomataType PersistentData::getAstAutomataTypeByInputStream() {
   return type;
 }
 
-std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *, PtrGrammarCompare>
-    *PersistentData::getNonterminalFollowMapByInputStream() {
+std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+         PtrGrammarCompare> *
+PersistentData::getNonterminalFollowMapByInputStream() {
   int size = readInt();
   auto *nonterminalFollowMap =
-      new std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+      new std::map<const Grammar *,
+                   std::set<const Grammar *, PtrGrammarCompare> *,
                    PtrGrammarCompare>();
   for (int indexOfNonterminal = 0; indexOfNonterminal < size;
        indexOfNonterminal++) {
@@ -270,8 +272,8 @@ std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *, PtrGra
       follow->insert(getGrammarByInputStream());
     }
 
-    std::pair<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *> pair(
-        nonterminal, follow);
+    std::pair<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *>
+        pair(nonterminal, follow);
     nonterminalFollowMap->insert(pair);
   }
   return nonterminalFollowMap;

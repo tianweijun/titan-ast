@@ -22,8 +22,6 @@ public:
   const Ast *buildAst(const std::string *sourceCodeFilePath);
   RuntimeAutomataAstApplication *clone();
 
-  const std::list<Ast *> *buildAsts(const std::string *sourceCodeFilePath);
-
 private:
   const PersistentAutomataAstApplication *persistentAutomataAstApplication;
 };

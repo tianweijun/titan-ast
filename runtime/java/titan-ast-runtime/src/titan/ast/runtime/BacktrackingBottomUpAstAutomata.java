@@ -2,7 +2,6 @@ package titan.ast.runtime;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TreeSet;
@@ -21,7 +20,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       new TreeSet<>(new BacktrackingBottomUpBranchComparator());
   TreeSet<BacktrackingBottomUpBranch> triedBottomUpBranchs =
       new TreeSet<>(new BacktrackingBottomUpBranchComparator());
-  LinkedList<AutomataTmpAst> result = new LinkedList<>();
+  AutomataTmpAst result = null;
 
   public BacktrackingBottomUpAstAutomata(SyntaxDfa astDfa, Grammar startGrammar) {
     this.astDfa = astDfa;
@@ -42,34 +41,15 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
   @Override
   public Ast buildAst(List<Token> sourceTokens) {
     init(sourceTokens);
-    while (result.isEmpty() && !bottomUpBranchs.isEmpty()) {
+    while (result == null && !bottomUpBranchs.isEmpty()) {
       consumeBottomUpBranch();
     }
 
-    if (result.isEmpty()) {
+    if (result == null) {
       throw new AstRuntimeException(getNoResultErrorInfo());
     }
 
-    Ast ret = result.getFirst().toAst();
-    clear();
-    return ret;
-  }
-
-  @Override
-  public List<Ast> buildAsts(List<Token> sourceTokens) {
-    init(sourceTokens);
-    while (!bottomUpBranchs.isEmpty()) {
-      consumeBottomUpBranch();
-    }
-
-    if (result.isEmpty()) {
-      throw new AstRuntimeException(getNoResultErrorInfo());
-    }
-
-    List<Ast> ret = new ArrayList<>(result.size());
-    for (AutomataTmpAst tmpAst : result) {
-      ret.add(tmpAst.toAst());
-    }
+    Ast ret = result.toAst();
     clear();
     return ret;
   }
@@ -85,7 +65,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     triedBottomUpBranchs.add(triedBottomUpBranch);
 
     if (isAcceptedBottomUpBranch(bottomUpBranch)) {
-      result.add(bottomUpBranch.reducingSymbols.getLast().astOfCurrentDfaState);
+      result = bottomUpBranch.reducingSymbols.getLast().astOfCurrentDfaState;
       return;
     }
     reduceBottomUpBranch(bottomUpBranch);
@@ -104,7 +84,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       if (null != nextDfaState) {
         // 归约的符号
         ReducingSymbol terminalReducingSymbol = new ReducingSymbol();
-        terminalReducingSymbol.reducedGrammar = token.terminal;
         terminalReducingSymbol.astOfCurrentDfaState = new AutomataTmpAst(token);
         terminalReducingSymbol.currentDfaState = nextDfaState;
         terminalReducingSymbol.endIndexOfToken = tokenReducingSymbolInputStream.nextReadIndex - 1;
@@ -136,7 +115,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       if (null != nextDfaState) {
         // 归约的符号
         ReducingSymbol nonterminalReducingSymbol = new ReducingSymbol();
-        nonterminalReducingSymbol.reducedGrammar = closingProductionRule.grammar;
         nonterminalReducingSymbol.astOfCurrentDfaState =
             new AutomataTmpAst(closingProductionRule.grammar, closingProductionRule.alias);
         nonterminalReducingSymbol.currentDfaState = nextDfaState;
@@ -160,7 +138,8 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
         break;
       }
       SyntaxDfaState nextReducingProductionRuleDfaState =
-          reducingProductionRuleDfaState.edges.get(inputReducingSymbol.reducedGrammar);
+          reducingProductionRuleDfaState.edges.get(
+              inputReducingSymbol.astOfCurrentDfaState.grammar);
       if (null == nextReducingProductionRuleDfaState) { // 无法按照产生式向前归约，结束
         break;
       }
@@ -185,7 +164,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
           }
           // 归约的符号
           ReducingSymbol nonterminalReducingSymbol = new ReducingSymbol();
-          nonterminalReducingSymbol.reducedGrammar = closingProductionRule.grammar;
           nonterminalReducingSymbol.endIndexOfToken = endIndexOfToken;
           nonterminalReducingSymbol.currentDfaState = nextDfaState;
           nonterminalReducingSymbol.astOfCurrentDfaState = reducingAst;
@@ -204,14 +182,14 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     // 可接受状态:栈中有两个归约，栈底是基准标志，栈顶是归约结果，并且源文件输入流全部识别了
     return tokenReducingSymbolInputStream.hasReadAll()
         && bottomUpBranch.reducingSymbols.size() == 2
-        && startGrammar.equals(topReducingSymbol.reducedGrammar);
+        && startGrammar.equals(topReducingSymbol.astOfCurrentDfaState.grammar);
   }
 
   private void clear() {
     tokenReducingSymbolInputStream = null;
     bottomUpBranchs.clear();
     triedBottomUpBranchs.clear();
-    result.clear();
+    result = null;
   }
 
   private void init(List<Token> sourceTokens) {
@@ -234,7 +212,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
    */
   private ReducingSymbol getConnectedSignOfStartGrammarReducingSymbol() {
     ReducingSymbol connectedSignOfStartGrammarReducingSymbol = new ReducingSymbol();
-    connectedSignOfStartGrammarReducingSymbol.reducedGrammar = startGrammar;
     connectedSignOfStartGrammarReducingSymbol.astOfCurrentDfaState =
         new AutomataTmpAst(startGrammar, "");
     connectedSignOfStartGrammarReducingSymbol.endIndexOfToken = -1;

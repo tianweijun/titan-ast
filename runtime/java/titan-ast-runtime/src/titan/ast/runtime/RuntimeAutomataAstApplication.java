@@ -2,7 +2,6 @@ package titan.ast.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * RuntimeAutomataAstApplication.
@@ -18,22 +17,6 @@ public class RuntimeAutomataAstApplication implements Cloneable {
     Grammar[] grammars = new Grammar[oriGrammars.length];
     System.arraycopy(oriGrammars, 0, grammars, 0, oriGrammars.length);
     return grammars;
-  }
-
-  public List<Ast> buildAsts(String sourceCodeFilePath) {
-    return persistentAutomataAstApplication.buildAsts(sourceCodeFilePath);
-  }
-
-  public List<Ast> buildAsts(InputStream sourceByteInputStream) {
-    List<Ast> asts = persistentAutomataAstApplication.buildAsts(sourceByteInputStream);
-    if (null != sourceByteInputStream) {
-      try {
-        sourceByteInputStream.close();
-      } catch (Exception e) {
-        throw new AstRuntimeException(e);
-      }
-    }
-    return asts;
   }
 
   public Ast buildAst(String sourceFilePath) {

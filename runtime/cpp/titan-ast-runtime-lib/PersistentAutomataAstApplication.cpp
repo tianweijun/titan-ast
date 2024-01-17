@@ -94,34 +94,3 @@ PersistentAutomataAstApplication::clone() const {
   app->astAutomata = astAutomataBuilder.build(ptrPersistentObject);
   return app;
 }
-const std::list<Ast *> *PersistentAutomataAstApplication::buildAsts(
-    const std::string *sourceCodeFilePath) const {
-  std::list<Token *> *tokens = tokenAutomata->buildToken(sourceCodeFilePath);
-
-  // byteBufferedInputStream初始化错误（可能原因：源文件不存在）
-  // text is not a token
-  if (AstRuntimeExceptionResolver::hasThrewException()) {
-    if (tokens) {
-      for (auto &token : *tokens) {
-        delete token;
-      }
-      delete tokens;
-    }
-    return nullptr;
-  }
-  const std::list<Ast *> *asts = astAutomata->buildAsts(tokens);
-  //回收堆中的token
-  for (auto token : *tokens) {
-    delete token;
-  }
-  delete tokens;
-  // clone ast error
-  if (AstRuntimeExceptionResolver::hasThrewException()) {
-    for (auto ast : *asts) {
-      delete ast;
-    }
-    delete asts;
-    asts = nullptr;
-  }
-  return asts;
-}

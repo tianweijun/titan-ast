@@ -11,6 +11,4 @@ public interface AstAutomata {
   AstAutomataType getType();
 
   Ast buildAst(List<Token> sourceTokens);
-
-  List<Ast> buildAsts(List<Token> sourceTokens);
 }

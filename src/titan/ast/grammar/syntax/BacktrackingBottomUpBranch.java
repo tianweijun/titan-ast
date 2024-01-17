@@ -51,9 +51,7 @@ public class BacktrackingBottomUpBranch
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
     for (ReducingSymbol reducingSymbol : reducingSymbols) {
-      if (null != reducingSymbol.reducedGrammar) {
-        stringBuilder.append("-").append(reducingSymbol.reducedGrammar.name);
-      }
+      stringBuilder.append(reducingSymbol.astOfCurrentDfaState.grammar.name).append(" ");
     }
     return stringBuilder.toString();
   }

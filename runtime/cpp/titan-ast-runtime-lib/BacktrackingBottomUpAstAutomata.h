@@ -47,8 +47,6 @@ public:
 
   const Ast *buildAst(std::list<Token *> *sourceTokens) override;
 
-  const std::list<Ast *> *buildAsts(std::list<Token *> *sourceTokens) override;
-
 protected:
   virtual void reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
 
@@ -76,7 +74,7 @@ private:
 
   const SyntaxDfa *astDfa;
   const Grammar *startGrammar;
-  std::list<Ast *> result;
+  Ast *result;
 };
 
 #endif // AST__BACKTRACKINGBOTTOMUPASTAUTOMATA_H_

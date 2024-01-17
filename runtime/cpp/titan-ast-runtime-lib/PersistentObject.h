@@ -46,7 +46,8 @@ public:
   const Grammar *startGrammar;
 
   const Grammar *eofGrammar;
-  const std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+  const std::map<const Grammar *,
+                 std::set<const Grammar *, PtrGrammarCompare> *,
                  PtrGrammarCompare> *nonterminalFollowMap;
   void initByPersistentData(PersistentData *persistentData);
 };

@@ -43,32 +43,6 @@ public class GrammarFileAutomataAstApplication {
     persistentAutomataBuilder.build(persistentAutomataFilePath);
   }
 
-  public List<Ast> buildAsts(String sourceFilePath) {
-    AstContext astContext = AstContext.get();
-    LanguageGrammar languageGrammar = astContext.languageGrammar;
-    // token
-    List<Token> tokens = languageGrammar.tokenAutomata.buildToken(sourceFilePath);
-    // ast
-    return languageGrammar.astAutomata.buildAsts(tokens);
-  }
-
-  public List<Ast> buildAsts(InputStream sourceInputStream) {
-    AstContext astContext = AstContext.get();
-    LanguageGrammar languageGrammar = astContext.languageGrammar;
-    // token
-    List<Token> tokens = languageGrammar.tokenAutomata.buildToken(sourceInputStream);
-    // ast
-    List<Ast> asts = languageGrammar.astAutomata.buildAsts(tokens);
-    if (null != sourceInputStream) {
-      try {
-        sourceInputStream.close();
-      } catch (Exception e) {
-        throw new AstRuntimeException(e);
-      }
-    }
-    return asts;
-  }
-
   public Ast buildAst(String sourceFilePath) {
     AstContext astContext = AstContext.get();
     LanguageGrammar languageGrammar = astContext.languageGrammar;

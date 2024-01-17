@@ -38,7 +38,7 @@ BacktrackingBottomUpAstAutomata::BacktrackingBottomUpAstAutomata(
                                BacktrackingBottomUpCompare>()),
       triedBottomUpBranchs(std::set<BacktrackingBottomUpBranch *,
                                     BacktrackingBottomUpCompare>()),
-      astDfa(astDfa), startGrammar(startGrammar), result(std::list<Ast *>()) {}
+      astDfa(astDfa), startGrammar(startGrammar), result(nullptr) {}
 
 BacktrackingBottomUpAstAutomata::~BacktrackingBottomUpAstAutomata() {
   // astDfa delete by PersistentObject.astDfa
@@ -47,7 +47,7 @@ BacktrackingBottomUpAstAutomata::~BacktrackingBottomUpAstAutomata() {
   clear();
 }
 void BacktrackingBottomUpAstAutomata::clear() {
-  result.clear();
+  result = nullptr;
   tokenReducingSymbolInputStream.clear();
 
   for (auto backtrackingBottomUpBranch : bottomUpBranchs) {
@@ -63,39 +63,19 @@ void BacktrackingBottomUpAstAutomata::clear() {
   triedBottomUpBranchs.clear();
 }
 
-const std::list<Ast *> *
-BacktrackingBottomUpAstAutomata::buildAsts(std::list<Token *> *sourceTokens) {
-  init(sourceTokens);
-  while (!bottomUpBranchs.empty()) {
-    consumeBottomUpBranch();
-  }
-
-  if (result.empty()) {
-    AstRuntimeExceptionResolver::throwException(AstRuntimeException(
-        AstRuntimeExceptionCode::RUNTIME_ERROR, getNoResultErrorInfo()));
-  }
-
-  auto *ret = new std::list<Ast *>();
-  for (auto ast : result) {
-    ret->push_back(ast);
-  }
-  clear();
-  return ret;
-}
-
 const Ast *
 BacktrackingBottomUpAstAutomata::buildAst(std::list<Token *> *sourceTokens) {
   init(sourceTokens);
-  while (result.empty() && !bottomUpBranchs.empty()) {
+  while (result == nullptr && !bottomUpBranchs.empty()) {
     consumeBottomUpBranch();
   }
 
-  if (result.empty()) {
+  if (result == nullptr) {
     AstRuntimeExceptionResolver::throwException(AstRuntimeException(
         AstRuntimeExceptionCode::RUNTIME_ERROR, getNoResultErrorInfo()));
   }
 
-  const Ast *ret = result.empty() ? nullptr : result.front();
+  const Ast *ret = result;
   clear();
   return ret;
 }
@@ -116,7 +96,7 @@ void BacktrackingBottomUpAstAutomata::consumeBottomUpBranch() {
   if (isAcceptedBottomUpBranch(bottomUpBranch)) {
     const AutomataTmpAst *automataTmpAst =
         bottomUpBranch->reducingSymbols.back()->astOfCurrentDfaState;
-    result.push_back(automataTmpAst->toAst());
+    result = automataTmpAst->toAst();
 
     delete bottomUpBranch;
     bottomUpBranch = nullptr;
@@ -162,8 +142,6 @@ void BacktrackingBottomUpAstAutomata::doReduce(
 
       // 归约的符号
       auto *nonterminalReducingSymbol = new ReducingSymbol();
-      nonterminalReducingSymbol->reducedGrammar =
-          closingProductionRule->grammar;
       nonterminalReducingSymbol->astOfCurrentDfaState = new AutomataTmpAst(
           closingProductionRule->grammar, closingProductionRule->alias);
       nonterminalReducingSymbol->currentDfaState = nextDfaState;
@@ -191,7 +169,7 @@ void BacktrackingBottomUpAstAutomata::doReduce(
     SyntaxDfaState *nextReducingProductionRuleDfaState = nullptr;
     auto nextReducingProductionRuleDfaStateIt =
         reducingProductionRuleDfaState->edges.find(
-            inputReducingSymbol->reducedGrammar);
+            inputReducingSymbol->astOfCurrentDfaState->grammar);
     if (nextReducingProductionRuleDfaStateIt !=
         reducingProductionRuleDfaState->edges.end()) {
       nextReducingProductionRuleDfaState =
@@ -231,8 +209,6 @@ void BacktrackingBottomUpAstAutomata::doReduce(
         }
         // 归约的符号
         auto *nonterminalReducingSymbol = new ReducingSymbol();
-        nonterminalReducingSymbol->reducedGrammar =
-            closingProductionRule->grammar;
         nonterminalReducingSymbol->endIndexOfToken = endIndexOfToken;
         nonterminalReducingSymbol->currentDfaState = nextDfaState;
         nonterminalReducingSymbol->astOfCurrentDfaState = reducingAst;
@@ -269,7 +245,6 @@ void BacktrackingBottomUpAstAutomata::shiftBottomUpBranch(
           bottomUpBranch->clone();
       // 归约的符号
       auto *terminalReducingSymbol = new ReducingSymbol();
-      terminalReducingSymbol->reducedGrammar = token->terminal;
       terminalReducingSymbol->astOfCurrentDfaState = new AutomataTmpAst(token);
       terminalReducingSymbol->currentDfaState = nextDfaState;
       terminalReducingSymbol->endIndexOfToken =
@@ -292,7 +267,7 @@ bool BacktrackingBottomUpAstAutomata::isAcceptedBottomUpBranch(
   // 可接受状态:栈中有两个归约，栈底是基准标志，栈顶是归约结果，并且源文件输入流全部识别了
   return tokenReducingSymbolInputStream.hasReadAll() &&
          bottomUpBranch->reducingSymbols.size() == 2 &&
-         startGrammar == topReducingSymbol->reducedGrammar;
+         startGrammar == topReducingSymbol->astOfCurrentDfaState->grammar;
 }
 
 void BacktrackingBottomUpAstAutomata::init(std::list<Token *> *sourceTokens) {
@@ -313,7 +288,6 @@ void BacktrackingBottomUpAstAutomata::init(std::list<Token *> *sourceTokens) {
 ReducingSymbol *BacktrackingBottomUpAstAutomata::
     getConnectedSignOfStartGrammarReducingSymbol() {
   auto *connectedSignOfStartGrammarReducingSymbol = new ReducingSymbol();
-  connectedSignOfStartGrammarReducingSymbol->reducedGrammar = startGrammar;
   connectedSignOfStartGrammarReducingSymbol->astOfCurrentDfaState =
       new AutomataTmpAst(startGrammar, nullptr);
   connectedSignOfStartGrammarReducingSymbol->endIndexOfToken = -1;

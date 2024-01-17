@@ -1,7 +1,6 @@
 package titan.ast.grammar.syntax;
 
 import java.util.Objects;
-import titan.ast.grammar.Grammar;
 import titan.ast.runtime.AstRuntimeException;
 import titan.ast.target.AutomataTmpAst;
 
@@ -11,9 +10,6 @@ import titan.ast.target.AutomataTmpAst;
  * @author tian wei jun
  */
 public class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
-
-  // grammar
-  public Grammar reducedGrammar = null;
   // ast
   public AutomataTmpAst astOfCurrentDfaState = null;
   // 状态
@@ -30,7 +26,6 @@ public class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
     } catch (CloneNotSupportedException e) {
       throw new AstRuntimeException(e);
     }
-    reducingSymbol.reducedGrammar = this.reducedGrammar;
     reducingSymbol.currentDfaState = this.currentDfaState;
     reducingSymbol.endIndexOfToken = this.endIndexOfToken;
     reducingSymbol.astOfCurrentDfaState = this.astOfCurrentDfaState.diyClone();
@@ -47,14 +42,13 @@ public class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
     }
     ReducingSymbol that = (ReducingSymbol) o;
     return endIndexOfToken == that.endIndexOfToken
-        && reducedGrammar.equals(that.reducedGrammar)
         && astOfCurrentDfaState.equals(that.astOfCurrentDfaState)
         && currentDfaState.equals(that.currentDfaState);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(reducedGrammar, astOfCurrentDfaState, currentDfaState, endIndexOfToken);
+    return Objects.hash(astOfCurrentDfaState, currentDfaState, endIndexOfToken);
   }
 
   @Override
@@ -64,17 +58,10 @@ public class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
 
   @Override
   public int compareTo(ReducingSymbol that) {
-    if (endIndexOfToken != that.endIndexOfToken) {
-      return endIndexOfToken - that.endIndexOfToken;
-    }
-    int compare = reducedGrammar.compareTo(that.reducedGrammar);
+    int compare = astOfCurrentDfaState.grammar.compareTo(that.astOfCurrentDfaState.grammar);
     if (0 != compare) {
       return compare;
     }
-    compare = currentDfaState.compareTo(that.currentDfaState);
-    if (0 != compare) {
-      return compare;
-    }
-    return astOfCurrentDfaState.compareTo(that.astOfCurrentDfaState);
+    return currentDfaState.compareTo(that.currentDfaState);
   }
 }

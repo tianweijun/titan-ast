@@ -21,9 +21,6 @@ public:
   // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
   bool equals(const ReducingSymbol *o) const;
   ReducingSymbol *clone() const;
-
-  // grammar
-  const Grammar *reducedGrammar;
   // ast
   const AutomataTmpAst *astOfCurrentDfaState;
   // 状态

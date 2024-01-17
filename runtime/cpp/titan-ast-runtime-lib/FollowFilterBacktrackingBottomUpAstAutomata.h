@@ -14,15 +14,20 @@ public:
   FollowFilterBacktrackingBottomUpAstAutomata(
       const SyntaxDfa *astDfa, const Grammar *startGrammar,
       Grammar **innerGrammars, int countOfInnerGrammars,
-      const std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+      const std::map<const Grammar *,
+                     std::set<const Grammar *, PtrGrammarCompare> *,
                      PtrGrammarCompare> *nonterminalFollowMap,
       const Grammar *eofGrammar);
 
+  AstAutomataType getType() override;
+
 protected:
-  void reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch) override;
+  void
+  reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch) override;
 
 public:
-  const std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
+  const std::map<const Grammar *,
+                 std::set<const Grammar *, PtrGrammarCompare> *,
                  PtrGrammarCompare> *nonterminalFollowMap;
   const Grammar *eofGrammar;
 };

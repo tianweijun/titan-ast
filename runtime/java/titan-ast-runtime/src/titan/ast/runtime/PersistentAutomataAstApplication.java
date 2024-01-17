@@ -29,16 +29,6 @@ public class PersistentAutomataAstApplication implements Cloneable {
     astAutomata = persistentObject.astAutomata;
   }
 
-  public List<Ast> buildAsts(String sourceCodeFilePath) {
-    List<Token> tokens = tokenAutomata.buildToken(sourceCodeFilePath);
-    return astAutomata.buildAsts(tokens);
-  }
-
-  public List<Ast> buildAsts(InputStream sourceByteInputStream) {
-    List<Token> tokens = tokenAutomata.buildToken(sourceByteInputStream);
-    return astAutomata.buildAsts(tokens);
-  }
-
   public Ast buildAst(String sourceCodeFilePath) {
     List<Token> tokens = tokenAutomata.buildToken(sourceCodeFilePath);
     return astAutomata.buildAst(tokens);

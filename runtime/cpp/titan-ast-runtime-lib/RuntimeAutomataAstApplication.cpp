@@ -33,7 +33,3 @@ RuntimeAutomataAstApplication *RuntimeAutomataAstApplication::clone() {
       persistentAutomataAstApplication->clone();
   return app;
 }
-const std::list<Ast *> *RuntimeAutomataAstApplication::buildAsts(
-    const std::string *sourceCodeFilePath) {
-  return persistentAutomataAstApplication->buildAsts(sourceCodeFilePath);
-}

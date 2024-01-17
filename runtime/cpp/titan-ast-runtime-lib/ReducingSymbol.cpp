@@ -6,8 +6,8 @@
 #include <unordered_set>
 
 ReducingSymbol::ReducingSymbol()
-    : endIndexOfToken(-1), reducedGrammar(nullptr),
-      astOfCurrentDfaState(nullptr), currentDfaState(nullptr) {}
+    : endIndexOfToken(-1), astOfCurrentDfaState(nullptr),
+      currentDfaState(nullptr) {}
 
 ReducingSymbol::~ReducingSymbol() {
   // reducedGrammar delete by PersistentData.grammars
@@ -19,7 +19,6 @@ ReducingSymbol::~ReducingSymbol() {
 ReducingSymbol *ReducingSymbol::clone() const {
   auto *reducingSymbol = new ReducingSymbol();
   reducingSymbol->endIndexOfToken = this->endIndexOfToken;
-  reducingSymbol->reducedGrammar = this->reducedGrammar;
   reducingSymbol->currentDfaState = this->currentDfaState;
   reducingSymbol->astOfCurrentDfaState = this->astOfCurrentDfaState->clone();
   return reducingSymbol;
@@ -27,41 +26,25 @@ ReducingSymbol *ReducingSymbol::clone() const {
 
 // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
 bool ReducingSymbol::equals(const ReducingSymbol *o) const {
-  // this->reducedGrammar->type == o->reducedGrammar->type &&
   // o->reducedGrammar->name == this->reducedGrammar->name;
-  return this->reducedGrammar == o->reducedGrammar &&
-         this->endIndexOfToken == o->endIndexOfToken &&
+  return this->endIndexOfToken == o->endIndexOfToken &&
          this->currentDfaState == o->currentDfaState &&
          this->astOfCurrentDfaState->equals(o->astOfCurrentDfaState);
 }
 
 // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
 bool ReducingSymbol::compare(const ReducingSymbol *o) const {
-  if (this->endIndexOfToken != o->endIndexOfToken) {
-    return this->endIndexOfToken < o->endIndexOfToken;
+  if (this->astOfCurrentDfaState->grammar != o->astOfCurrentDfaState->grammar) {
+    return reinterpret_cast<uintptr_t>(this->astOfCurrentDfaState->grammar) <
+           reinterpret_cast<uintptr_t>(o->astOfCurrentDfaState->grammar);
   }
 
-  if (this->reducedGrammar != o->reducedGrammar) {
-    return reinterpret_cast<uintptr_t>(this->reducedGrammar) <
-           reinterpret_cast<uintptr_t>(o->reducedGrammar);
-  }
-
-  if (this->currentDfaState != o->currentDfaState) {
-    return reinterpret_cast<uintptr_t>(this->currentDfaState) <
-           reinterpret_cast<uintptr_t>(o->currentDfaState);
-  }
-
-  /*
-  if (!this->astOfCurrentDfaState->equals(o->astOfCurrentDfaState)) {
-    return this->astOfCurrentDfaState->compare(o->astOfCurrentDfaState);
-  }
-   */
-
-  return this->astOfCurrentDfaState->compare(o->astOfCurrentDfaState);
+  return reinterpret_cast<uintptr_t>(this->currentDfaState) <
+         reinterpret_cast<uintptr_t>(o->currentDfaState);
 }
+
 size_t ReducingSymbol::hashCode() const {
-  size_t hashCode = (endIndexOfToken & 0xFF) << 24;
-  hashCode += (((long)reducedGrammar) & 0xFF) << 16;
+  size_t hashCode = (endIndexOfToken & 0xFF) << 16;
   hashCode += (((long)currentDfaState) & 0xFF) << 8;
   hashCode += (astOfCurrentDfaState->hashCode() & 0xFF);
   return hashCode;
