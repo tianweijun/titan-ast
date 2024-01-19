@@ -2,7 +2,9 @@ package titan.ast.grammar.token;
 
 import java.util.LinkedHashMap;
 import titan.ast.AstContext;
+import titan.ast.grammar.FaStateType;
 import titan.ast.grammar.Grammar;
+import titan.ast.runtime.AstRuntimeException;
 
 /**
  * 构造终结符的dfa.
@@ -39,6 +41,11 @@ public class TerminalDfaBuilder {
         new TerminalDfaBuilderPostProcessor(dfa, terminals);
     postProcessor.postProcessTerminalDfaBuilder();
     dfa = new TokenDfaOptimizer().optimize(dfa);
+    if (FaStateType.isClosingTag(dfa.start.type)) { // 不允许空token
+      Grammar emptyTerminal = dfa.start.terminal;
+      throw new AstRuntimeException(
+          String.format("empty token('%s') is not legal", emptyTerminal.name));
+    }
     return dfa;
   }
 

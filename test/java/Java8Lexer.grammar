@@ -31,6 +31,22 @@
 
 @TerminalGrammar begin ;
 
+BlockComment
+    nfa(start,end) laziness()
+    :
+     start[/]prefix1
+     prefix1[\*]prefix2
+     prefix2[\*]suffix1 prefix2~[\*]prefix2
+     suffix1[/]end      suffix1~[/]prefix2
+
+     -> skip
+;
+
+LINE_COMMENT
+    :   '//' ~[\r\n]* -> skip
+    ;
+
+
 // §3.10.5 String Literals
 
 StringLiteral
@@ -43,15 +59,6 @@ CharacterLiteral
 	:	'\'' SingleCharacter '\''
 	|	'\'' EscapeSequence '\''
 	;
-
-
-LINE_COMMENT
-    :   '//' ~[\r\n]* -> skip
-    ;
-
-COMMENT laziness()
-    :   '/*'  [\x00-\xFF]* '*/' -> skip
-    ;
 
 // §3.10.1 Integer Literals
 

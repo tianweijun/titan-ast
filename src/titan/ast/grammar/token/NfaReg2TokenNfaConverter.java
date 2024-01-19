@@ -136,6 +136,15 @@ public class NfaReg2TokenNfaConverter {
       for (int ch = minChar; ch <= maxChar; ch++) {
         charsBuilder.add(ch);
       }
+    } else {
+      StringBuilder errorInfo = new StringBuilder("");
+      for (int indexOfChars = startIndexOfChar; indexOfChars < chars.size(); indexOfChars++) {
+        errorInfo.append(chars.get(indexOfChars));
+      }
+      throw new AstRuntimeException(
+          String.format(
+              "%s:format like this,'from[min-max]to', 'min-max'error near %s",
+              grammar.name, grammarCharset.getDisplayingString(errorInfo.toString())));
     }
   }
 
@@ -191,7 +200,7 @@ public class NfaReg2TokenNfaConverter {
       return newIndexByNormalEscapeChar;
     }
     // special char for regexp
-    int intSpecialChar = getIntByNfaRegRegExpEscapeChar(text[indexOfText]);
+    int intSpecialChar = grammarCharset.getIntByRegExpEscapeChar((char) text[indexOfText]);
     if (intSpecialChar >= 0) {
       charsBuilder.add(intSpecialChar);
       ++indexOfText;
@@ -204,29 +213,6 @@ public class NfaReg2TokenNfaConverter {
             grammar.name,
             grammarCharset.getDisplayingString(
                 text, startIndexOfText, text.length - startIndexOfText)));
-  }
-
-  private int getIntByNfaRegRegExpEscapeChar(int ch) {
-    int res = -1;
-    switch (ch) {
-      case 's':
-        res = ' ';
-        break;
-      case '-':
-        res = '-';
-        break;
-      case '~':
-        res = '~';
-        break;
-      case '[':
-        res = '[';
-        break;
-      case ']':
-        res = ']';
-        break;
-      default:
-    }
-    return res;
   }
 
   private void mapAllStates() {

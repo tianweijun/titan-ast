@@ -533,9 +533,15 @@ StringLiteral
     :   EncodingPrefix? '"' SCharSequence? '"'
     ;
 
-BlockComment laziness()
-:   '/*' AnyOneChar* '*/'
-    -> skip
+BlockComment
+    nfa(start,end) laziness()
+    :
+     start[/]prefix1
+     prefix1[\*]prefix2
+     prefix2[\*]suffix1 prefix2~[\*]prefix2
+     suffix1[/]end      suffix1~[/]prefix2
+
+     -> skip
 ;
 
 LineComment

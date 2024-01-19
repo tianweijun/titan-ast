@@ -1,5 +1,5 @@
 module entry {
-  use std::Io;
+  /*use std::Io;*/
 
   public function  main() -> i32 {
       let num: i32 = 100 ;

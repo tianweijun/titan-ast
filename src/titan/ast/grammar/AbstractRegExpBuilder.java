@@ -683,7 +683,7 @@ public abstract class AbstractRegExpBuilder {
       return newIndexByNormalEscapeChar;
     }
     // special char for regexp
-    int intSpecialChar = getIntByRegExpEscapeChar(text[indexOfText]);
+    int intSpecialChar = grammarCharset.getIntByRegExpEscapeChar(text[indexOfText]);
     if (intSpecialChar >= 0) {
       stringBuilder.append((char) intSpecialChar);
       ++indexOfText;
@@ -696,59 +696,6 @@ public abstract class AbstractRegExpBuilder {
             grammar.name,
             text[indexOfText],
             new String(text, startIndexOfText, text.length - startIndexOfText)));
-  }
-
-  /**
-   * 正则特殊转义：~ 正则重复次数特殊符转义：? * + { } 正则组特殊字符：() [] ''. 默认已有\\，根据后一个字符ch找到对应真正的字符.
-   *
-   * @param ch '\\ch' 表示一个转义字符
-   * @return '\\ch'对应的 对应真正的字符，-1表示'\\ch'不是转义字符
-   */
-  private int getIntByRegExpEscapeChar(char ch) {
-    int res = -1;
-    switch (ch) {
-      case 's':
-        res = grammarCharset.getGrammarSpace();
-        break;
-      case '-':
-        res = '-';
-        break;
-      case '~':
-        res = '~';
-        break;
-      case '?':
-        res = '?';
-        break;
-      case '*':
-        res = '*';
-        break;
-      case '+':
-        res = '+';
-        break;
-      case '{':
-        res = '{';
-        break;
-      case '}':
-        res = '}';
-        break;
-      case '(':
-        res = '(';
-        break;
-      case ')':
-        res = ')';
-        break;
-      case '[':
-        res = '[';
-        break;
-      case ']':
-        res = ']';
-        break;
-      case '\'':
-        res = '\'';
-        break;
-      default:
-    }
-    return res;
   }
 
   private boolean isRegExpKeywordChar(char ch) {
