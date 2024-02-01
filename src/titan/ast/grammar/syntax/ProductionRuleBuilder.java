@@ -89,7 +89,7 @@ public class ProductionRuleBuilder {
       case UNIT:
         switch (productionRuleRegExp.unitType) {
           case SEQUENCE_CHARS:
-            sequenceCharsOrOneCharOptionCharsetUnit2TerminalGrammarUnitRegExp(productionRuleRegExp);
+            sequenceCharsRegExp2TerminalGrammarUnitRegExp(productionRuleRegExp);
             break;
           case GRAMMAR:
           case EMPTY:
@@ -115,43 +115,47 @@ public class ProductionRuleBuilder {
   /**
    * 设置unitType,sets.
    *
-   * @param unit [UNIT&&(SEQUENCE_CHARS||ONE_CHAR_OPTION_CHARSET)]
+   * @param sequenceCharsRegExp UNIT&&SEQUENCE_CHARS
    */
-  private void sequenceCharsOrOneCharOptionCharsetUnit2TerminalGrammarUnitRegExp(RegExp unit) {
-    RegExp eleGrammarRegExp = cloneSequenceCharsOrOneCharOptionCharsetUnitRegExp(unit);
+  private void sequenceCharsRegExp2TerminalGrammarUnitRegExp(RegExp sequenceCharsRegExp) {
+    RegExp eleGrammarRegExp = cloneSequenceCharsRegExpForTerminalsMap(sequenceCharsRegExp);
     Grammar terminal = unitRegExpTerminalsMap.get(eleGrammarRegExp);
 
     if (null == terminal) {
       throw new AstRuntimeException(
           String.format(
               "error in %s %s,no terminal match",
-              this.nonterminal.name, new String(unit.text, unit.startOfText, unit.lengthOfText)));
+              this.nonterminal.name,
+              new String(
+                  sequenceCharsRegExp.text,
+                  sequenceCharsRegExp.startOfText,
+                  sequenceCharsRegExp.lengthOfText)));
     }
     // sets
     RegExp.RegExpCharSet grammarCharSet = new RegExp.RegExpCharSet();
     grammarCharSet.type = RegExp.RegExpCharSetType.GRAMMAR;
     grammarCharSet.grammar = terminal;
-    unit.sets.clear();
-    unit.sets.add(grammarCharSet);
+    sequenceCharsRegExp.sets.clear();
+    sequenceCharsRegExp.sets.add(grammarCharSet);
 
     // unitType
-    unit.unitType = RegExp.RegExpUnitType.GRAMMAR;
+    sequenceCharsRegExp.unitType = RegExp.RegExpUnitType.GRAMMAR;
   }
 
-  private RegExp cloneSequenceCharsOrOneCharOptionCharsetUnitRegExp(RegExp unitRegExp) {
-    if (unitRegExp.type == RegExp.RegExpType.UNIT
-        && unitRegExp.unitType == RegExp.RegExpUnitType.SEQUENCE_CHARS) {
+  private RegExp cloneSequenceCharsRegExpForTerminalsMap(RegExp sequenceCharsRegExp) {
+    if (sequenceCharsRegExp.type == RegExp.RegExpType.UNIT
+        && sequenceCharsRegExp.unitType == RegExp.RegExpUnitType.SEQUENCE_CHARS) {
       // 复制的字段和RegExp的equals字段一样
       RegExp cloner = new RegExp();
-      cloner.type = unitRegExp.type;
-      cloner.isNot = unitRegExp.isNot;
+      cloner.type = sequenceCharsRegExp.type;
+      cloner.isNot = sequenceCharsRegExp.isNot;
       cloner.repMinTimes.setTimes(1);
       cloner.repMaxTimes.setTimes(1);
-      cloner.matchingPattern = unitRegExp.matchingPattern;
+      cloner.matchingPattern = sequenceCharsRegExp.matchingPattern;
       // children肯定没有，那children、relationshipOfChildren都是默认值，不用复制
-      cloner.unitType = unitRegExp.unitType;
+      cloner.unitType = sequenceCharsRegExp.unitType;
       // sets
-      for (RegExp.RegExpCharSet regExpCharSet : unitRegExp.sets) {
+      for (RegExp.RegExpCharSet regExpCharSet : sequenceCharsRegExp.sets) {
         cloner.sets.add(regExpCharSet.clone());
       }
       return cloner;
