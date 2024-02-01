@@ -18,7 +18,7 @@ public class TerminalTokenNfa2DfaConverter {
   private int epsilon;
 
   TerminalTokenNfa2DfaConverter(TokenNfa nfa) {
-    epsilon = AstContext.get().grammarCharset.getTextEpsilon();
+    epsilon = AstContext.get().grammarCharset.getEpsilon();
     this.nfa = nfa;
   }
 

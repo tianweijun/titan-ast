@@ -30,7 +30,7 @@ public class Reg2TokenNfaConverter {
    */
   public Reg2TokenNfaConverter() {
     grammarCharset = AstContext.get().grammarCharset;
-    epsilon = grammarCharset.getTextEpsilon();
+    epsilon = grammarCharset.getEpsilon();
     tasks = new HashMap<>();
     completedTasks = new HashMap<>();
     dependentFragmentGrammars = new HashMap<>();
@@ -261,14 +261,12 @@ public class Reg2TokenNfaConverter {
     TokenNfa rnfa = new TokenNfa();
     TokenNfaState start = rnfa.start;
     TokenNfaState end = rnfa.end;
-    boolean isEmpty = true;
     for (int ch = 0; ch < toEdgeChars.length; ch++) {
       if (toEdgeChars[ch] == 1) {
         start.addEdge(ch, end);
-        isEmpty = false;
       }
     }
-    if (isEmpty) {
+    if (start.edges.isEmpty()) {
       throw new AstRuntimeException(
           String.format("%s:~[ab]{m,n},~[ab] is empty", taskGrammar.name));
     }

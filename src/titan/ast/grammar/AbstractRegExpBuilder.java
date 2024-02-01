@@ -201,7 +201,7 @@ public abstract class AbstractRegExpBuilder {
     charsRegExpUnit.startOfText = indexOfText;
     regExpStack.push(charsRegExpUnit);
     ++indexOfText;
-    indexOfText = setSetsOfBaseUnitRegExp(text, indexOfText);
+    indexOfText = setSetsOfSequenceCharsAndOneCharOptionCharsetUnitRegExp(text, indexOfText);
     indexOfText = expectOneChar('\'', text, indexOfText);
     indexOfText = setRepTimes(charsRegExpUnit, text, indexOfText);
     charsRegExpUnit.lengthOfText = indexOfText - charsRegExpUnit.startOfText;
@@ -226,7 +226,7 @@ public abstract class AbstractRegExpBuilder {
     charsRegExpUnit.startOfText = indexOfText;
     regExpStack.push(charsRegExpUnit);
     ++indexOfText;
-    indexOfText = setSetsOfBaseUnitRegExp(text, indexOfText);
+    indexOfText = setSetsOfSequenceCharsAndOneCharOptionCharsetUnitRegExp(text, indexOfText);
     indexOfText = expectOneChar(']', text, indexOfText);
     indexOfText = setRepTimes(charsRegExpUnit, text, indexOfText);
     charsRegExpUnit.lengthOfText = indexOfText - charsRegExpUnit.startOfText;
@@ -511,7 +511,8 @@ public abstract class AbstractRegExpBuilder {
    * @param indexOfText 正则文本的索引
    * @return 处理后 新的 正则文本的索引
    */
-  private int setSetsOfBaseUnitRegExp(char[] text, int indexOfText) {
+  private int setSetsOfSequenceCharsAndOneCharOptionCharsetUnitRegExp(
+      char[] text, int indexOfText) {
     int startIndexOfText = indexOfText;
     RegExp.RegExpUnitType unitType = regExpStack.peek().unitType;
     CreateSetsOfCharsRegExpUnitDescriptor descriptor = new CreateSetsOfCharsRegExpUnitDescriptor();
@@ -696,30 +697,6 @@ public abstract class AbstractRegExpBuilder {
             grammar.name,
             text[indexOfText],
             new String(text, startIndexOfText, text.length - startIndexOfText)));
-  }
-
-  private boolean isRegExpKeywordChar(char ch) {
-    boolean isRegExpKeywordChar = false;
-    switch (ch) {
-      case '-':
-      case '~':
-      case '?':
-        break;
-      case '*':
-      case '+':
-        break;
-      case '{':
-      case '}':
-      case '(':
-      case ')':
-      case '[':
-      case ']':
-      case '\'':
-        isRegExpKeywordChar = true;
-        break;
-      default:
-    }
-    return isRegExpKeywordChar;
   }
 
   private int expectOneChar(char ch, char[] text, int indexOfText) {

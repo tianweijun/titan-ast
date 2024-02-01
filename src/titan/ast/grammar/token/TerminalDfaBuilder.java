@@ -52,7 +52,7 @@ public class TerminalDfaBuilder {
   private TokenNfa mergeNfasByTerminalNfas() {
     TokenNfa nfa = new TokenNfa();
     TokenNfaState start = nfa.start;
-    int epsilon = AstContext.get().grammarCharset.getTextEpsilon();
+    int epsilon = AstContext.get().grammarCharset.getEpsilon();
 
     for (Grammar terminal : terminals.values()) {
       start.addEdge(epsilon, terminal.regExp.tokenNfa.start);

@@ -12,10 +12,11 @@ public class GrammarCharset {
   public char grammarSpace = 32;
   public int grammarNewline = 10;
   public char[] grammarWhitespaces = {32, 9, 13};
-  public int textEpsilon = 0x100;
-  public int textMax = 0xFF;
+  public int epsilon = 0x100;
+  public int maxChar = 0xFF;
   public int hexLengthOfTextChar = 2;
   public int octalLengthOfTextChar = 3;
+  // 文本字符集个数，不包括epsilon
   public int countOfChars = 0xFF + 1;
   // 语法文件字符集是byte(ISO-8859-1)
   private String grammarCharset = "ISO-8859-1";
@@ -47,7 +48,7 @@ public class GrammarCharset {
   }
 
   public char[] getDisplayingChars(int tchar) {
-    if (tchar == getTextEpsilon()) {
+    if (tchar == getEpsilon()) {
       return new char[] {'\\', 'e'};
     }
     int postfixEscapeChar = -1;
@@ -281,12 +282,8 @@ public class GrammarCharset {
     return res;
   }
 
-  public int getTextMax() {
-    return textMax;
-  }
-
-  public int getTextEpsilon() {
-    return textEpsilon;
+  public int getEpsilon() {
+    return epsilon;
   }
 
   /**
@@ -295,9 +292,9 @@ public class GrammarCharset {
    * @return dfa所有可能的字符
    */
   public int[] getTokenDfaChars() {
-    int[] chars = new int[textMax + 1];
+    int[] chars = new int[maxChar + 1];
     // normal chars
-    for (int indexOfChar = 0; indexOfChar <= textMax; indexOfChar++) {
+    for (int indexOfChar = 0; indexOfChar <= maxChar; indexOfChar++) {
       chars[indexOfChar] = indexOfChar;
     }
     return chars;
@@ -410,7 +407,7 @@ public class GrammarCharset {
           multiples *= 8;
           --indexOfOctalNumber;
         }
-        if (vchar > textMax) {
+        if (vchar > maxChar) {
           throw new AstRuntimeException(
               String.format("not a EscapeChar,error in '%s'", new String(text)));
         }
@@ -450,7 +447,7 @@ public class GrammarCharset {
           multiples *= 16;
           --indexOfHexNumber;
         }
-        if (vchar > textMax) {
+        if (vchar > maxChar) {
           throw new AstRuntimeException(
               String.format("not a EscapeChar,error in '%s'", new String(text)));
         }
@@ -487,7 +484,7 @@ public class GrammarCharset {
           multiples *= 8;
           --indexOfOctalNumber;
         }
-        if (vchar > textMax) {
+        if (vchar > maxChar) {
           throw new AstRuntimeException(
               String.format("not a EscapeChar,error in '%s'", getDisplayingString(text)));
         }
@@ -527,7 +524,7 @@ public class GrammarCharset {
           multiples *= 16;
           --indexOfHexNumber;
         }
-        if (vchar > textMax) {
+        if (vchar > maxChar) {
           throw new AstRuntimeException(
               String.format("not a EscapeChar,error in '%s'", getDisplayingString(text)));
         }

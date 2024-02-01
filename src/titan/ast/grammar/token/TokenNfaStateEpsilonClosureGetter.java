@@ -16,7 +16,7 @@ public class TokenNfaStateEpsilonClosureGetter {
   private Integer epsilon;
 
   TokenNfaStateEpsilonClosureGetter() {
-    epsilon = AstContext.get().grammarCharset.getTextEpsilon();
+    epsilon = AstContext.get().grammarCharset.getEpsilon();
   }
 
   public TreeSet<TokenNfaState> get(TokenNfaState state) {

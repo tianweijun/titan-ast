@@ -43,7 +43,7 @@ public class NfaReg2TokenNfaConverter {
   public void convert(Grammar grammar) {
     this.nfa = grammar.regExp.tokenNfa;
     if (grammar.text.isEmpty()) {
-      int epsilon = grammarCharset.getTextEpsilon();
+      int epsilon = grammarCharset.getEpsilon();
       nfa.start.addEdge(epsilon, nfa.end);
       return;
     }
@@ -295,7 +295,7 @@ public class NfaReg2TokenNfaConverter {
           String.format("%s: edge is wrong in %s", grammar.name, token.text));
     }
     if (charsBuilder.isEmpty()) {
-      charsBuilder.add(grammarCharset.getTextEpsilon());
+      charsBuilder.add(grammarCharset.getEpsilon());
     }
     int[] charsArr = new int[charsBuilder.size()];
     int indexOfCharArr = 0;
