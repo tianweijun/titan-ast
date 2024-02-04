@@ -48,7 +48,7 @@ default terminal grammar:  Epsilon
 
 default nonterminal grammar:  augmentedNonterminal
 
-format of grammar's definition : nameOfGrammar  [nfa(start,end) regexp() greediness() laziness() acceptWhenFirstArriveAtTerminalState()] : regularExpression [-> skip] ;
+format of grammar's definition : nameOfGrammar  [nfa(start,end) regexp() greediness() laziness() ] : regularExpression [-> skip] ;
 
 The grammar file should be encoded in 8bits(iso-8859-1) format.
 
