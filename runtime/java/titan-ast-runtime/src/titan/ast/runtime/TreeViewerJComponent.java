@@ -45,7 +45,10 @@ public class TreeViewerJComponent extends JComponent {
   }
 
   private void initFontMetrics() {
-    fontMetrics = this.getFontMetrics(new Font(null, Font.PLAIN, FONT_SIZE));
+    Font font = getFont();
+    font = font == null ? new Font(null, Font.PLAIN, FONT_SIZE) : font;
+    setFont(font);
+    fontMetrics = this.getFontMetrics(font);
   }
 
   /**
@@ -57,6 +60,7 @@ public class TreeViewerJComponent extends JComponent {
     this.scale = scale;
     boxTreeContext = getDrawTreeContext(stringTree);
     setSize(boxTreeContext.width * 2, boxTreeContext.height * 2);
+    repaint();
   }
 
   @Override
@@ -82,8 +86,7 @@ public class TreeViewerJComponent extends JComponent {
   }
 
   private BoxTreeContext getDrawTreeContext(StringTree strTree) {
-    Font oldFont = fontMetrics.getFont();
-    fontMetrics = this.getFontMetrics(oldFont.deriveFont(FONT_SIZE * scale));
+    fontMetrics = this.getFontMetrics(getFont().deriveFont(FONT_SIZE * scale));
 
     fontHeight = fontMetrics.getAscent();
     colLineHeight = fontHeight * 2;

@@ -3,7 +3,8 @@ package titan.ast.output;
 import java.util.ArrayList;
 import java.util.concurrent.Future;
 import javax.swing.JFrame;
-import titan.ast.output.tree.TreeViewerDialog;
+import titan.ast.runtime.StringTree;
+import titan.ast.runtime.TreeViewerDialog;
 import titan.ast.target.Ast;
 
 /**

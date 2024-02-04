@@ -43,7 +43,10 @@ public class GraphViewerJComponent extends JComponent {
     this.addMouseListener(new GraphViewerMouseInputListener());
     this.strGraph = strGraph;
 
-    fontMetrics = FontDesignMetrics.getMetrics(new Font(null, Font.PLAIN, FONT_SIZE));
+    Font font = getFont();
+    font = font == null ? new Font(null, Font.PLAIN, FONT_SIZE) : font;
+    setFont(font);
+    fontMetrics = FontDesignMetrics.getMetrics(font);
     createBoxs();
     refreshWidthAndHeight();
   }
