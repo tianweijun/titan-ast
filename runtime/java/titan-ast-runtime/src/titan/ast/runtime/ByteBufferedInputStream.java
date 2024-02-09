@@ -48,7 +48,7 @@ public class ByteBufferedInputStream {
         read = read();
       }
     }
-    return read;
+    return read == eof ? eof : read & 0xFF;
   }
 
   /**
