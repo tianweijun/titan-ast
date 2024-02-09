@@ -29,7 +29,7 @@ int ByteBufferedInputStream::read() {
       readedByte = read();
     }
   }
-  return readedByte;
+  return readedByte == eof ? eof : readedByte & 0xFF;
 }
 
 /*
