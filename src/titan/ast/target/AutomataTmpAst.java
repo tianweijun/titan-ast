@@ -1,5 +1,6 @@
 package titan.ast.target;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -51,9 +52,11 @@ public class AutomataTmpAst implements Comparable<AutomataTmpAst> {
     if (null != this.token) {
       ast.token = new AstToken(this.token.start, this.token.text);
     }
+    ArrayList<Ast> astChildren = new ArrayList<>();
     for (AutomataTmpAst thisChild : this.children) {
-      ast.children.add(thisChild.toAst());
+      astChildren.add(thisChild.toAst());
     }
+    ast.children = astChildren;
     return ast;
   }
 

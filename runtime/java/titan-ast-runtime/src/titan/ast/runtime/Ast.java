@@ -1,6 +1,6 @@
 package titan.ast.runtime;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -14,7 +14,7 @@ public class Ast {
   // grammar.type == GrammarType.TERMINAL
   public AstToken token = null;
 
-  public LinkedList<Ast> children = new LinkedList<>();
+  public ArrayList<Ast> children = new ArrayList<>();
 
   public Ast() {}
 

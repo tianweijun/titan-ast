@@ -1,6 +1,6 @@
 package titan.ast.target;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Objects;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarType;
@@ -18,7 +18,7 @@ public class Ast {
   // grammar.type == GrammarType.TERMINAL
   public AstToken token = null;
 
-  public LinkedList<Ast> children = new LinkedList<>();
+  public ArrayList<Ast> children = new ArrayList<>();
 
   public Ast() {}
 

@@ -53,35 +53,7 @@ public class FollowFilterBacktrackingBottomUpAstAutomataBuilder {
   public FollowFilterBacktrackingBottomUpAstAutomata build() {
     setEmptyNonterminal();
     setNonterminalFirstMap();
-
-    /*
-    System.out.println("\n\nfirst:");
-    System.out.println("[");
-    for (Entry<Grammar, Set<Grammar>> entry : nonterminalFirstMap.entrySet()) {
-      Grammar nonterminal = entry.getKey();
-      System.out.print(nonterminal.name + ":[");
-      for (Grammar first : entry.getValue()) {
-        System.out.print(first.name + ",");
-      }
-      System.out.println("]");
-    }
-    System.out.println("]");*/
-
     setNonterminalFollowMap();
-
-    /*
-    System.out.println("\n\nfollow:");
-    System.out.println("[");
-    for (Entry<Grammar, Set<Grammar>> entry : nonterminalFollowMap.entrySet()) {
-      Grammar nonterminal = entry.getKey();
-      System.out.print(nonterminal.name + ":[");
-      for (Grammar first : entry.getValue()) {
-        System.out.print(first.name + ",");
-      }
-      System.out.println("]");
-    }
-    System.out.println("]");*/
-
     return new FollowFilterBacktrackingBottomUpAstAutomata(
         languageGrammar.astDfa,
         languageGrammar.getStartGrammar(),
@@ -102,13 +74,6 @@ public class FollowFilterBacktrackingBottomUpAstAutomataBuilder {
         emptyNonterminal.add(productionRule.grammar);
       }
     }
-    /*
-    System.out.println("\n\nempty:");
-    System.out.print("[");
-    for (Grammar empty : emptyNonterminal) {
-      System.out.print(empty.name + ",");
-    }
-    System.out.println("]");*/
   }
 
   private void setNonterminalFirstMap() {
@@ -160,36 +125,7 @@ public class FollowFilterBacktrackingBottomUpAstAutomataBuilder {
     nonterminalFollowMap.get(languageGrammar.augmentedNonterminal).add(languageGrammar.eof);
 
     setPrevNonterminalNextGrammarMap();
-
-    /*
-    System.out.println("\n\nprevNext:");
-    System.out.println("[");
-    for (Entry<Grammar, Set<Grammar>> entry : prevNonterminalNextGrammarMap.entrySet()) {
-      Grammar nonterminal = entry.getKey();
-      System.out.print(nonterminal.name + ":[");
-      for (Grammar next : entry.getValue()) {
-        System.out.print(next.name + ",");
-      }
-      System.out.println("]");
-    }
-    System.out.println("]");*/
-
     setProductionRuleLastNonterminalMap();
-
-    /*
-    System.out.println("\n\nproductionRuleLastNonterminal:");
-    System.out.println("[");
-    for (Entry<ProductionRule, Set<Grammar>> entry : productionRuleLastNonterminalMap.entrySet()) {
-      ProductionRule productionRule = entry.getKey();
-      RegExp rule = productionRule.rule;
-      String text = productionRule.grammar.name + rule.toString();
-      System.out.print(text + ":[");
-      for (Grammar lastNonterminal : entry.getValue()) {
-        System.out.print(lastNonterminal.name + ",");
-      }
-      System.out.println("]");
-    }
-    System.out.println("]");*/
 
     while (addFollow()) {}
   }
