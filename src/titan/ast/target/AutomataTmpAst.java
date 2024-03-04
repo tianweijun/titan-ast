@@ -52,7 +52,7 @@ public class AutomataTmpAst implements Comparable<AutomataTmpAst> {
     if (null != this.token) {
       ast.token = new AstToken(this.token.start, this.token.text);
     }
-    ArrayList<Ast> astChildren = new ArrayList<>();
+    ArrayList<Ast> astChildren = new ArrayList<>(this.children.size());
     for (AutomataTmpAst thisChild : this.children) {
       astChildren.add(thisChild.toAst());
     }
