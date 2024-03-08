@@ -3,7 +3,7 @@ package titan.ast.grammar.syntax;
 import java.util.Objects;
 import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
-import titan.ast.grammar.RegExp;
+import titan.ast.grammar.regexp.RegExp;
 
 /**
  * 产生式.

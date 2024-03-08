@@ -16,22 +16,9 @@ public class FragmentNfaBuilder {
     this.terminalFragments = terminalFragments;
   }
 
-  public void build() {
-    buildRegExp();
-    buildNfa();
-  }
-
   public void buildNfa() {
     Reg2TokenNfaConverter reg2TokenNfaConverter = new Reg2TokenNfaConverter();
     reg2TokenNfaConverter.addTasks(terminalFragments);
     reg2TokenNfaConverter.convert();
-  }
-
-  public void buildRegExp() {
-    TokenRegExpBuilder regExpBuilder = new TokenRegExpBuilder();
-    regExpBuilder.addTasks(terminalFragments);
-    regExpBuilder.addSources(terminalFragments);
-
-    regExpBuilder.build();
   }
 }

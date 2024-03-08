@@ -1,8 +1,6 @@
-package titan.ast.grammar.token;
+package titan.ast.grammar.regexp;
 
-import titan.ast.grammar.AbstractRegExpBuilder;
 import titan.ast.grammar.Grammar;
-import titan.ast.grammar.RegExp;
 
 /**
  * 建立grammar的依赖关系.

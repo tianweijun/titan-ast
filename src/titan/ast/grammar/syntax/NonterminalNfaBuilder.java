@@ -22,33 +22,11 @@ public class NonterminalNfaBuilder {
     this.nonterminals = nonterminals;
   }
 
-  /** 1.建立正则 2.正则转产生式 3.产生式转nfa */
-  public void build() {
-    buildRegExp();
-    buildProductionRule();
-    productionRuleToNfa();
-  }
-
-  private void productionRuleToNfa() {
+  public void productionRuleToNfa() {
     Map<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap =
         AstContext.get().nonterminalProductionRulesMap;
     NonterminalProductionRuleNfaBuilder nonterminalProductionRuleNfaBuilder =
         new NonterminalProductionRuleNfaBuilder(nonterminalProductionRulesMap);
     nonterminalProductionRuleNfaBuilder.build();
-  }
-
-  private void buildProductionRule() {
-    ProductionRuleBuilder productionRuleBuilder = new ProductionRuleBuilder(nonterminals);
-    LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap =
-        productionRuleBuilder.build();
-    AstContext.get().nonterminalProductionRulesMap = nonterminalProductionRulesMap;
-  }
-
-  private void buildRegExp() {
-    SyntaxRegExpBuilder syntaxRegExpBuilder = new SyntaxRegExpBuilder();
-    syntaxRegExpBuilder.addTasks(nonterminals);
-    syntaxRegExpBuilder.addSources(nonterminals);
-    syntaxRegExpBuilder.addSources(terminals);
-    syntaxRegExpBuilder.build();
   }
 }

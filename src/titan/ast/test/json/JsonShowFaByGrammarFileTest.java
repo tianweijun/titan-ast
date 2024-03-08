@@ -23,7 +23,7 @@ public class JsonShowFaByGrammarFileTest {
 
     GrammarFileAutomataAstApplication grammarFileAutomataAstApplication =
         new GrammarFileAutomataAstApplication();
-    grammarFileAutomataAstApplication.setContext(testArgs[1]);
+    grammarFileAutomataAstApplication.setAstAutomataContext(testArgs[1]);
 
     AstContext astContext = AstContext.get();
 

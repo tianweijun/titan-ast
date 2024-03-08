@@ -1,12 +1,16 @@
-package titan.ast.grammar;
+package titan.ast.grammar.io;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import titan.ast.AstContext;
-import titan.ast.grammar.io.GrammarCharset;
-import titan.ast.grammar.io.GrammarToken;
-import titan.ast.grammar.io.GrammarTokenType;
+import titan.ast.grammar.Grammar;
+import titan.ast.grammar.GrammarAction;
+import titan.ast.grammar.GrammarAttribute;
+import titan.ast.grammar.LanguageGrammar;
+import titan.ast.grammar.NonterminaltGrammar;
+import titan.ast.grammar.TerminalFragmentGrammar;
+import titan.ast.grammar.TerminalGrammar;
 import titan.ast.runtime.AstRuntimeException;
 
 /**
@@ -14,7 +18,7 @@ import titan.ast.runtime.AstRuntimeException;
  *
  * @author tian wei jun
  */
-public class TextOfGrammarBuilder {
+public class GrammarInitializer {
 
   private static final String PREFIX_START_GRAMMAR_STATEMENT = "@StartGrammar";
   private static final String PREFIX_NONTERMINAL_GRAMMAR_STATEMENT = "@NonterminalGrammar";
@@ -42,14 +46,14 @@ public class TextOfGrammarBuilder {
    * @param grammarTokens tokens
    * @param languageGrammar 语法对象
    */
-  public TextOfGrammarBuilder(List<GrammarToken> grammarTokens, LanguageGrammar languageGrammar) {
+  public GrammarInitializer(List<GrammarToken> grammarTokens, LanguageGrammar languageGrammar) {
     this.grammarTokens = grammarTokens;
     this.languageGrammar = languageGrammar;
     grammarCharset = AstContext.get().grammarCharset;
   }
 
   /** 创建语法节点 设置语法产生式内容. */
-  public void build() {
+  public void initByGrammarTokens() {
     parseStatements();
   }
 
@@ -66,7 +70,16 @@ public class TextOfGrammarBuilder {
     boolean hasSetState = setState(statementContentTokens);
     if (!hasSetState) {
       // 创建语法节点
-      createGrammarNode(statementContentTokens);
+      Grammar grammar = createGrammarNode(statementContentTokens);
+      if (grammar.isTerminal()) {
+        ((TerminalGrammar) grammar).setLookaheadMatchingMode();
+      }
+      // add to languageGrammar
+      if (state == State.KEY_WORD) {
+        languageGrammar.addKeyWord(grammar);
+      } else {
+        languageGrammar.addGrammar(grammar);
+      }
     }
   }
 
@@ -150,7 +163,7 @@ public class TextOfGrammarBuilder {
    * @param statementContentTokens 从grammarName到;前的内容，同时没有skiptoken,如Newline : NewlineFragment ->
    *     skip
    */
-  private void createGrammarNode(LinkedList<GrammarToken> statementContentTokens) {
+  private Grammar createGrammarNode(LinkedList<GrammarToken> statementContentTokens) {
     // NORMAL状态不能建立语法，出错
     boolean isWrong = state == State.NORMAL;
     if (statementContentTokens.size() < 3) { // 语句太短可能出错
@@ -218,12 +231,7 @@ public class TextOfGrammarBuilder {
     }
     // text & action
     setTextAndActionOfGrammarNode(grammar, statementContentTokensIt);
-    // add to languageGrammar
-    if (state == State.KEY_WORD) {
-      languageGrammar.addKeyWord(grammar);
-    } else {
-      languageGrammar.addGrammar(grammar);
-    }
+    return grammar;
   }
 
   private String getStringOfStatementContentTokens(

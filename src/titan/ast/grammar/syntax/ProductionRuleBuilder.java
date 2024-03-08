@@ -5,9 +5,17 @@ import java.util.LinkedList;
 import java.util.Map;
 import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
-import titan.ast.grammar.RegExp;
-import titan.ast.grammar.RelationshipQualifier;
+import titan.ast.grammar.LanguageGrammar;
+import titan.ast.grammar.io.GrammarCharset;
+import titan.ast.grammar.io.GrammarToken;
+import titan.ast.grammar.regexp.RegExp;
+import titan.ast.grammar.regexp.RegExp.MatchingPattern;
+import titan.ast.grammar.regexp.RegExp.RegExpCharSet;
+import titan.ast.grammar.regexp.RegExp.RegExpCharSetType;
+import titan.ast.grammar.regexp.RegExp.RegExpType;
+import titan.ast.grammar.regexp.RelationshipQualifier;
 import titan.ast.runtime.AstRuntimeException;
+import titan.ast.util.StringUtils;
 
 /**
  * 根据终结符正则构造产生式，并将产生式中的[]、''的基本正则转为token终结符正则.
@@ -28,11 +36,6 @@ public class ProductionRuleBuilder {
    */
   public ProductionRuleBuilder(LinkedHashMap<String, Grammar> nonterminals) {
     this.nonterminals = nonterminals;
-    initUnitRegExpTerminalsMap();
-  }
-
-  private void initUnitRegExpTerminalsMap() {
-    unitRegExpTerminalsMap = AstContext.get().unitRegExpTerminalsMap;
   }
 
   /** 将所有从构造方法传递进来的非终结符生成对应的产生式. */
@@ -52,6 +55,7 @@ public class ProductionRuleBuilder {
     // 2.处理产生式别名问题
     setAliasForProductionRule();
     // 3.所有正则替换为终结符和非终结符（复合正则、grammar引用的单元正则）
+    initUnitRegExpTerminalsMap();
     formatRegExpForProductionRule();
   }
 
@@ -204,5 +208,87 @@ public class ProductionRuleBuilder {
       }
     }
     nonterminalProductionRulesMap.put(nonterminal, productionRules);
+  }
+
+  private void initUnitRegExpTerminalsMap() {
+    AstContext astContext = AstContext.get();
+    LanguageGrammar languageGrammar = astContext.languageGrammar;
+    unitRegExpTerminalsMap = new LinkedHashMap<>(languageGrammar.terminals.size());
+    buildUnitRegExpTerminalsMapByTerminals(languageGrammar);
+    buildUnitRegExpTerminalsMapByKeyWords(languageGrammar);
+  }
+
+  private void buildUnitRegExpTerminalsMapByTerminals(LanguageGrammar languageGrammar) {
+    LinkedHashMap<String, Grammar> terminals = languageGrammar.terminals;
+    // 普通的串字符
+    for (Grammar terminal : terminals.values()) {
+      RegExp terminalCompositeRegExp = terminal.regExp;
+      if (terminalCompositeRegExp.children.size() == 1) {
+        RegExp unitRegExp = terminalCompositeRegExp.children.getFirst();
+        if (unitRegExp.type == RegExp.RegExpType.UNIT
+            && unitRegExp.unitType == RegExp.RegExpUnitType.SEQUENCE_CHARS) {
+          if (unitRegExp.repMinTimes.isNumberTimesAndEqual(1)
+              && unitRegExp.repMaxTimes.isNumberTimesAndEqual(1)) {
+            unitRegExpTerminalsMap.put(unitRegExp, terminal);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * keyWords,虽然已经处于terminals了，但仅仅是LanguageGrammarInitializer.init()， 正则没有构建（为空），
+   * 所以不能通过SEQUENCE_CHARS正则map,需要特殊处理 .
+   *
+   * @param languageGrammar languageGrammar
+   */
+  public void buildUnitRegExpTerminalsMapByKeyWords(LanguageGrammar languageGrammar) {
+    GrammarCharset grammarCharset = AstContext.get().grammarCharset;
+    for (Grammar keyWord : languageGrammar.keyWords) {
+      RegExp unitRegExp = new RegExp(null);
+      unitRegExp.type = RegExpType.UNIT;
+      unitRegExp.isNot = false;
+      unitRegExp.repMinTimes.setTimes(1);
+      unitRegExp.repMaxTimes.setTimes(1);
+      unitRegExp.matchingPattern = MatchingPattern.UNBACKTRACKING_GREEDINESS;
+      unitRegExp.children.clear();
+      unitRegExp.relationshipOfChildren = RelationshipQualifier.AND;
+      unitRegExp.unitType = RegExp.RegExpUnitType.SEQUENCE_CHARS;
+      RegExpCharSet regExpCharSet = new RegExpCharSet();
+      regExpCharSet.type = RegExpCharSetType.SEQUENCE_CHARS;
+      String textOfKeyWord = getTextOfKeyWord(keyWord, grammarCharset);
+      regExpCharSet.chars = textOfKeyWord.toCharArray();
+      unitRegExp.sets.add(regExpCharSet);
+      unitRegExpTerminalsMap.put(unitRegExp, keyWord);
+    }
+  }
+
+  private String getTextOfKeyWord(Grammar keyWord, GrammarCharset grammarCharset) {
+    LinkedList<GrammarToken> textTokens = keyWord.text;
+    boolean isTextTokensRight = true;
+    if (textTokens.size() != 1) {
+      isTextTokensRight = false;
+    }
+    String text = textTokens.getFirst().text;
+    if (StringUtils.isBlank(text)) {
+      isTextTokensRight = false;
+    } else {
+      if (!text.startsWith("'")) {
+        isTextTokensRight = false;
+      }
+      if (!text.endsWith("'")) {
+        isTextTokensRight = false;
+      }
+      if (text.length() < 2) {
+        isTextTokensRight = false;
+      }
+    }
+    if (!isTextTokensRight) {
+      throw new AstRuntimeException(
+          String.format("text of KeyWord is not illegal,error near '%s'", keyWord.name));
+    }
+    text = text.substring(1, text.length() - 1);
+    text = grammarCharset.formatEscapeChar2Char(text);
+    return text;
   }
 }

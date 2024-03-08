@@ -14,9 +14,8 @@ import titan.ast.grammar.LanguageGrammar;
 public class NonterminalDfaBuilder {
 
   public SyntaxDfa buildAstDfa() {
-    buildProductionRuleNfas();
-    // 依赖于上面的buildProductionRuleNfas方法调用将正则构建好
     buildProductionRuleReducingDfas();
+    buildProductionRuleNfas();
     return buildAstDfaByNonterminals();
   }
 
@@ -53,6 +52,6 @@ public class NonterminalDfaBuilder {
     LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
     NonterminalNfaBuilder nonterminalNfaBuilder =
         new NonterminalNfaBuilder(languageGrammar.terminals, languageGrammar.nonterminals);
-    nonterminalNfaBuilder.build();
+    nonterminalNfaBuilder.productionRuleToNfa();
   }
 }

@@ -3,6 +3,7 @@ package titan.ast.grammar;
 import java.util.LinkedList;
 import java.util.Objects;
 import titan.ast.grammar.io.GrammarToken;
+import titan.ast.grammar.regexp.RegExp;
 
 /**
  * 语法：包括终结符、终结符片段、非终结符.

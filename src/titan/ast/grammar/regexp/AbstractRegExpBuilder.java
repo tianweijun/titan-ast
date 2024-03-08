@@ -1,14 +1,15 @@
-package titan.ast.grammar;
+package titan.ast.grammar.regexp;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
 import titan.ast.AstContext;
-import titan.ast.grammar.RegExp.RegExpType;
-import titan.ast.grammar.RegExp.RepTimes;
+import titan.ast.grammar.Grammar;
 import titan.ast.grammar.io.GrammarCharset;
 import titan.ast.grammar.io.GrammarToken;
+import titan.ast.grammar.regexp.RegExp.RegExpType;
+import titan.ast.grammar.regexp.RegExp.RepTimes;
 import titan.ast.runtime.AstRuntimeException;
 import titan.ast.util.StringUtils;
 

@@ -32,17 +32,35 @@ public class CommandLineAstApplication {
 
   private void buildByGrammarFile(CommandLineParameters commandLineParameters) {
     if (!(commandLineParameters.isPersistentAutomata()
-        || commandLineParameters.isBuildingAstByGrammarFile())) {
+        || commandLineParameters.isBuildingAstByGrammarFile()
+        || commandLineParameters.isAmbiguous())) {
       return;
     }
     GrammarFileAutomataAstApplication grammarFileAutomataAstApplication =
         new GrammarFileAutomataAstApplication();
-    grammarFileAutomataAstApplication.setContext(commandLineParameters.grammarFilePaths);
+    // build context
+    if (commandLineParameters.isPersistentAutomata()
+        || commandLineParameters.isBuildingAstByGrammarFile()) {
+      grammarFileAutomataAstApplication.setAstAutomataContext(
+          commandLineParameters.grammarFilePaths);
+    } else if (commandLineParameters.isAmbiguous()) {
+      grammarFileAutomataAstApplication.setProductionRuleContext(
+          commandLineParameters.grammarFilePaths);
+    }
 
+    isAmbiguous(grammarFileAutomataAstApplication, commandLineParameters);
     persistAutomata(grammarFileAutomataAstApplication, commandLineParameters);
     buildAstByGrammarFile(grammarFileAutomataAstApplication, commandLineParameters);
 
     grammarFileAutomataAstApplication.clear();
+  }
+
+  private void isAmbiguous(
+      GrammarFileAutomataAstApplication grammarFileAutomataAstApplication,
+      CommandLineParameters commandLineParameters) {
+    if (commandLineParameters.isAmbiguous()) {
+      grammarFileAutomataAstApplication.isAmbiguous();
+    }
   }
 
   private void persistAutomata(

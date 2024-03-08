@@ -12,7 +12,7 @@ import titan.ast.runtime.AstRuntimeException;
 import titan.ast.util.StringUtils;
 
 /**
- * .
+ * keyWords不参与任何tokenDfa的构建，仅仅是LanguageGrammarInitializer.init().
  *
  * @author tian wei jun
  */

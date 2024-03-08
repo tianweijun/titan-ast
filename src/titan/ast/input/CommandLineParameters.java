@@ -14,15 +14,19 @@ public class CommandLineParameters {
   public static final String keyOfGrammarFilePath = "-grammarFilePath";
   public static final String keyOfGrammarFilePaths = "-grammarFilePaths";
   public static final String keyOfSourceFilePath = "-sourceFilePath";
-  public static final String keyOfGraphicalViewOfAst = "--graphicalViewOfAst";
   public static final String keyOfPersistentAutomataFilePath = "-persistentAutomataFilePath";
   public static final String keyOfAutomataFilePath = "-automataFilePath";
+
+  public static final String keyOfGraphicalViewOfAst = "--graphicalViewOfAst";
+  public static final String keyOfIsAmbiguous = "--isAmbiguous";
 
   public List<String> grammarFilePaths = new LinkedList<>();
   public String sourceFilePath = "";
   public String persistentAutomataFilePath = "";
-  public boolean graphicalViewOfAst = false;
   public String automataFilePath = "";
+
+  public boolean graphicalViewOfAst = false;
+  public boolean isAmbiguous = false;
 
   public CommandLineParameters(String[] args) {
     initByCommandLineArgs(args);
@@ -42,6 +46,9 @@ public class CommandLineParameters {
       String key = args[indexOfArg];
       if (keyOfGraphicalViewOfAst.equals(key)) {
         graphicalViewOfAst = true;
+        ++indexOfArg;
+      } else if (keyOfIsAmbiguous.equals(key)) {
+        isAmbiguous = true;
         ++indexOfArg;
       } else if (keyOfPersistentAutomataFilePath.equals(key)) {
         ++indexOfArg;
@@ -106,7 +113,10 @@ public class CommandLineParameters {
   }
 
   public boolean isRight() {
-    return isBuildingAstByAutomataFile() || isBuildingAstByGrammarFile() || isPersistentAutomata();
+    return isBuildingAstByAutomataFile()
+        || isBuildingAstByGrammarFile()
+        || isPersistentAutomata()
+        || isAmbiguous();
   }
 
   public boolean isBuildingAstByAutomataFile() {
@@ -119,5 +129,9 @@ public class CommandLineParameters {
 
   public boolean isPersistentAutomata() {
     return !grammarFilePaths.isEmpty() && StringUtils.isNotBlank(persistentAutomataFilePath);
+  }
+
+  public boolean isAmbiguous() {
+    return !grammarFilePaths.isEmpty() && isAmbiguous;
   }
 }

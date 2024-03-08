@@ -15,7 +15,7 @@ public class FollowShowFaByGrammarFileTest {
 
     GrammarFileAutomataAstApplication grammarFileAutomataAstApplication =
         new GrammarFileAutomataAstApplication();
-    grammarFileAutomataAstApplication.setContext(grammarFilePaths);
+    grammarFileAutomataAstApplication.setAstAutomataContext(grammarFilePaths);
 
     AstContext astContext = AstContext.get();
     new FaGraphGuiOutputer().outputSyntaxDfa(astContext.languageGrammar.astDfa);

@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import titan.ast.grammar.FaStateType;
 import titan.ast.grammar.Grammar;
-import titan.ast.grammar.TerminalGrammar;
 
 /**
  * 构造终结符的nfa并设置.
@@ -23,17 +22,8 @@ public class TerminalNfaBuilder {
   }
 
   public void build() {
-    buildRegExp();
     buildNfa();
     setClosingState();
-    setLookaheadMatchingMode();
-  }
-
-  private void setLookaheadMatchingMode() {
-    for (Map.Entry<String, Grammar> entry : terminals.entrySet()) {
-      TerminalGrammar terminal = (TerminalGrammar) entry.getValue();
-      terminal.setLookaheadMatchingMode();
-    }
   }
 
   /**
@@ -53,13 +43,5 @@ public class TerminalNfaBuilder {
     reg2TokenNfaConverter.addTasks(terminals);
     reg2TokenNfaConverter.addDependentFragmentGrammars(terminalFragments);
     reg2TokenNfaConverter.convert();
-  }
-
-  public void buildRegExp() {
-    TokenRegExpBuilder regExpBuilder = new TokenRegExpBuilder();
-    regExpBuilder.addTasks(terminals);
-    regExpBuilder.addSources(terminals);
-    regExpBuilder.addSources(terminalFragments);
-    regExpBuilder.build();
   }
 }

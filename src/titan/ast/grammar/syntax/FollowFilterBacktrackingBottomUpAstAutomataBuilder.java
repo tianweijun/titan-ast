@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
-import titan.ast.grammar.RegExp;
+import titan.ast.grammar.regexp.RegExp;
 
 /**
  * .

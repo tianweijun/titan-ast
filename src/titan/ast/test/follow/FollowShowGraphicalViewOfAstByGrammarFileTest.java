@@ -18,7 +18,7 @@ public class FollowShowGraphicalViewOfAstByGrammarFileTest {
 
     GrammarFileAutomataAstApplication grammarFileAutomataAstApplication =
         new GrammarFileAutomataAstApplication();
-    grammarFileAutomataAstApplication.setContext(testArgs[1]);
+    grammarFileAutomataAstApplication.setAstAutomataContext(testArgs[1]);
 
     Ast ast = grammarFileAutomataAstApplication.buildAst(testArgs[3]);
     grammarFileAutomataAstApplication.displayGraphicalViewOfAst(ast);

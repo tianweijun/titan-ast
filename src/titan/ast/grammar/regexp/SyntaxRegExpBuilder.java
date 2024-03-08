@@ -1,6 +1,5 @@
-package titan.ast.grammar.syntax;
+package titan.ast.grammar.regexp;
 
-import titan.ast.grammar.AbstractRegExpBuilder;
 import titan.ast.grammar.Grammar;
 
 /**

@@ -11,7 +11,7 @@ public class ClangShowFaByGrammarFileTest {
 
     GrammarFileAutomataAstApplication grammarFileAutomataAstApplication =
         new GrammarFileAutomataAstApplication();
-    grammarFileAutomataAstApplication.setContext(grammarFilePath);
+    grammarFileAutomataAstApplication.setAstAutomataContext(grammarFilePath);
 
     AstContext astContext = AstContext.get();
     new FaGraphGuiOutputer().outputTokenDfa(astContext.languageGrammar.tokenDfa);

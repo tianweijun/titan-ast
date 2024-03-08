@@ -1,8 +1,6 @@
 package titan.ast.grammar.syntax;
 
-import java.util.LinkedList;
 import titan.ast.AstContext;
-import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
 
 /**
@@ -29,26 +27,6 @@ public class DfaAstAutomataBuilder {
         new DfaAstAutomataFactory(AstAutomataType.FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA)
             .build();
     languageGrammar.astAutomata = astAutomata;
-
-    clearTransientObjects();
     return astAutomata;
-  }
-
-  private void clearTransientObjects() {
-    AstContext astContext = AstContext.get();
-    LanguageGrammar languageGrammar = astContext.languageGrammar;
-    // nonterminals
-    for (Grammar nonterminal : languageGrammar.nonterminals.values()) {
-      nonterminal.regExp = null;
-      nonterminal.attributes = null;
-      nonterminal.text = null;
-    }
-    // productionRules
-    for (LinkedList<ProductionRule> productionRules :
-        astContext.nonterminalProductionRulesMap.values()) {
-      for (ProductionRule productionRule : productionRules) {
-        productionRule.rule = null;
-      }
-    }
   }
 }

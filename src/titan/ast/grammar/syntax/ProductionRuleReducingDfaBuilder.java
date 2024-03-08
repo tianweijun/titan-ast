@@ -1,7 +1,7 @@
 package titan.ast.grammar.syntax;
 
 import titan.ast.grammar.FaStateType;
-import titan.ast.grammar.RegExp;
+import titan.ast.grammar.regexp.RegExp;
 
 /**
  * .

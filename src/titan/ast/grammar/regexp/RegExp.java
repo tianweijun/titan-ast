@@ -1,9 +1,10 @@
-package titan.ast.grammar;
+package titan.ast.grammar.regexp;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
+import titan.ast.grammar.Grammar;
 import titan.ast.grammar.syntax.SyntaxNfa;
 import titan.ast.grammar.token.TokenNfa;
 import titan.ast.runtime.AstRuntimeException;
@@ -232,7 +233,7 @@ public class RegExp {
       this.times = times;
     }
 
-    void setInfinity() {
+    public void setInfinity() {
       this.type = RepTimesType.INFINITY;
       this.times = 0;
     }
@@ -245,14 +246,14 @@ public class RegExp {
       return type == RepTimesType.INFINITY;
     }
 
-    boolean lessThan(int otherRepTimes) {
+    public boolean lessThan(int otherRepTimes) {
       if (this.isInfinityTimes()) { // INFINITY>=any
         return false;
       }
       return this.times < otherRepTimes;
     }
 
-    boolean lessThanOrEqual(RepTimes otherRepTimes) {
+    public boolean lessThanOrEqual(RepTimes otherRepTimes) {
       if (otherRepTimes.isInfinityTimes()) { // any<=INFINITY
         return true;
       }

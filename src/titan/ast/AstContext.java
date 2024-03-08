@@ -2,10 +2,8 @@ package titan.ast;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
-import titan.ast.grammar.RegExp;
 import titan.ast.grammar.io.GrammarCharset;
 import titan.ast.grammar.syntax.ProductionRule;
 
@@ -22,7 +20,6 @@ public class AstContext {
   public LanguageGrammar languageGrammar = null;
   public GrammarCharset grammarCharset = null;
 
-  public Map<RegExp, Grammar> unitRegExpTerminalsMap = null;
   public LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap = null;
 
   /**
@@ -40,6 +37,37 @@ public class AstContext {
 
   public static void set(AstContext ctx) {
     contextThreadLocal.set(ctx);
+  }
+
+  /** call after builded context. */
+  private void clearTransientObjects() {
+    AstContext astContext = AstContext.get();
+    LanguageGrammar languageGrammar = astContext.languageGrammar;
+    // fragment
+    for (Grammar terminalFragment : languageGrammar.terminalFragments.values()) {
+      terminalFragment.regExp = null;
+      terminalFragment.attributes = null;
+      terminalFragment.text = null;
+    }
+    // terminal
+    for (Grammar terminal : languageGrammar.terminals.values()) {
+      terminal.regExp = null;
+      terminal.attributes = null;
+      terminal.text = null;
+    }
+    // nonterminals
+    for (Grammar nonterminal : languageGrammar.nonterminals.values()) {
+      nonterminal.regExp = null;
+      nonterminal.attributes = null;
+      nonterminal.text = null;
+    }
+    // productionRules
+    for (LinkedList<ProductionRule> productionRules :
+        astContext.nonterminalProductionRulesMap.values()) {
+      for (ProductionRule productionRule : productionRules) {
+        productionRule.rule = null;
+      }
+    }
   }
 
   public static void clear() {

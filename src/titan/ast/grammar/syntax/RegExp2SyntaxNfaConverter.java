@@ -2,8 +2,8 @@ package titan.ast.grammar.syntax;
 
 import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
-import titan.ast.grammar.RegExp;
-import titan.ast.grammar.RegExp.RepTimes;
+import titan.ast.grammar.regexp.RegExp;
+import titan.ast.grammar.regexp.RegExp.RepTimes;
 
 /**
  * .
