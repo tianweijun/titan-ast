@@ -10,7 +10,7 @@ import titan.ast.AstContext;
 public class GrammarAmbiguousJudge {
 
   /**
-   * 语法的text必须填充好.
+   * 前置前提：语法的产生式已构建.
    *
    * @return GrammarAmbiguousJudgeResult 判断结果
    */

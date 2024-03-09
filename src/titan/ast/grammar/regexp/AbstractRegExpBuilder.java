@@ -102,9 +102,12 @@ public abstract class AbstractRegExpBuilder {
       rootRegExpText.append(token.text);
       rootRegExpText.append(splitCharByTextOfRegExp);
     }
-    rootRegExp.text = rootRegExpText.toString().toCharArray();
-    rootRegExp.startOfText = 0;
-    rootRegExp.lengthOfText = rootRegExp.text.length;
+    if (rootRegExpText.length() > 0) {
+      rootRegExpText.delete(rootRegExpText.length() - 1, rootRegExpText.length());
+      rootRegExp.text = rootRegExpText.toString().toCharArray();
+      rootRegExp.startOfText = 0;
+      rootRegExp.lengthOfText = rootRegExp.text.length;
+    }
   }
 
   /**
@@ -340,10 +343,13 @@ public abstract class AbstractRegExpBuilder {
     newRegExpContext.init();
     aliasRegExp.text = text;
     aliasRegExp.startOfText = indexOfText;
+
+    boolean isSplitCharByTextOfRegExp = false;
     StringBuilder stringBuilder = new StringBuilder();
     while (indexOfText < text.length) {
       char tchar = text[indexOfText];
       if (tchar == splitCharByTextOfRegExp) { // 后缀为分隔符
+        isSplitCharByTextOfRegExp = true;
         ++indexOfText;
         break;
       }
@@ -361,7 +367,13 @@ public abstract class AbstractRegExpBuilder {
     aliasRegExpSet.chars =
         grammarCharset.formatEscapeChar2Char(stringBuilder.toString()).toCharArray();
     aliasRegExp.sets.add(aliasRegExpSet);
-    aliasRegExp.lengthOfText = indexOfText - aliasRegExp.startOfText;
+    if (isSplitCharByTextOfRegExp) {
+      // 分隔符不算text部分，减去1
+      aliasRegExp.lengthOfText = indexOfText - aliasRegExp.startOfText - 1;
+    } else {
+      aliasRegExp.lengthOfText = indexOfText - aliasRegExp.startOfText;
+    }
+
     return indexOfText;
   }
 
@@ -374,10 +386,12 @@ public abstract class AbstractRegExpBuilder {
     grammarRegExp.text = text;
     grammarRegExp.startOfText = indexOfText;
 
+    boolean isSplitCharByTextOfRegExp = false;
     StringBuilder stringBuilder = new StringBuilder();
     while (indexOfText < text.length) {
       char tchar = text[indexOfText];
-      if (tchar == splitCharByTextOfRegExp) {
+      if (tchar == splitCharByTextOfRegExp) { // 后缀为分隔符
+        isSplitCharByTextOfRegExp = true;
         ++indexOfText;
         break;
       }
@@ -407,8 +421,14 @@ public abstract class AbstractRegExpBuilder {
     grammarRegExpSet.type = RegExp.RegExpCharSetType.GRAMMAR;
     grammarRegExpSet.grammar = grammar;
     grammarRegExp.sets.add(grammarRegExpSet);
-    indexOfText = setRepTimes(grammarRegExp, text, indexOfText);
-    grammarRegExp.lengthOfText = indexOfText - grammarRegExp.startOfText;
+    if (isSplitCharByTextOfRegExp) {
+      // 分隔符不算text部分，减去1
+      grammarRegExp.lengthOfText = indexOfText - grammarRegExp.startOfText - 1;
+    } else {
+      indexOfText = setRepTimes(grammarRegExp, text, indexOfText);
+      grammarRegExp.lengthOfText = indexOfText - grammarRegExp.startOfText;
+    }
+
     return indexOfText;
   }
 

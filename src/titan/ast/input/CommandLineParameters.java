@@ -2,6 +2,7 @@ package titan.ast.input;
 
 import java.util.LinkedList;
 import java.util.List;
+import titan.ast.logger.Logger;
 import titan.ast.util.StringUtils;
 
 /**
@@ -19,6 +20,7 @@ public class CommandLineParameters {
 
   public static final String keyOfGraphicalViewOfAst = "--graphicalViewOfAst";
   public static final String keyOfIsAmbiguous = "--isAmbiguous";
+  public static final String keyOfHelp = "--help";
 
   public List<String> grammarFilePaths = new LinkedList<>();
   public String sourceFilePath = "";
@@ -49,6 +51,9 @@ public class CommandLineParameters {
         ++indexOfArg;
       } else if (keyOfIsAmbiguous.equals(key)) {
         isAmbiguous = true;
+        ++indexOfArg;
+      } else if (keyOfHelp.equals(key)) {
+        Logger.info(null, infoOfHelper());
         ++indexOfArg;
       } else if (keyOfPersistentAutomataFilePath.equals(key)) {
         ++indexOfArg;
@@ -99,16 +104,27 @@ public class CommandLineParameters {
 
   public String infoOfHelper() {
     StringBuilder stringBuilder = new StringBuilder();
+
     stringBuilder.append("usage: java -jar  titan-ast.jar").append("\n");
+
     stringBuilder
         .append("         ")
-        .append("[-grammarFilePath <filepath>] [-sourceFilePath <filepath>]")
+        .append("[-grammarFilePath <filepath>] [-grammarFilePaths <filepath1 filepath2 ...>]")
         .append("\n");
+
+    stringBuilder.append("         ").append("[-sourceFilePath <filepath>]").append("\n");
+
     stringBuilder
         .append("         ")
         .append("[-persistentAutomataFilePath <filepath>]")
         .append("\n");
+
     stringBuilder.append("         ").append("[-automataFilePath <filepath>]").append("\n");
+
+    stringBuilder
+        .append("         ")
+        .append("[--graphicalViewOfAst --isAmbiguous --help]")
+        .append("\n");
     return stringBuilder.toString();
   }
 

@@ -12,6 +12,7 @@ import titan.ast.grammar.syntax.DfaAstAutomataBuilder;
 import titan.ast.grammar.syntax.ProductionRuleBuilder;
 import titan.ast.grammar.token.KeyWordAutomataBuilder;
 import titan.ast.grammar.token.TokenAutomataBuilder;
+import titan.ast.logger.Logger;
 import titan.ast.output.AstGuiOutputer;
 import titan.ast.persistence.PersistentAutomataBuilder;
 import titan.ast.runtime.AstRuntimeException;
@@ -108,9 +109,10 @@ public class GrammarFileAutomataAstApplication {
         new LanguageGrammarRegExpBuilder(astContext.languageGrammar);
     regExpBuilder.buildRegExpOfFragment();
     regExpBuilder.buildRegExpOfTerminal();
+
+    addKeyWord2Terminals();
     regExpBuilder.buildRegExpOfNonterminal();
     // build ProductionRule
-    addKeyWord2Terminals();
     buildProductionRule(languageGrammar.nonterminals);
   }
 
@@ -156,6 +158,6 @@ public class GrammarFileAutomataAstApplication {
   public void isAmbiguous() {
     GrammarAmbiguousJudge grammarAmbiguousJudge = new GrammarAmbiguousJudge();
     GrammarAmbiguousJudgeResult ambiguousJudgeResult = grammarAmbiguousJudge.isAmbiguous();
-    System.out.println("grammar is ambiguous : " + ambiguousJudgeResult.isAmbiguous);
+    Logger.info(null, "grammar is ambiguous : " + ambiguousJudgeResult.isAmbiguous);
   }
 }
