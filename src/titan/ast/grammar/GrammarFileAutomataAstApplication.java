@@ -158,6 +158,6 @@ public class GrammarFileAutomataAstApplication {
   public void isAmbiguous() {
     GrammarAmbiguousJudge grammarAmbiguousJudge = new GrammarAmbiguousJudge();
     GrammarAmbiguousJudgeResult ambiguousJudgeResult = grammarAmbiguousJudge.isAmbiguous();
-    Logger.info(null, "grammar is ambiguous : " + ambiguousJudgeResult.isAmbiguous);
+    Logger.info(null, ambiguousJudgeResult.toString());
   }
 }

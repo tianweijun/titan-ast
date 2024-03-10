@@ -10,10 +10,7 @@ import titan.ast.CommandLineAstApplication;
 public class AmbiguityTest {
   public static void main(String[] args) {
     String[] testArgs = {
-      "--help",
-      "-grammarFilePath",
-      "D://github-pro/titan/titan-ast/test/json/json.grammar",
-      "--isAmbiguous"
+      "-grammarFilePath", "D://github-pro/titan/titan-ast/test/json/json.grammar", "--isAmbiguous"
     };
 
     new CommandLineAstApplication().run(testArgs);
