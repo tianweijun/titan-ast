@@ -10,6 +10,6 @@ public class GrammarAmbiguousJudgeResult {
 
   @Override
   public String toString() {
-    return "ambiguity of grammars is unknown. be careful of precedence, associativity and uniqueness properties.";
+    return "the feature(isAmbiguous) is not available. be careful of precedence, associativity and uniqueness properties.";
   }
 }
