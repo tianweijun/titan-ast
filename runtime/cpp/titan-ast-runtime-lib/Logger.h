@@ -5,8 +5,6 @@
 #ifndef AST__RUNTIME__LOGGER_H_
 #define AST__RUNTIME__LOGGER_H_
 
-namespace logger {
-
 #define debug(format, ...)                                                     \
   Logger::logger.log(Logger::DEBUG, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
@@ -44,7 +42,5 @@ private:
   int m_level;
   static const char *s_level[LEVEL_COUNT];
 };
-
-} // namespace logger
 
 #endif // AST__RUNTIME__LOGGER_H_

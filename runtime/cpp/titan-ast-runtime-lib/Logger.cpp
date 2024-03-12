@@ -8,8 +8,6 @@
 #include <ctime>
 #include <iostream>
 
-using namespace logger;
-
 const char *Logger::s_level[LEVEL_COUNT] = {"DEBUG", "INFO", "WARN", "ERROR",
                                             "FATAL"};
 

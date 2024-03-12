@@ -9,10 +9,18 @@ import java.util.Set;
  * @author tian wei jun
  */
 public class PersistentObject {
+  // TokenAutomata
   KeyWordAutomata keyWordAutomata = null;
   TokenDfa tokenDfa = null;
-  AstAutomata astAutomata = null;
 
+  // AstAutomata
+  AstAutomataType astAutomataType = AstAutomataType.BACKTRACKING_BOTTOM_UP_AST_AUTOMATA;
+  Grammar startGrammar = null;
+  SyntaxDfa astDfa = null;
+  Grammar eofGrammar = null;
+  Map<Grammar, Set<Grammar>> nonterminalFollowMap = null;
+
+  // meta data
   PersistentData persistentData;
 
   public PersistentObject(PersistentData persistentData) {
@@ -36,7 +44,7 @@ public class PersistentObject {
   }
 
   private void initAstAutomata() {
-    AstAutomataType astAutomataType = persistentData.getAstAutomataTypeByInputStream();
+    astAutomataType = persistentData.getAstAutomataTypeByInputStream();
     switch (astAutomataType) {
       case BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
         initBacktrackingBottomUpAstAutomata();
@@ -49,21 +57,16 @@ public class PersistentObject {
   }
 
   private void initFollowFilterBacktrackingBottomUpAstAutomata() {
-    Grammar startGrammar = persistentData.getGrammarByInputStream();
-    SyntaxDfa astDfa = persistentData.getSyntaxDfaByInputStream();
+    startGrammar = persistentData.getGrammarByInputStream();
+    astDfa = persistentData.getSyntaxDfaByInputStream();
 
-    Grammar eofGrammar = persistentData.getGrammarByInputStream();
-    Map<Grammar, Set<Grammar>> nonterminalFollowMap =
-        persistentData.getNonterminalFollowMapByInputStream();
-    astAutomata =
-        new FollowFilterBacktrackingBottomUpAstAutomata(
-            astDfa, startGrammar, nonterminalFollowMap, eofGrammar);
+    eofGrammar = persistentData.getGrammarByInputStream();
+    nonterminalFollowMap = persistentData.getNonterminalFollowMapByInputStream();
   }
 
   private void initBacktrackingBottomUpAstAutomata() {
-    Grammar startGrammar = persistentData.getGrammarByInputStream();
-    SyntaxDfa astDfa = persistentData.getSyntaxDfaByInputStream();
-    astAutomata = new BacktrackingBottomUpAstAutomata(astDfa, startGrammar);
+    startGrammar = persistentData.getGrammarByInputStream();
+    astDfa = persistentData.getSyntaxDfaByInputStream();
   }
 
   private void initProductionRules() {

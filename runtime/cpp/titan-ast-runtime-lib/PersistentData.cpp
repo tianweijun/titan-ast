@@ -235,6 +235,7 @@ std::string *PersistentData::readByteString(int countOfStringBytes) {
 
 int PersistentData::readInt() {
   doRead(intByteBuffer.buffer, 0, intByteBuffer.capacity);
+  intByteBuffer.setPosition(intByteBuffer.capacity);
   return intByteBuffer.getInt();
 }
 

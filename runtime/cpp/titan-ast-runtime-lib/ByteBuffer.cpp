@@ -69,7 +69,7 @@ int ByteBuffer::getInt() const { return isBigEndian ? getIntB() : getIntL(); }
 int ByteBuffer::getIntB() const {
   int base = 0;
   int value = 0;
-  for (int i = capacity - 1; i >= 0; i--) {
+  for (int i = position - 1; i >= 0; i--) {
     byte tmp = buffer[i];
     value = value | tmp << base;
     base += 8;
@@ -80,7 +80,7 @@ int ByteBuffer::getIntB() const {
 int ByteBuffer::getIntL() const {
   int base = 0;
   int value = 0;
-  for (int i = 0; i < capacity; i++) {
+  for (int i = 0; i < position; i++) {
     byte tmp = buffer[i];
     value = value | tmp << base;
     base += 8;

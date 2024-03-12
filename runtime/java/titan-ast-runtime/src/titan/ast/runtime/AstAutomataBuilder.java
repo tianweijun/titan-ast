@@ -38,4 +38,24 @@ public class AstAutomataBuilder {
         baseAstAutomata.nonterminalFollowMap,
         baseAstAutomata.eof);
   }
+
+  public AstAutomata build(PersistentObject persistentObject) {
+    AstAutomata astAutomata = null;
+    switch (persistentObject.astAutomataType) {
+      case BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+        astAutomata =
+            new BacktrackingBottomUpAstAutomata(
+                persistentObject.astDfa, persistentObject.startGrammar);
+        break;
+      case FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+        astAutomata =
+            new FollowFilterBacktrackingBottomUpAstAutomata(
+                persistentObject.astDfa,
+                persistentObject.startGrammar,
+                persistentObject.nonterminalFollowMap,
+                persistentObject.eofGrammar);
+        break;
+    }
+    return astAutomata;
+  }
 }

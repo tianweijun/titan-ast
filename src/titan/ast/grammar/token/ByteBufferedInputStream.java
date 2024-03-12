@@ -3,7 +3,6 @@ package titan.ast.grammar.token;
 import java.io.IOException;
 import java.io.InputStream;
 import titan.ast.runtime.AstRuntimeException;
-
 /**
  * 类似BufferedInpustream功能的流.
  *
@@ -12,10 +11,15 @@ import titan.ast.runtime.AstRuntimeException;
 public class ByteBufferedInputStream {
   private final int standardBufferCapacity = 1024;
   private final int eof = -1;
+
   public int nextReadIndex = 0;
   private int nextPos = 0;
   private int count = 0;
   private int mark = eof;
+
+  private boolean hasReadFromFile2FillBuffer = false;
+  private boolean isReadAllFromFile = false;
+
   private byte[] buffer;
   private InputStream byteInputStream;
 
@@ -40,104 +44,72 @@ public class ByteBufferedInputStream {
    * @return 所读取的字符，若没有文本了，返回-1
    */
   public int read() {
-    int read = eof;
-    if (nextPos < count) {
-      read = buffer[nextPos++];
+    if (nextPos < count) { // 从缓冲中正常读取
+      int read = ((int) buffer[nextPos++]) & 0x000000FF;
       ++nextReadIndex;
+      return read;
+    }
+    if (!isReadAllFromFile) { // 文件还没有读完就先填充，在尝试读取
+      fillBuffer();
+      return read();
+    }
+    if (!hasReadFromFile2FillBuffer) { // 第一次填充缓冲，在尝试读取
+      firstFillBuffer();
+      return read();
+    }
+    return eof;
+  }
+
+  private void fillBuffer() {
+    if (count < buffer.length) {
+      fillRemainder();
     } else {
-      if (fill()) {
-        read = read();
-      }
-    }
-    return read == eof ? eof : read & 0xFF;
-  }
-
-  /**
-   * 只有当读完缓冲后才能调用，其他时候不能调用，只能在read方法中调用.
-   *
-   * @return isFill
-   */
-  private boolean fill() {
-    if (mark == eof) { // 重新填入
-      return fillByNoMark();
-    } else if (mark == 0) { // 扩容
-      return fillByExpansion();
-    } else { // mark>0 && mark<=count 移动
-      int oldCount = count - mark;
-      if (oldCount > 0) {
-        System.arraycopy(buffer, mark, buffer, 0, count - mark);
-      }
-      int newCount = oldCount;
-      if (oldCount < buffer.length) {
-        int countOfRead = doRead(buffer, oldCount, buffer.length - oldCount);
-        newCount += countOfRead;
-      }
-
-      this.count = newCount;
-      this.nextPos -= mark;
-      this.mark = 0;
-      return this.count > 0;
+      fillByExpansion();
     }
   }
 
-  private boolean fillByExpansion() {
+  private void fillRemainder() {
+    int countOfReaded = doRead(buffer, count, buffer.length - count);
+    count += countOfReaded;
+  }
+
+  private void firstFillBuffer() {
+    this.count = doRead(buffer, 0, buffer.length);
+    hasReadFromFile2FillBuffer = true;
+  }
+
+  private void fillByExpansion() {
     int nsz = buffer.length + standardBufferCapacity;
     byte[] newBuffer = new byte[nsz];
-    int oldCount = count;
-    System.arraycopy(buffer, 0, newBuffer, 0, oldCount);
-    int newCount = oldCount;
+    System.arraycopy(buffer, 0, newBuffer, 0, count);
 
     // extend read
-    int countOfRead = doRead(newBuffer, oldCount, nsz - oldCount);
-    newCount += countOfRead;
+    int countOfNewRead = doRead(newBuffer, count, nsz - count);
 
     this.buffer = newBuffer;
-    this.count = newCount;
-    return newCount > oldCount;
+    this.count = this.count + countOfNewRead;
   }
 
-  private boolean fillByNoMark() {
-    int read = doRead();
-    if (eof == read) {
-      return false;
-    }
-    mark = eof;
-    nextPos = 0;
-    count = 0;
-
-    buffer[0] = (byte) read;
-    ++count;
-
-    if (count < buffer.length) {
-      int countOfFill = doRead(buffer, count, buffer.length - count);
-      count += countOfFill;
-    }
-    return true;
-  }
-
-  /**
-   * 跳过skipSteps.
-   *
-   * @param skipSteps 跳过的步数
-   */
-  public void skip(int skipSteps) {
-    for (int skipTimes = 0; skipTimes < skipSteps; skipTimes++) {
-      read();
-    }
-  }
-
-  /** 重置到mark的位置. */
-  public void reset() {
-    if (mark == eof) {
+  private void moveBuffer() {
+    if (mark < 0) {
       return;
     }
-    nextReadIndex = nextReadIndex - (nextPos - mark);
-    nextPos = mark;
+    int countOfAvailableData = count - mark - 1;
+    if (countOfAvailableData > 0) { // 移动
+      System.arraycopy(buffer, mark + 1, buffer, 0, countOfAvailableData);
+    }
+    this.count = countOfAvailableData;
+  }
+
+  /** mark为空 */
+  public void reset() {
+    moveBuffer();
+    nextPos = 0;
     mark = eof;
   }
 
   public void mark() {
-    this.mark = nextPos;
+    this.mark = nextPos - 1;
   }
 
   private int doRead(byte[] buffer, int offset, int len) {
@@ -148,18 +120,10 @@ public class ByteBufferedInputStream {
       close();
       throw new AstRuntimeException(e);
     }
-    return Math.max(countOfRead, 0);
-  }
-
-  private int doRead() {
-    int read = eof;
-    try {
-      read = byteInputStream.read();
-    } catch (IOException e) {
-      close();
-      throw new AstRuntimeException(e);
+    if (countOfRead == eof) {
+      isReadAllFromFile = true;
     }
-    return read;
+    return Math.max(countOfRead, 0);
   }
 
   /** 关闭输入流. */

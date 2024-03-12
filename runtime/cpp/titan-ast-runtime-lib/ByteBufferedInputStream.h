@@ -20,14 +20,15 @@ public:
 public:
   void init(const std::string *sourceFilePath);
   int read();
-  bool fill();
   bool fillByExpansion();
-  bool fillByNoMark();
-  void skip(int skipSteps);
   void reset();
   void mark();
   int doReadBuffer(byte *readBuffer, int offset, int len);
-  int doRead();
+  void fillBuffer();
+  void fillRemainder();
+  void firstFillBuffer();
+  void moveBuffer();
+
   void clear();
 
 public:
@@ -37,13 +38,19 @@ private:
   const static int standardBufferCapacity;
 
 private:
-  int eof;
+  const int eof;
+
   int nextPos;
   int count;
-  int markPos;
+  int markFlag;
+
+  bool hasReadFromFile2FillBuffer;
+  bool isReadAllFromFile;
+
   byte *buffer;
   int sizeOfBuffer;
   std::ifstream byteInputStream;
+
 };
 
 #endif // AST__BYTEBUFFEREDINPUTSTREAM_H_
