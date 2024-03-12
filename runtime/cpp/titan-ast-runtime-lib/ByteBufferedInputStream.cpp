@@ -6,13 +6,12 @@
 #include "AstRuntimeException.h"
 #include "Logger.h"
 
-const int ByteBufferedInputStream::standardBufferCapacity = 256;
-const int ByteBufferedInputStream::peekCount = 128;
+const int ByteBufferedInputStream::standardBufferCapacity = 512;
 
 ByteBufferedInputStream::ByteBufferedInputStream()
-    : nextReadIndex(0), eof(-1), nextPos(0), count(0), markFlag(-1),
-      hasReadFromFile2FillBuffer(false),isReadAllFromFile(false),
-      sizeOfBuffer(0), buffer(nullptr), byteInputStream(std::ifstream()) {}
+    : nextReadIndex(0), eof(-1), nextPos(0), limit(0), markFlag(-1), start(-1),
+      isReadAllFromFile(false), sizeOfBuffer(0), buffer(nullptr),
+      byteInputStream(std::ifstream()) {}
 
 ByteBufferedInputStream::~ByteBufferedInputStream() {
   delete[] buffer;
@@ -23,7 +22,7 @@ ByteBufferedInputStream::~ByteBufferedInputStream() {
 }
 
 int ByteBufferedInputStream::read() {
-  if (nextPos < count) {
+  if (nextPos < limit) {
     int readedByte = ((int)buffer[nextPos++]) & 0x000000FF;
     ++nextReadIndex;
     return readedByte;
@@ -32,82 +31,83 @@ int ByteBufferedInputStream::read() {
     fillBuffer();
     return read();
   }
-  if (!hasReadFromFile2FillBuffer) { // 第一次填充缓冲，在尝试读取
-    firstFillBuffer();
-    return read();
-  }
   return eof;
 }
 
 void ByteBufferedInputStream::fillBuffer() {
-  if (count < sizeOfBuffer) {
+  if (limit < sizeOfBuffer) {
     fillRemainder();
   } else {
-    fillByExpansion();
+    if (start > 0) {
+      compact();
+      fillRemainder();
+    } else {
+      fillByExpansion();
+    }
   }
+}
+
+void ByteBufferedInputStream::compact() {
+  int moveCount = limit - start;
+  for (int i = 0; i < moveCount; i++) {
+    buffer[i] = buffer[i + start];
+  }
+  nextPos = nextPos - start;
+  markFlag = markFlag - start;
+  limit = moveCount;
+  start = 0;
 }
 
 void ByteBufferedInputStream::fillRemainder() {
-  int countOfReaded = doReadBuffer(buffer, count, sizeOfBuffer - count);
-  count += countOfReaded;
+  int countOfReaded = doReadBuffer(buffer, limit, sizeOfBuffer - limit);
+  limit += countOfReaded;
 }
 
-bool ByteBufferedInputStream::fillByExpansion() {
+void ByteBufferedInputStream::fillByExpansion() {
   int nsz = sizeOfBuffer + sizeOfBuffer;
   byte *nBuffer = new byte[nsz];
 
-  for (int i = 0; i < count; i++) {
+  for (int i = 0; i < limit; i++) {
     nBuffer[i] = buffer[i];
   }
   // extend read
-  int countOfNewRead = doReadBuffer(nBuffer, count, nsz - count);
+  int countOfNewRead = doReadBuffer(nBuffer, limit, nsz - limit);
 
   delete[] this->buffer;
   this->buffer = nBuffer;
   this->sizeOfBuffer = nsz;
-  this->count = this->count+ countOfNewRead;
-  return countOfNewRead > 0;
-}
-
-void ByteBufferedInputStream::firstFillBuffer() {
-  count = doReadBuffer(buffer, 0, sizeOfBuffer);
-  hasReadFromFile2FillBuffer = true;
-}
-
-void ByteBufferedInputStream::moveBuffer() {
-  if (markFlag < 0) {
-    return;
-  }
-  int mark = markFlag +1;
-  for (int indexOfBuffer = mark; indexOfBuffer < count; indexOfBuffer++) {//移动
-    buffer[indexOfBuffer - mark] = buffer[indexOfBuffer];
-  }
-  count = count - mark;
+  this->limit = this->limit + countOfNewRead;
 }
 
 void ByteBufferedInputStream::reset() {
-  moveBuffer();
-  nextPos = 0;
+  if (markFlag < 0) {
+    return;
+  }
+  nextPos = markFlag + 1;
+  if (nextPos >= limit) { // 数据全失效了
+    nextPos = 0;
+    limit = 0;
+    start = eof;
+  } else { // 还有可用数据
+    start = nextPos;
+  }
   markFlag = eof;
 }
 
-void ByteBufferedInputStream::mark() { this->markFlag = nextPos-1; }
+void ByteBufferedInputStream::mark() { this->markFlag = nextPos - 1; }
 
 int ByteBufferedInputStream::doReadBuffer(byte *readBuffer, int offset,
                                           int len) {
   char *base = reinterpret_cast<char *>(readBuffer + offset);
-  if(len>peekCount){
-    len=peekCount;
-  }
   int countOfRead = byteInputStream.read(base, len).gcount();
   if (byteInputStream.bad()) {
     isReadAllFromFile = true;
-    error("%s","bad read from file");
+    error("%s", "bad read from file");
   }
-  if(byteInputStream.eof()){
+  if (byteInputStream.eof()) {
     isReadAllFromFile = true;
   }
-  if(countOfRead<0){
+  if (countOfRead < 0) {
     countOfRead = 0;
   }
   return countOfRead;
@@ -116,10 +116,10 @@ int ByteBufferedInputStream::doReadBuffer(byte *readBuffer, int offset,
 void ByteBufferedInputStream::clear() {
   nextReadIndex = 0;
   nextPos = 0;
-  count = 0;
+  limit = 0;
+  start = eof;
   markFlag = eof;
-
-  hasReadFromFile2FillBuffer = false;
+  
   isReadAllFromFile = false;
 
   if (byteInputStream.is_open()) {
@@ -148,4 +148,3 @@ void ByteBufferedInputStream::init(const std::string *sourceFilePath) {
         "open source File error,path:'" + *sourceFilePath + "'"));
   }
 }
-

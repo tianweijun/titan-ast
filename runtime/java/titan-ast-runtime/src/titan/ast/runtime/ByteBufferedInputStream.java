@@ -9,16 +9,16 @@ import java.io.InputStream;
  * @author tian wei jun
  */
 public class ByteBufferedInputStream {
-  private final int standardBufferCapacity = 256;
-  private final int peekCount = 128;
+  private final int standardBufferCapacity = 512;
   private final int eof = -1;
 
   public int nextReadIndex = 0;
-  private int nextPos = 0;
-  private int count = 0;
-  private int mark = eof;
 
-  private boolean hasReadFromFile2FillBuffer = false;
+  private int nextPos = 0;
+  private int limit = 0;
+  private int start = -1;
+  private int mark = -1;
+
   private boolean isReadAllFromFile = false;
 
   private byte[] buffer;
@@ -45,67 +45,71 @@ public class ByteBufferedInputStream {
    * @return 所读取的字符，若没有文本了，返回-1
    */
   public int read() {
-    if (nextPos < count) { // 从缓冲中正常读取
+    if (nextPos < limit) { // 从缓冲中正常读取
       int read = ((int) buffer[nextPos++]) & 0x000000FF;
       ++nextReadIndex;
       return read;
     }
+    // nextPos >= limit
     if (!isReadAllFromFile) { // 文件还没有读完就先填充，在尝试读取
       fillBuffer();
-      return read();
-    }
-    if (!hasReadFromFile2FillBuffer) { // 第一次填充缓冲，在尝试读取
-      firstFillBuffer();
       return read();
     }
     return eof;
   }
 
-  private void fillBuffer() {
-    if (count < buffer.length) {
+  private void fillBuffer() { // nextPos >= limit
+    if (limit < buffer.length) {
       fillRemainder();
     } else {
-      fillByExpansion();
+      if (start > 0) {
+        compact();
+        fillRemainder();
+      } else {
+        fillByExpansion();
+      }
     }
   }
 
-  private void fillRemainder() {
-    int countOfReaded = doRead(buffer, count, buffer.length - count);
-    count += countOfReaded;
+  private void compact() {
+    int moveCount = limit - start;
+    System.arraycopy(buffer, start, buffer, 0, moveCount);
+    nextPos = nextPos - start;
+    mark = mark - start;
+    limit = moveCount;
+    start = 0;
   }
 
-  private void firstFillBuffer() {
-    this.count = doRead(buffer, 0, buffer.length);
-    hasReadFromFile2FillBuffer = true;
+  private void fillRemainder() {
+    int countOfReaded = doRead(buffer, limit, buffer.length - limit);
+    limit += countOfReaded;
   }
 
   private void fillByExpansion() {
     int nsz = buffer.length + buffer.length;
     byte[] newBuffer = new byte[nsz];
-    System.arraycopy(buffer, 0, newBuffer, 0, count);
+    System.arraycopy(buffer, 0, newBuffer, 0, limit);
 
     // extend read
-    int countOfNewRead = doRead(newBuffer, count, nsz - count);
+    int countOfNewRead = doRead(newBuffer, limit, nsz - limit);
 
     this.buffer = newBuffer;
-    this.count = this.count + countOfNewRead;
-  }
-
-  private void moveBuffer() {
-    if (mark < 0) {
-      return;
-    }
-    int countOfAvailableData = count - mark - 1;
-    if (countOfAvailableData > 0) { // 移动
-      System.arraycopy(buffer, mark + 1, buffer, 0, countOfAvailableData);
-    }
-    this.count = countOfAvailableData;
+    this.limit = this.limit + countOfNewRead;
   }
 
   /** mark为空 */
   public void reset() {
-    moveBuffer();
-    nextPos = 0;
+    if (mark < 0) {
+      return;
+    }
+    nextPos = mark + 1;
+    if (nextPos >= limit) { // 数据全失效了
+      nextPos = 0;
+      limit = 0;
+      start = eof;
+    } else { // 还有可用数据
+      start = nextPos;
+    }
     mark = eof;
   }
 
@@ -116,9 +120,6 @@ public class ByteBufferedInputStream {
   private int doRead(byte[] buffer, int offset, int len) {
     int countOfRead = 0;
     try {
-      if (len > peekCount) {
-        len = peekCount;
-      }
       countOfRead = byteInputStream.read(buffer, offset, len);
     } catch (IOException e) {
       close();
