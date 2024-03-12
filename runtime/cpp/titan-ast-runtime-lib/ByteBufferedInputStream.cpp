@@ -7,6 +7,7 @@
 #include "Logger.h"
 
 const int ByteBufferedInputStream::standardBufferCapacity = 256;
+const int ByteBufferedInputStream::peekCount = 128;
 
 ByteBufferedInputStream::ByteBufferedInputStream()
     : nextReadIndex(0), eof(-1), nextPos(0), count(0), markFlag(-1),
@@ -52,7 +53,7 @@ void ByteBufferedInputStream::fillRemainder() {
 }
 
 bool ByteBufferedInputStream::fillByExpansion() {
-  int nsz = sizeOfBuffer + standardBufferCapacity;
+  int nsz = sizeOfBuffer + sizeOfBuffer;
   byte *nBuffer = new byte[nsz];
 
   for (int i = 0; i < count; i++) {
@@ -95,6 +96,9 @@ void ByteBufferedInputStream::mark() { this->markFlag = nextPos-1; }
 int ByteBufferedInputStream::doReadBuffer(byte *readBuffer, int offset,
                                           int len) {
   char *base = reinterpret_cast<char *>(readBuffer + offset);
+  if(len>peekCount){
+    len=peekCount;
+  }
   int countOfRead = byteInputStream.read(base, len).gcount();
   if (byteInputStream.bad()) {
     isReadAllFromFile = true;

@@ -9,7 +9,8 @@ import java.io.InputStream;
  * @author tian wei jun
  */
 public class ByteBufferedInputStream {
-  private final int standardBufferCapacity = 1024;
+  private final int standardBufferCapacity = 256;
+  private final int peekCount = 128;
   private final int eof = -1;
 
   public int nextReadIndex = 0;
@@ -79,7 +80,7 @@ public class ByteBufferedInputStream {
   }
 
   private void fillByExpansion() {
-    int nsz = buffer.length + standardBufferCapacity;
+    int nsz = buffer.length + buffer.length;
     byte[] newBuffer = new byte[nsz];
     System.arraycopy(buffer, 0, newBuffer, 0, count);
 
@@ -115,6 +116,9 @@ public class ByteBufferedInputStream {
   private int doRead(byte[] buffer, int offset, int len) {
     int countOfRead = 0;
     try {
+      if (len > peekCount) {
+        len = peekCount;
+      }
       countOfRead = byteInputStream.read(buffer, offset, len);
     } catch (IOException e) {
       close();

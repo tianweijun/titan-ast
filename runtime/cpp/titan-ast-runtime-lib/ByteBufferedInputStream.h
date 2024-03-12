@@ -36,6 +36,7 @@ public:
 
 private:
   const static int standardBufferCapacity;
+  const static int peekCount;
 
 private:
   const int eof;
