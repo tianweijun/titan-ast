@@ -27,8 +27,7 @@ public:
 
 enum class LookaheadMatchingMode : int {
   GREEDINESS = 0,
-  LAZINESS = 1,
-  ACCEPT_WHEN_FIRST_ARRIVE_AT_TERMINAL_STATE = 2
+  LAZINESS = 1
 };
 
 class DLL_PUBLIC TerminalGrammar : public Grammar {

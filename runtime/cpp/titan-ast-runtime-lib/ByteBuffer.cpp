@@ -5,19 +5,19 @@
 #include "ByteBuffer.h"
 
 ByteBuffer::ByteBuffer(int capacity)
-    : isBigEndian(true), capacity(capacity), position(0) {
+    : isBigEndian(true), capacity(capacity), limit(0) {
   buffer = new byte[capacity];
 }
 
 ByteBuffer::ByteBuffer(int capacity, bool isBigEndian)
-    : isBigEndian(isBigEndian), capacity(capacity), position(0) {
+    : isBigEndian(isBigEndian), capacity(capacity), limit(0) {
   buffer = new byte[capacity];
 }
 
 ByteBuffer::ByteBuffer(const ByteBuffer &byteBuffer) {
   this->isBigEndian = byteBuffer.isBigEndian;
   this->capacity = byteBuffer.capacity;
-  this->position = byteBuffer.position;
+  this->limit = byteBuffer.limit;
   this->buffer = new byte[this->capacity];
   for (int i = 0; i < this->capacity; i++) {
     this->buffer[i] = byteBuffer.buffer[i];
@@ -27,12 +27,12 @@ ByteBuffer::ByteBuffer(const ByteBuffer &byteBuffer) {
 ByteBuffer::ByteBuffer(ByteBuffer &&byteBuffer) {
   this->isBigEndian = byteBuffer.isBigEndian;
   this->capacity = byteBuffer.capacity;
-  this->position = byteBuffer.position;
+  this->limit = byteBuffer.limit;
   this->buffer = byteBuffer.buffer;
 
   byteBuffer.buffer = nullptr;
   byteBuffer.capacity = 0;
-  byteBuffer.position = 0;
+  byteBuffer.limit = 0;
 }
 
 ByteBuffer::~ByteBuffer() {
@@ -40,15 +40,15 @@ ByteBuffer::~ByteBuffer() {
   buffer = nullptr;
 }
 
-void ByteBuffer::setPosition(int pos) { position = pos; }
+void ByteBuffer::setLimit(int limit) { this->limit = limit; }
 
-int ByteBuffer::length() const { return position; }
+int ByteBuffer::length() const { return limit; }
 
 void ByteBuffer::append(byte b) {
-  if (position >= capacity) {
+  if (limit >= capacity) {
     extendBuffer();
   }
-  buffer[position++] = b;
+  buffer[limit++] = b;
 }
 
 void ByteBuffer::extendBuffer() {
@@ -62,14 +62,14 @@ void ByteBuffer::extendBuffer() {
   capacity = newCapacity;
 }
 
-void ByteBuffer::clear() { position = 0; }
+void ByteBuffer::clear() { limit = 0; }
 
 int ByteBuffer::getInt() const { return isBigEndian ? getIntB() : getIntL(); }
 
 int ByteBuffer::getIntB() const {
   int base = 0;
   int value = 0;
-  for (int i = position - 1; i >= 0; i--) {
+  for (int i = limit - 1; i >= 0; i--) {
     byte tmp = buffer[i];
     value = value | tmp << base;
     base += 8;
@@ -80,7 +80,7 @@ int ByteBuffer::getIntB() const {
 int ByteBuffer::getIntL() const {
   int base = 0;
   int value = 0;
-  for (int i = 0; i < position; i++) {
+  for (int i = 0; i < limit; i++) {
     byte tmp = buffer[i];
     value = value | tmp << base;
     base += 8;

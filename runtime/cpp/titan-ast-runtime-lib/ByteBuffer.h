@@ -17,7 +17,7 @@ public:
   ByteBuffer(ByteBuffer &&byteBuffer) noexcept;
   ~ByteBuffer();
 
-  void setPosition(int pos);
+  void setLimit(int limit);
   int length() const;
   void append(byte b);
   void clear();
@@ -27,7 +27,7 @@ public:
 
   bool isBigEndian;
   int capacity;
-  int position;
+  int limit;
   byte *buffer;
 
 private:

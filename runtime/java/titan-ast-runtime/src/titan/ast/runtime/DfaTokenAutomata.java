@@ -81,7 +81,7 @@ public class DfaTokenAutomata implements TokenAutomata {
    */
   private boolean buildOneToken() {
     TokenDfaState terminalState = getTerminalState();
-    if (null == terminalState) { // 输入流读完结束
+    if (null == terminalState) { // 表示输入流读取完了
       return false;
     }
     Token token = new Token(startIndexOfToken);
@@ -93,6 +93,11 @@ public class DfaTokenAutomata implements TokenAutomata {
     return true;
   }
 
+  /**
+   * .
+   *
+   * @return 返回null，表示输入流读取完了
+   */
   private TokenDfaState getTerminalState() {
     oneTokenStringBuilder.delete(0, oneTokenStringBuilder.length());
     startIndexOfToken = byteBufferedInputStream.nextReadIndex;
@@ -129,10 +134,10 @@ public class DfaTokenAutomata implements TokenAutomata {
     int lengthOfToken = oneTokenStringBuilder.length();
     // heaviest terminal state
     TokenDfaState heaviestTerminalState = firstTerminalState;
-    TerminalGrammar terminal = (TerminalGrammar) heaviestTerminalState.terminal;
-    ch = byteBufferedInputStream.read();
+
     // 如果没有文本嗅探了直接跳出循环
     // 贪婪或者嗅探高优先级
+    ch = byteBufferedInputStream.read();
     while (ch != eof) {
       TokenDfaState nextState = currentState.edges.get(ch);
       oneTokenStringBuilder.append((char) ch);
@@ -141,24 +146,19 @@ public class DfaTokenAutomata implements TokenAutomata {
         break;
       }
       if (FaStateType.isClosingTag(currentState.type)) { // 找到终态
-        // 新状态具有更高优先级的，接受状态转移
-        if (currentState.weight > heaviestTerminalState.weight) {
+        // 新状态具有更高优先级的，接受终态转移
+        boolean isHigherPriority = currentState.weight > heaviestTerminalState.weight;
+        // 相同优先级说明状态是同一个token的终态
+        // 如果是贪婪的，则增加识别的字符，接受终态转移
+        // 不是贪婪的，则不接受终态转移
+        boolean isSameAndGreediness =
+            heaviestTerminalState.terminal == currentState.terminal
+                && ((TerminalGrammar) heaviestTerminalState.terminal).lookaheadMatchingMode
+                    == LookaheadMatchingMode.GREEDINESS;
+        if (isHigherPriority || isSameAndGreediness) {
           heaviestTerminalState = currentState;
-          terminal = (TerminalGrammar) heaviestTerminalState.terminal;
           lengthOfToken = oneTokenStringBuilder.length();
           byteBufferedInputStream.mark();
-        }
-        // 相同优先级说明状态是同一个token的终态
-        // 如果是贪婪的，则增加识别的字符，接受状态转移
-        // 不是贪婪的，则不接受状态转移
-        if (currentState.weight == heaviestTerminalState.weight
-            && terminal == heaviestTerminalState.terminal) {
-          if (terminal.lookaheadMatchingMode == LookaheadMatchingMode.GREEDINESS) {
-            heaviestTerminalState = currentState;
-            terminal = (TerminalGrammar) heaviestTerminalState.terminal;
-            lengthOfToken = oneTokenStringBuilder.length();
-            byteBufferedInputStream.mark();
-          }
         }
         // 新token优先级更低直接被覆盖，不接受替换旧终态
       }

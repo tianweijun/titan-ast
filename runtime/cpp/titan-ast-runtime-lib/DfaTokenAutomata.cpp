@@ -40,7 +40,7 @@ void DfaTokenAutomata::clear() {
 
 bool DfaTokenAutomata::buildOneToken() {
   const TokenDfaState *terminalState = getTerminalState();
-  if (!terminalState) { // 输入流读完结束
+  if (!terminalState) { // 表示输入流读取完了，或者源输入流内容无法根据语法生成token
     return false;
   }
   std::string text((char *)oneTokenStringBuilder.buffer,
@@ -54,6 +54,10 @@ bool DfaTokenAutomata::buildOneToken() {
   return true;
 }
 
+/**
+ * .
+ * @return 返回null，表示输入流读取完了，或者源输入流内容无法根据语法生成token
+ */
 const TokenDfaState *DfaTokenAutomata::getTerminalState() {
   oneTokenStringBuilder.clear();
   startIndexOfToken = byteBufferedInputStream.nextReadIndex;
@@ -84,7 +88,7 @@ const TokenDfaState *DfaTokenAutomata::getTerminalState() {
   }
   if (!firstTerminalState) {
     std::string tokenStr((char *)(oneTokenStringBuilder.buffer),
-                         oneTokenStringBuilder.position);
+                         oneTokenStringBuilder.limit);
     std::stringstream errorInfo;
     errorInfo << "[" << startIndexOfToken << ","
               << startIndexOfToken + oneTokenStringBuilder.length() << "):'"
@@ -97,14 +101,10 @@ const TokenDfaState *DfaTokenAutomata::getTerminalState() {
   int lengthOfToken = oneTokenStringBuilder.length();
   // heaviest terminal state
   const TokenDfaState *heaviestTerminalState = firstTerminalState;
-  auto *terminal = (TerminalGrammar *)heaviestTerminalState->terminal;
   ch = byteBufferedInputStream.read();
   // 如果没有文本嗅探了直接跳出循环
   // 如果当前接受状态是acceptWhenFirstArriveAtTerminalState，就直接接受,跳出嗅探循环
-  while (
-      ch != eof &&
-      terminal->lookaheadMatchingMode !=
-          LookaheadMatchingMode::ACCEPT_WHEN_FIRST_ARRIVE_AT_TERMINAL_STATE) {
+  while (ch != eof) {
     TokenDfaState *nextState = nullptr;
     auto nextStateIt = currentState->edges.find(ch);
     if (nextStateIt != currentState->edges.end()) {
@@ -116,30 +116,26 @@ const TokenDfaState *DfaTokenAutomata::getTerminalState() {
       break;
     }
     if (FaStateType::isClosingTag(currentState->type)) { // 找到终态
+                                                         // 新状态具有更高优先级的，接受终态转移
+      bool isHigherPriority = currentState->weight > heaviestTerminalState->weight;
+      // 相同优先级说明状态是同一个token的终态
+      // 如果是贪婪的，则增加识别的字符，接受终态转移
+      // 不是贪婪的，则不接受终态转移
+      bool isSameAndGreediness =
+          heaviestTerminalState->terminal == currentState->terminal &&
+          ((TerminalGrammar *)heaviestTerminalState->terminal)
+                  ->lookaheadMatchingMode == LookaheadMatchingMode::GREEDINESS;
       // 新状态具有更高优先级的，接受状态转移
-      if (currentState->weight > heaviestTerminalState->weight) {
+      if (isHigherPriority || isSameAndGreediness) {
         heaviestTerminalState = currentState;
         lengthOfToken = oneTokenStringBuilder.length();
         byteBufferedInputStream.mark();
-      }
-      // 相同优先级说明状态是同一个token的终态
-      // 如果是贪婪的，则增加识别的字符，接受状态转移
-      // 不是贪婪的，则不接受状态转移
-      if (currentState->weight == heaviestTerminalState->weight &&
-          terminal == heaviestTerminalState->terminal) {
-        if (terminal->lookaheadMatchingMode ==
-            LookaheadMatchingMode::GREEDINESS) {
-          heaviestTerminalState = currentState;
-          terminal = (TerminalGrammar *)heaviestTerminalState->terminal;
-          lengthOfToken = oneTokenStringBuilder.length();
-          byteBufferedInputStream.mark();
-        }
       }
       // 新token优先级更低直接被覆盖，不接受替换旧终态
     }
     ch = byteBufferedInputStream.read();
   }
   byteBufferedInputStream.reset();
-  oneTokenStringBuilder.setPosition(lengthOfToken);
+  oneTokenStringBuilder.setLimit(lengthOfToken);
   return heaviestTerminalState;
 }

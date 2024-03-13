@@ -34,7 +34,7 @@ public:
   int nextReadIndex;
 
 private:
-  const static int standardBufferCapacity;
+  const static int STANDARD_BUFFER_CAPACITY;
 
 private:
   const int eof;

@@ -6,7 +6,7 @@
 #include "AstRuntimeException.h"
 #include "Logger.h"
 
-const int ByteBufferedInputStream::standardBufferCapacity = 512;
+const int ByteBufferedInputStream::STANDARD_BUFFER_CAPACITY = 512;
 
 ByteBufferedInputStream::ByteBufferedInputStream()
     : nextReadIndex(0), eof(-1), nextPos(0), limit(0), markFlag(-1), start(-1),
@@ -138,8 +138,8 @@ void ByteBufferedInputStream::init(const std::string *sourceFilePath) {
   clear();
 
   if (!buffer) {
-    buffer = new byte[standardBufferCapacity];
-    sizeOfBuffer = standardBufferCapacity;
+    buffer = new byte[STANDARD_BUFFER_CAPACITY];
+    sizeOfBuffer = STANDARD_BUFFER_CAPACITY;
   }
   byteInputStream.open(*sourceFilePath, std::ios::in | std::ios::binary);
   if (!byteInputStream.is_open()) {

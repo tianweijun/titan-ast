@@ -10,7 +10,7 @@ import titan.ast.runtime.AstRuntimeException;
  * @author tian wei jun
  */
 public class ByteBufferedInputStream {
-  private final int standardBufferCapacity = 512;
+  private static final int STANDARD_BUFFER_CAPACITY = 512;
   private final int eof = -1;
 
   public int nextReadIndex = 0;
@@ -37,7 +37,7 @@ public class ByteBufferedInputStream {
 
   /** 初始化. */
   public void init() {
-    buffer = new byte[standardBufferCapacity];
+    buffer = new byte[STANDARD_BUFFER_CAPACITY];
   }
 
   /**
