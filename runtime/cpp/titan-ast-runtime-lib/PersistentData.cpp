@@ -9,7 +9,7 @@
 PersistentData::PersistentData(const std::string *automataFilePath)
     : intByteBuffer(ByteBuffer(4, true)), stringPool(nullptr),
       sizeOfStringPool(0), grammars(nullptr), sizeOfGramamrs(0),
-      productionRules(nullptr), sizeOfProductionRules(0) {
+      productionRules(nullptr), sizeOfProductionRules(0),syntaxDfaStateId(0) {
   init(automataFilePath);
 }
 
@@ -83,7 +83,7 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
   auto **syntaxDfaStates = new SyntaxDfaState *[sizeOfSyntaxDfaStates];
   for (int indexOfSyntaxDfaState = 0;
        indexOfSyntaxDfaState < sizeOfSyntaxDfaStates; indexOfSyntaxDfaState++) {
-    syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState();
+    syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState(++syntaxDfaStateId);
   }
   // countOfSyntaxDfaStates-(type-countOfEdges-[ch,dest]{countOfEdges}-countOfProductions-productions)
   for (int indexOfSyntaxDfaState = 0;

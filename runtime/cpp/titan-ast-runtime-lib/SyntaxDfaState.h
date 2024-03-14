@@ -13,7 +13,7 @@ class ProductionRule;
 
 class SyntaxDfaState {
 public:
-  SyntaxDfaState();
+  SyntaxDfaState(int id);
   SyntaxDfaState(const SyntaxDfaState &syntaxDfaState) = delete;
   SyntaxDfaState(const SyntaxDfaState &&syntaxDfaState) = delete;
   ~SyntaxDfaState();
@@ -25,9 +25,6 @@ public:
   std::list<ProductionRule *> closingProductionRules;
   bool equals(const SyntaxDfaState *o) const;
   bool compare(const SyntaxDfaState *o) const;
-
-public:
-  static int syntaxDfaStateId;
 };
 
 #endif // AST__SYNTAXDFASTATE_H_

@@ -32,6 +32,7 @@ public:
   int sizeOfGramamrs;
   ProductionRule **productionRules;
   int sizeOfProductionRules;
+  int syntaxDfaStateId;
 
   SyntaxDfa *getSyntaxDfaByInputStream();
   void getProductionRulesByInputStream();

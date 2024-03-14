@@ -4,12 +4,9 @@
 
 #include "SyntaxDfaState.h"
 
-int SyntaxDfaState::syntaxDfaStateId = 0;
-
-SyntaxDfaState::SyntaxDfaState()
-    : type(0), edges(std::map<const Grammar *, SyntaxDfaState *>()),
+SyntaxDfaState::SyntaxDfaState(int id)
+    : id(id),type(0), edges(std::map<const Grammar *, SyntaxDfaState *>()),
       closingProductionRules(std::list<ProductionRule *>()) {
-  id = ++syntaxDfaStateId;
 }
 
 bool SyntaxDfaState::equals(const SyntaxDfaState *o) const {
