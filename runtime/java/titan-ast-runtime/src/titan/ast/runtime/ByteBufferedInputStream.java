@@ -16,7 +16,7 @@ public class ByteBufferedInputStream {
 
   private int nextPos = 0;
   private int limit = 0;
-  private int start = -1;
+  private int limitOfInvalidData = 0;
   private int mark = -1;
 
   private boolean isReadAllFromFile = false;
@@ -62,7 +62,7 @@ public class ByteBufferedInputStream {
     if (limit < buffer.length) {
       fillRemainder();
     } else {
-      if (start > 0) {
+      if (limitOfInvalidData > 0) {
         compact();
         fillRemainder();
       } else {
@@ -72,12 +72,12 @@ public class ByteBufferedInputStream {
   }
 
   private void compact() {
-    int moveCount = limit - start;
-    System.arraycopy(buffer, start, buffer, 0, moveCount);
-    nextPos = nextPos - start;
-    mark = mark - start;
+    int moveCount = limit - limitOfInvalidData;
+    System.arraycopy(buffer, limitOfInvalidData, buffer, 0, moveCount);
+    nextPos = nextPos - limitOfInvalidData;
+    mark = mark - limitOfInvalidData;
     limit = moveCount;
-    start = 0;
+    limitOfInvalidData = 0;
   }
 
   private void fillRemainder() {
@@ -106,9 +106,9 @@ public class ByteBufferedInputStream {
     if (nextPos >= limit) { // 数据全失效了
       nextPos = 0;
       limit = 0;
-      start = eof;
+      limitOfInvalidData = 0;
     } else { // 还有可用数据
-      start = nextPos;
+      limitOfInvalidData = nextPos;
     }
     mark = eof;
   }

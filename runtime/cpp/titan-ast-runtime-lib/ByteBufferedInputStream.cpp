@@ -9,7 +9,8 @@
 const int ByteBufferedInputStream::STANDARD_BUFFER_CAPACITY = 512;
 
 ByteBufferedInputStream::ByteBufferedInputStream()
-    : nextReadIndex(0), eof(-1), nextPos(0), limit(0), markFlag(-1), start(-1),
+    : nextReadIndex(0), eof(-1), nextPos(0), limit(0), markFlag(-1),
+      limitOfInvalidData(0),
       isReadAllFromFile(false), sizeOfBuffer(0), buffer(nullptr),
       byteInputStream(std::ifstream()) {}
 
@@ -38,7 +39,7 @@ void ByteBufferedInputStream::fillBuffer() {
   if (limit < sizeOfBuffer) {
     fillRemainder();
   } else {
-    if (start > 0) {
+    if (limitOfInvalidData > 0) {
       compact();
       fillRemainder();
     } else {
@@ -48,14 +49,14 @@ void ByteBufferedInputStream::fillBuffer() {
 }
 
 void ByteBufferedInputStream::compact() {
-  int moveCount = limit - start;
+  int moveCount = limit - limitOfInvalidData;
   for (int i = 0; i < moveCount; i++) {
-    buffer[i] = buffer[i + start];
+    buffer[i] = buffer[i + limitOfInvalidData];
   }
-  nextPos = nextPos - start;
-  markFlag = markFlag - start;
+  nextPos = nextPos - limitOfInvalidData;
+  markFlag = markFlag - limitOfInvalidData;
   limit = moveCount;
-  start = 0;
+  limitOfInvalidData = 0;
 }
 
 void ByteBufferedInputStream::fillRemainder() {
@@ -87,9 +88,9 @@ void ByteBufferedInputStream::reset() {
   if (nextPos >= limit) { // 数据全失效了
     nextPos = 0;
     limit = 0;
-    start = eof;
+    limitOfInvalidData = 0;
   } else { // 还有可用数据
-    start = nextPos;
+    limitOfInvalidData = nextPos;
   }
   markFlag = eof;
 }
@@ -117,7 +118,7 @@ void ByteBufferedInputStream::clear() {
   nextReadIndex = 0;
   nextPos = 0;
   limit = 0;
-  start = eof;
+  limitOfInvalidData = 0;
   markFlag = eof;
   
   isReadAllFromFile = false;

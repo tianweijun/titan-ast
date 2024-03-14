@@ -10,7 +10,7 @@ pub(crate) struct ByteBufferedInputStream {
     pub(crate) next_read_index: usize,
     next_pos: usize,
     limit: usize,
-    start: i32,
+    limit_of_invalid_data: usize,
     mark: i32,
 
     is_read_all_from_file: bool,
@@ -46,7 +46,7 @@ impl ByteBufferedInputStream {
         if self.limit < self.buffer.len() {
             self.fill_remainder();
         } else {
-            if self.start > 0 {
+            if self.limit_of_invalid_data > 0 {
                 self.compact();
                 self.fill_remainder();
             } else {
@@ -56,15 +56,14 @@ impl ByteBufferedInputStream {
     }
 
     fn compact(&mut self) {
-        let u_start = self.start as usize;
-        let move_count = self.limit - u_start;
+        let move_count = self.limit - self.limit_of_invalid_data;
         for i in 0..move_count {
-            self.buffer[i] = self.buffer[i + u_start];
+            self.buffer[i] = self.buffer[i + self.limit_of_invalid_data];
         }
-        self.next_pos -= u_start;
-        self.mark -= self.start;
+        self.next_pos -= self.limit_of_invalid_data;
+        self.mark -= self.limit_of_invalid_data as i32;
         self.limit = move_count;
-        self.start = 0;
+        self.limit_of_invalid_data = 0;
     }
 
     fn fill_remainder(&mut self) {
@@ -94,10 +93,10 @@ impl ByteBufferedInputStream {
             // 数据全失效了
             self.next_pos = 0;
             self.limit = 0;
-            self.start = EOF;
+            self.limit_of_invalid_data = 0;
         } else {
             // 还有可用数据
-            self.start = self.next_pos as i32;
+            self.limit_of_invalid_data = self.next_pos;
         }
         self.mark = EOF;
     }
@@ -121,7 +120,9 @@ impl ByteBufferedInputStream {
     pub(crate) fn init(&mut self, source_code_file_path: &String) -> Result<(), AstAppError> {
         self.clear();
 
-        if self.buffer.capacity() < STANDARD_BUFFER_CAPACITY {
+        if self.buffer.len() < STANDARD_BUFFER_CAPACITY
+            || self.buffer.len() != self.buffer.capacity()
+        {
             self.buffer = vec![0; STANDARD_BUFFER_CAPACITY];
         }
         let source_code_file = File::open(source_code_file_path)?;
@@ -134,7 +135,7 @@ impl ByteBufferedInputStream {
         self.next_pos = 0;
         self.limit = 0;
         self.mark = EOF;
-        self.start = -1;
+        self.limit_of_invalid_data = 0;
         self.is_read_all_from_file = false;
 
         self.byte_input_stream = None;
@@ -150,7 +151,7 @@ impl Clone for ByteBufferedInputStream {
             next_pos: self.next_pos,
             limit: self.limit,
             mark: self.mark,
-            start: self.start,
+            limit_of_invalid_data: self.limit_of_invalid_data,
             is_read_all_from_file: self.is_read_all_from_file,
             buffer: self.buffer.clone(),
             byte_input_stream: None,
@@ -165,7 +166,7 @@ impl Default for ByteBufferedInputStream {
             next_pos: 0,
             limit: 0,
             mark: EOF,
-            start: EOF,
+            limit_of_invalid_data: 0,
             is_read_all_from_file: false,
             buffer: vec![0; STANDARD_BUFFER_CAPACITY],
             byte_input_stream: None,

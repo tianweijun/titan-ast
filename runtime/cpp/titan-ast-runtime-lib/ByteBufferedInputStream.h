@@ -41,7 +41,7 @@ private:
 
   int nextPos;
   int limit;
-  int start;
+  int limitOfInvalidData;
   int markFlag;
   bool isReadAllFromFile;
 
