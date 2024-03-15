@@ -29,7 +29,6 @@ add_library(titan-ast-runtime-lib SHARED Ast.cpp Ast.h
         GrammarType.h GrammarAction.h TokenType.h Logger.cpp
         Logger.h AstRuntimeException.cpp AstRuntimeException.h
         RuntimeAutomataAstApplication.cpp RuntimeAutomataAstApplication.h
-        PersistentAutomataAstApplication.cpp PersistentAutomataAstApplication.h
         PersistentData.cpp PersistentData.h
         StringUtils.cpp StringUtils.h PersistentObject.cpp PersistentObject.h
         DfaTokenAutomata.cpp DfaTokenAutomata.h TokenDfa.cpp TokenDfa.h
@@ -48,5 +47,6 @@ add_library(titan-ast-runtime-lib SHARED Ast.cpp Ast.h
         AstAutomata.h
         AstAutomataType.h AstAutomataBuilder.cpp
         AstAutomataBuilder.h FollowFilterBacktrackingBottomUpAstAutomata.cpp
-        FollowFilterBacktrackingBottomUpAstAutomata.h
+        FollowFilterBacktrackingBottomUpAstAutomata.h AstGrammar.h AstGrammar.cpp
+        AutomataData.cpp AutomataData.h
         )

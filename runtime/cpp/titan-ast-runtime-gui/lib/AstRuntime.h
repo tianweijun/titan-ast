@@ -8,6 +8,9 @@
 #include <list>
 #include <map>
 #include <string>
+#include <mutex>
+#include <memory>
+#include <vector>
 #include "Runtime.h"
 
 enum class TokenType : int {
@@ -21,71 +24,19 @@ enum class GrammarType : int {
   NONTERMINAL = 2
 };
 
-enum class GrammarAction : int {
-  TEXT = 0,
-  SKIP = 1
-};
-
-class DLL_PUBLIC Grammar {
+class DLL_PUBLIC AstGrammar {
  public:
-  Grammar();
-  Grammar(std::string name, GrammarType type, GrammarAction action);
-  Grammar(const Grammar &grammar);
-  Grammar(Grammar &&grammar) noexcept;
-  Grammar &operator=(const Grammar &other);
-  ~Grammar();
-  bool compare(const Grammar &o) const;
-  bool equals(const Grammar &o) const;
+  AstGrammar();
+  AstGrammar(std::string name, GrammarType type);
+  AstGrammar(const AstGrammar &grammar);
+  AstGrammar(AstGrammar &&grammar) noexcept;
+  AstGrammar &operator=(const AstGrammar &other);
+  ~AstGrammar();
+  bool compare(const AstGrammar &o) const;
+  bool equals(const AstGrammar &o) const;
 
   std::string name;
   GrammarType type;
-  GrammarAction action;
-};
-
-enum class LookaheadMatchingMode : int {
-  GREEDINESS = 0,
-  LAZINESS = 1,
-  ACCEPT_WHEN_FIRST_ARRIVE_AT_TERMINAL_STATE = 2
-};
-
-class DLL_PUBLIC TerminalGrammar : public Grammar{
- public :
-  TerminalGrammar();
-  TerminalGrammar(std::string name, GrammarType type, GrammarAction action);
-  TerminalGrammar(const TerminalGrammar &grammar);
-  TerminalGrammar(TerminalGrammar &&grammar) noexcept;
-  TerminalGrammar &operator=(const TerminalGrammar &other);
-  ~TerminalGrammar();
-
-  LookaheadMatchingMode lookaheadMatchingMode;
-
-};
-
-class DLL_PUBLIC NonterminaltGrammar : public Grammar{
- public :
-  NonterminaltGrammar();
-  NonterminaltGrammar(std::string name, GrammarType type, GrammarAction action);
-  NonterminaltGrammar(const NonterminaltGrammar &grammar);
-  NonterminaltGrammar(NonterminaltGrammar &&grammar) noexcept;
-  NonterminaltGrammar &operator=(const NonterminaltGrammar &other);
-  ~NonterminaltGrammar();
-
-};
-
-class DLL_PUBLIC Token {
- public:
-  Token();
-  Token(Grammar terminal, int start, std::string text, TokenType type);
-  Token(const Token &token);
-  Token(Token &&token) noexcept;
-  Token &operator=(const Token &other);
-  ~Token() = default;
-  const Token *clone() const;
-
-  Grammar terminal;
-  int start;
-  std::string text;
-  TokenType type;
 };
 
 class DLL_PUBLIC AstToken {
@@ -104,16 +55,15 @@ class DLL_PUBLIC AstToken {
 
 class DLL_PUBLIC Ast {
  public:
-  explicit Ast(Grammar grammar);
-  Ast(Grammar grammar, std::string alias);
-  explicit Ast(const Token &token);
+  explicit Ast(AstGrammar grammar);
+  Ast(AstGrammar grammar, std::string alias);
   Ast(const Ast &ast) = delete;
   Ast(const Ast &&ast) = delete;
   ~Ast();
 
   std::string toString() const;
 
-  Grammar grammar;
+  AstGrammar grammar;
   std::string alias;
   // grammar.type == GrammarType.TERMINAL
   AstToken token;
@@ -130,11 +80,14 @@ class DLL_PUBLIC RuntimeAutomataAstApplication {
   void setContext(const std::string *automataFilePath);
   const Ast *buildAst(const std::string *sourceCodeFilePath);
   RuntimeAutomataAstApplication *clone();
-
-  const std::list<Ast *> *buildAsts(const std::string *sourceCodeFilePath);
+  std::vector<AstGrammar> getGrammars();
 
  private:
-  const void *persistentAutomataAstApplication;
+  std::shared_ptr<RuntimeAutomataAstApplication> automataData;
+  void *tokenAutomata;
+  void *astAutomata;
+
+  static std::mutex cloneLock;
 };
 
 

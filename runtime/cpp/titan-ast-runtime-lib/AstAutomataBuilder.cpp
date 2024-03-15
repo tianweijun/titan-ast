@@ -6,22 +6,22 @@
 #include "BacktrackingBottomUpAstAutomata.h"
 #include "FollowFilterBacktrackingBottomUpAstAutomata.h"
 
-AstAutomata *AstAutomataBuilder::build(PersistentObject *ptrPersistentObject) {
+AstAutomata *AstAutomataBuilder::build(AutomataData *automataData) {
   AstAutomata *astAutomata = nullptr;
-  switch (ptrPersistentObject->astAutomataType) {
+  switch (automataData->astAutomataType) {
   case AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
     astAutomata = new BacktrackingBottomUpAstAutomata(
-        ptrPersistentObject->astDfa, ptrPersistentObject->startGrammar,
-        ptrPersistentObject->persistentData->grammars,
-        ptrPersistentObject->persistentData->sizeOfGramamrs);
+        automataData->astDfa, automataData->startGrammar,
+        automataData->grammars,
+        automataData->sizeOfGramamrs);
     break;
   case AstAutomataType::FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
     astAutomata = new FollowFilterBacktrackingBottomUpAstAutomata(
-        ptrPersistentObject->astDfa, ptrPersistentObject->startGrammar,
-        ptrPersistentObject->persistentData->grammars,
-        ptrPersistentObject->persistentData->sizeOfGramamrs,
-        ptrPersistentObject->nonterminalFollowMap,
-        ptrPersistentObject->eofGrammar);
+        automataData->astDfa, automataData->startGrammar,
+        automataData->grammars,
+        automataData->sizeOfGramamrs,
+        automataData->nonterminalFollowMap,
+        automataData->eofGrammar);
     break;
   }
   return astAutomata;

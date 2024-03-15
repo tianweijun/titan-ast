@@ -7,11 +7,14 @@ use crate::{
 
 #[derive(Clone)]
 pub(crate) struct PersistentObject {
+    //matadata
     pub(crate) persistent_data: PersistentData,
+    //token dfa
     pub(crate) key_word_automata: KeyWordAutomata,
     pub(crate) token_dfa: TokenDfa,
+    //ast dfa
     pub(crate) ast_automata_type: AstAutomataType,
-    pub(crate) start_grammar: Grammar,
+    pub(crate) start_grammar: usize,
     pub(crate) ast_dfa: SyntaxDfa,
     pub(crate) eof_grammar: Grammar,
     pub(crate) nonterminal_follow_map: HashMap<usize, HashSet<usize>>,
@@ -44,7 +47,7 @@ impl PersistentObject {
     }
 
     fn init_follow_filter_backtracking_bottom_up_ast_automata(&mut self) {
-        self.start_grammar = self.persistent_data.get_grammar_by_input_stream();
+        self.start_grammar = self.persistent_data.get_index_of_grammar_by_input_stream();
         self.init_ast_dfa();
 
         self.eof_grammar = self.persistent_data.get_grammar_by_input_stream();
@@ -54,7 +57,7 @@ impl PersistentObject {
     }
 
     fn init_backtracking_bottom_up_ast_automata(&mut self) {
-        self.start_grammar = self.persistent_data.get_grammar_by_input_stream();
+        self.start_grammar = self.persistent_data.get_index_of_grammar_by_input_stream();
         self.init_ast_dfa();
     }
 
@@ -94,7 +97,7 @@ impl Default for PersistentObject {
             key_word_automata: Default::default(),
             token_dfa: Default::default(),
             ast_automata_type: AstAutomataType::BacktrackingBottomUpAstAutomata,
-            start_grammar: Default::default(),
+            start_grammar: 0,
             ast_dfa: Default::default(),
             eof_grammar: Default::default(),
             nonterminal_follow_map: Default::default(),

@@ -7,15 +7,13 @@ package titan.ast.runtime;
  */
 public class NonterminaltGrammar extends Grammar {
 
-  public NonterminaltGrammar() {
+  public NonterminaltGrammar(int index) {
+    super(index);
     this.type = GrammarType.NONTERMINAL;
   }
 
   @Override
   public int compareTo(Grammar that) {
-    if (type != that.type) {
-      return type.ordinal() - that.type.ordinal();
-    }
-    return name.compareTo(that.name);
+    return this.index - that.index;
   }
 }

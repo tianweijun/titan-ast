@@ -10,6 +10,7 @@
 #include "PersistentData.h"
 #include "SyntaxDfa.h"
 #include "TokenDfa.h"
+#include "AutomataData.h"
 
 class PersistentObject {
 public:
@@ -20,6 +21,8 @@ public:
   ~PersistentObject();
 
   void init();
+
+  void* setAutomataData(AutomataData* automataData) const;
 
 private:
   void initStringPool() const;

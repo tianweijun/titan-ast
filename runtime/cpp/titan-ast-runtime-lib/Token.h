@@ -7,10 +7,10 @@
 #include <string>
 
 #include "Grammar.h"
-#include "Runtime.h"
 #include "TokenType.h"
+#include "AstToken.h"
 
-class DLL_PUBLIC Token {
+class Token {
 public:
   Token();
   Token(Grammar terminal, int start, std::string text, TokenType type);
@@ -19,6 +19,7 @@ public:
   Token &operator=(const Token &other);
   ~Token() = default;
   const Token *clone() const;
+  AstToken toAstToken() const;
 
   Grammar terminal;
   int start;

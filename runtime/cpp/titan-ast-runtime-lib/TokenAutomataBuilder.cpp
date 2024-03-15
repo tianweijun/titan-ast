@@ -7,9 +7,9 @@
 
 TokenAutomataBuilder::TokenAutomataBuilder() = default;
 
-TokenAutomata *TokenAutomataBuilder::build(PersistentObject *persistentObject) {
-  const KeyWordAutomata *keyWordAutomata = persistentObject->keyWordAutomata;
-  const TokenDfa *tokenDfa = persistentObject->tokenDfa;
+TokenAutomata *TokenAutomataBuilder::build(AutomataData *automataData) {
+  const KeyWordAutomata *keyWordAutomata = automataData->keyWordAutomata;
+  const TokenDfa *tokenDfa = automataData->tokenDfa;
   TokenAutomata *tokenAutomata = nullptr;
   if (keyWordAutomata->emptyOrNot == KeyWordAutomata::EMPTY) {
     tokenAutomata = new DfaTokenAutomata(tokenDfa);

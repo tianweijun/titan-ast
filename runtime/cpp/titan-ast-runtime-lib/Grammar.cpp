@@ -37,6 +37,7 @@ bool Grammar::compare(const Grammar &o) const {
 bool Grammar::equals(const Grammar &o) const {
   return type == o.type && name == o.name;
 }
+AstGrammar Grammar::toAstGrammar() const { return AstGrammar(this->name,this->type); }
 
 // ------------------TerminalGrammar----------------------
 

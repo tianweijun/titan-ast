@@ -1,6 +1,5 @@
 package titan.ast.runtime;
 
-
 /**
  * .
  *
@@ -8,10 +7,9 @@ package titan.ast.runtime;
  */
 public class TokenAutomataBuilder {
 
-
-  public TokenAutomata build(PersistentObject persistentObject) {
-    KeyWordAutomata keyWordAutomata = persistentObject.keyWordAutomata;
-    TokenDfa tokenDfa = persistentObject.tokenDfa;
+  public TokenAutomata build(AutomataData automataData) {
+    KeyWordAutomata keyWordAutomata = automataData.keyWordAutomata;
+    TokenDfa tokenDfa = automataData.tokenDfa;
     TokenAutomata tokenAutomata = null;
     if (keyWordAutomata.emptyOrNot == KeyWordAutomata.EMPTY) {
       tokenAutomata = new DfaTokenAutomata(tokenDfa);

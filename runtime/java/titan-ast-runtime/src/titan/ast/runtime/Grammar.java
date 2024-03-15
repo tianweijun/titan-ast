@@ -6,10 +6,14 @@ package titan.ast.runtime;
  * @author tian wei jun
  */
 public class Grammar implements Comparable<Grammar> {
-
+  int index;
   String name = "";
   GrammarType type = GrammarType.TERMINAL;
   GrammarAction action = GrammarAction.TEXT;
+
+  public Grammar(int index) {
+    this.index = index;
+  }
 
   public String getName() {
     return name;
@@ -28,11 +32,12 @@ public class Grammar implements Comparable<Grammar> {
     return name;
   }
 
+  public AstGrammar toAstGrammar() {
+    return new AstGrammar(name, type);
+  }
+
   @Override
   public int compareTo(Grammar that) {
-    if (type != that.type) {
-      return type.ordinal() - that.type.ordinal();
-    }
-    return name.compareTo(that.name);
+    return this.index - that.index;
   }
 }

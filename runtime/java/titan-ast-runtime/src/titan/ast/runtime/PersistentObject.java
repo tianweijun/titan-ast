@@ -88,4 +88,22 @@ public class PersistentObject {
   private void initStringPool() {
     persistentData.getStringPoolByInputStream();
   }
+
+  public AutomataData toAutomataData() {
+    AutomataData automataData = new AutomataData();
+    // meta data
+    automataData.stringPool = persistentData.stringPool;
+    automataData.grammars = persistentData.grammars;
+    automataData.productionRules = persistentData.productionRules;
+    // TokenAutomata
+    automataData.keyWordAutomata = keyWordAutomata;
+    automataData.tokenDfa = tokenDfa;
+    // AstAutomata
+    automataData.astAutomataType = astAutomataType;
+    automataData.startGrammar = startGrammar;
+    automataData.astDfa = astDfa;
+    automataData.eofGrammar = eofGrammar;
+    automataData.nonterminalFollowMap = nonterminalFollowMap;
+    return automataData;
+  }
 }

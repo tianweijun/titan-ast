@@ -44,7 +44,7 @@ public class AutomataTmpAst implements Comparable<AutomataTmpAst> {
 
   public Ast toAst() {
     Ast ast = new Ast();
-    ast.grammar = this.grammar;
+    ast.grammar = this.grammar.toAstGrammar();
     ast.alias = this.alias;
     if (null != this.token) {
       ast.token = new AstToken(this.token.start, this.token.text);
@@ -67,8 +67,8 @@ public class AutomataTmpAst implements Comparable<AutomataTmpAst> {
     }
     AutomataTmpAst tmpAst = (AutomataTmpAst) o;
     return grammar.equals(tmpAst.grammar)
-        && Objects.equals(alias, tmpAst.alias)
         && Objects.equals(token, tmpAst.token)
+        && Objects.equals(alias, tmpAst.alias)
         && children.equals(tmpAst.children);
   }
 

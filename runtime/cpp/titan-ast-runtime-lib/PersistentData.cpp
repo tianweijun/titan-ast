@@ -25,32 +25,7 @@ void PersistentData::init(const std::string *automataFilePath) {
 
 PersistentData::~PersistentData() {
   inputStream.close();
-
-  for (int i = 0; i < sizeOfProductionRules; i++) {
-    ProductionRule *productionRule = productionRules[i];
-    delete productionRule;
-    productionRule = nullptr;
-  }
-  delete[] productionRules;
-  productionRules = nullptr;
-
-  for (int i = 0; i < sizeOfGramamrs; i++) {
-    Grammar *grammar = grammars[i];
-    delete grammar;
-    grammar = nullptr;
-  }
-  delete[] grammars;
-  grammars = nullptr;
-
-  if (stringPool) {
-    for (int i = 0; i < sizeOfStringPool; i++) {
-      std::string *string = stringPool[i];
-      delete string;
-      string = nullptr;
-    }
-    delete[] stringPool;
-    stringPool = nullptr;
-  }
+  //other delete by AutomataData
 }
 
 void PersistentData::getProductionRulesByInputStream() {

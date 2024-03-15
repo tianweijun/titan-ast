@@ -1,5 +1,6 @@
 mod ast_automata;
 mod ast_automata_builder;
+mod automata_data;
 mod automata_tmp_ast;
 mod backtracking_bottom_up_ast_automata;
 mod byte_buffer;
@@ -10,7 +11,6 @@ mod fa;
 mod follow_filter_backtracking_bottom_up_ast_automata;
 mod key_word_automata;
 mod key_word_dfa_token_automata;
-mod persistent_ast_application;
 mod persistent_data;
 mod persistent_object;
 mod super_backtracking_bottom_up_ast_automata;
@@ -63,10 +63,7 @@ mod tests_in_lib {
         let source_code_file_path =
             String::from("D://github-pro/titan/titan-ast/test/c/helloworld.c");
 
-        let tokens = app
-            .persistent_automata_ast_application
-            .token_automata
-            .build_token(&source_code_file_path);
+        let tokens = app.token_automata.build_token(&source_code_file_path);
 
         match tokens {
             Ok(t) => {
@@ -86,51 +83,6 @@ mod tests_in_lib {
             }
             Err(err) => println!("{err}"),
         };
-    }
-
-    #[test]
-    fn load_c_persistent_data() {
-        let mut app = RuntimeAutomataAstApplication::default();
-
-        let automata_file_path = String::from("D:/github-pro/titan/titan-ast/test/c/automata.data");
-        let set_context_result = app.set_context(&automata_file_path);
-        if set_context_result.is_err() {
-            println!("{}", set_context_result.err().unwrap());
-            return;
-        }
-
-        assert_eq!(
-            app.persistent_automata_ast_application
-                .persistent_object
-                .persistent_data
-                .string_pool
-                .len(),
-            275
-        );
-        assert_eq!(
-            app.persistent_automata_ast_application
-                .persistent_object
-                .persistent_data
-                .grammars
-                .len(),
-            181
-        );
-        assert_eq!(
-            app.persistent_automata_ast_application
-                .persistent_object
-                .key_word_automata
-                .text_terminal_map
-                .len(),
-            58
-        );
-        assert_eq!(
-            app.persistent_automata_ast_application
-                .persistent_object
-                .nonterminal_follow_map
-                .len(),
-            88
-        );
-        assert_eq!(2, 2);
     }
 
     #[test]

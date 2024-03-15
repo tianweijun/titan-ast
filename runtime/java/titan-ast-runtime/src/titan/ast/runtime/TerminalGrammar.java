@@ -8,15 +8,13 @@ public class TerminalGrammar extends Grammar {
 
   public LookaheadMatchingMode lookaheadMatchingMode = LookaheadMatchingMode.GREEDINESS;
 
-  public TerminalGrammar() {
+  public TerminalGrammar(int index) {
+    super(index);
     this.type = GrammarType.TERMINAL;
   }
 
   @Override
   public int compareTo(Grammar that) {
-    if (type != that.type) {
-      return type.ordinal() - that.type.ordinal();
-    }
-    return name.compareTo(that.name);
+    return this.index - that.index;
   }
 }

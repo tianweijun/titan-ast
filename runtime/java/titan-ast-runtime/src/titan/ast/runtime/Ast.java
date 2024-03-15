@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author tian wei jun
  */
 public class Ast {
-  public Grammar grammar = null;
+  public AstGrammar grammar = null;
   public String alias = "";
   // grammar.type == GrammarType.TERMINAL
   public AstToken token = null;
@@ -18,13 +18,13 @@ public class Ast {
 
   public Ast() {}
 
-  public Ast(Grammar grammar, String alias) {
+  public Ast(AstGrammar grammar, String alias) {
     this.grammar = grammar;
     this.alias = alias;
   }
 
   public Ast(Token token) {
-    this.grammar = token.terminal;
+    this.grammar = token.terminal.toAstGrammar();
     this.token = new AstToken(token.start, token.text);
   }
 

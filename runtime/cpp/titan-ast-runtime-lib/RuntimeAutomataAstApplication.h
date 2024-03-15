@@ -5,9 +5,14 @@
 #ifndef AST__RUNTIME__RUNTIMEAUTOMATAASTAPPLICATION_H_
 #define AST__RUNTIME__RUNTIMEAUTOMATAASTAPPLICATION_H_
 #include "Ast.h"
-#include "PersistentAutomataAstApplication.h"
 #include "Runtime.h"
+#include "AutomataData.h"
+#include "TokenAutomata.h"
+#include "AstAutomata.h"
 #include <string>
+#include <memory>
+#include <mutex>
+#include <vector>
 
 class DLL_PUBLIC RuntimeAutomataAstApplication {
 public:
@@ -21,9 +26,14 @@ public:
   void setContext(const std::string *automataFilePath);
   const Ast *buildAst(const std::string *sourceCodeFilePath);
   RuntimeAutomataAstApplication *clone();
+  std::vector<AstGrammar> getGrammars();
 
 private:
-  const PersistentAutomataAstApplication *persistentAutomataAstApplication;
+  std::shared_ptr<AutomataData> automataData;
+  TokenAutomata *tokenAutomata;
+  AstAutomata *astAutomata;
+
+  static std::mutex cloneLock;
 };
 
 #endif // AST__RUNTIME__RUNTIMEAUTOMATAASTAPPLICATION_H_

@@ -6,26 +6,25 @@
 #define AST__RUNTIME__AST_H_
 
 #include "AstToken.h"
-#include "Grammar.h"
 #include "ProductionRule.h"
 #include "Runtime.h"
 #include "Token.h"
+#include "AstGrammar.h"
 #include <list>
 #include <map>
 #include <string>
 
 class DLL_PUBLIC Ast {
 public:
-  Ast(Grammar grammar);
-  Ast(Grammar grammar, std::string alias);
-  explicit Ast(const Token &token);
+  explicit Ast(AstGrammar grammar);
+  Ast(AstGrammar grammar, std::string alias);
   Ast(const Ast &ast) = delete;
   Ast(const Ast &&ast) = delete;
   ~Ast();
 
   std::string toString() const;
 
-  Grammar grammar;
+  AstGrammar grammar;
   std::string alias;
   // grammar.type == GrammarType.TERMINAL
   AstToken token;

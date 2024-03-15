@@ -5,13 +5,13 @@
 #ifndef AST_RUNTIME_RUNTIME_TOKENAUTOMATABUILDER_H_
 #define AST_RUNTIME_RUNTIME_TOKENAUTOMATABUILDER_H_
 
-#include "PersistentObject.h"
+#include "AutomataData.h"
 #include "TokenAutomata.h"
 
 class TokenAutomataBuilder {
 public:
   TokenAutomataBuilder();
-  TokenAutomata *build(PersistentObject *persistentObject);
+  TokenAutomata *build(AutomataData *automataData);
 };
 
 #endif // AST_RUNTIME_RUNTIME_TOKENAUTOMATABUILDER_H_

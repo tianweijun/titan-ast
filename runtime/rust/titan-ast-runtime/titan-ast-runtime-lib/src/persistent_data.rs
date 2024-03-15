@@ -66,6 +66,11 @@ impl PersistentData {
         return nonterminal_follow_map;
     }
 
+    pub(crate) fn get_index_of_grammar_by_input_stream(&mut self) -> usize {
+        let index_of_grammar = self.read_i32() as usize;
+        return index_of_grammar;
+    }
+
     pub(crate) fn get_grammar_by_input_stream(&mut self) -> Grammar {
         let index_of_grammar = self.read_i32() as usize;
         return self.grammars[index_of_grammar].clone();
@@ -203,7 +208,7 @@ impl PersistentData {
     pub(crate) fn get_grammars_by_input_stream(&mut self) {
         let size_of_grammars = self.read_i32() as usize;
         self.grammars = Vec::with_capacity(size_of_grammars);
-        for _ in 0..size_of_grammars {
+        for index_of_grammars in 0..size_of_grammars {
             let i32_type = self.read_i32();
             let grammar_type: GrammarType = i32_type.try_into().unwrap();
 
@@ -217,14 +222,24 @@ impl PersistentData {
                 GrammarType::Terminal => {
                     let i32_lookahead_matching_mode = self.read_i32();
                     let lookahead_matching_mode = i32_lookahead_matching_mode.try_into().unwrap();
-                    let grammar: TerminalGrammar =
-                        TerminalGrammar::new(name, grammar_type, action, lookahead_matching_mode);
-                    self.grammars.push(Grammar::TerminalGrammar(grammar));
+
+                    self.grammars
+                        .push(Grammar::TerminalGrammar(TerminalGrammar {
+                            index: index_of_grammars,
+                            name: name,
+                            type_: grammar_type,
+                            action: action,
+                            lookahead_matching_mode: lookahead_matching_mode,
+                        }));
                 }
                 GrammarType::Nonterminal => {
-                    let grammar: NonterminalGrammar =
-                        NonterminalGrammar::new(name, grammar_type, action);
-                    self.grammars.push(Grammar::NonterminalGrammar(grammar));
+                    self.grammars
+                        .push(Grammar::NonterminalGrammar(NonterminalGrammar {
+                            index: index_of_grammars,
+                            name: name,
+                            type_: grammar_type,
+                            action: action,
+                        }));
                 }
                 GrammarType::TerminalFragment => {}
             }

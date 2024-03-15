@@ -77,7 +77,7 @@ public class PersistentData {
     LookaheadMatchingMode[] lookaheadMatchingModes = LookaheadMatchingMode.values();
     for (int indexOfGrammar = 0; indexOfGrammar < sizeOfGramamrs; indexOfGrammar++) {
       GrammarType type = grammarTypes[readInt()];
-      Grammar grammar = generateGrammarByType(type);
+      Grammar grammar = generateGrammarByType(type, indexOfGrammar);
       grammar.name = stringPool[readInt()];
       grammar.action = grammarActions[readInt()];
       // lookaheadMatchingMode
@@ -91,14 +91,14 @@ public class PersistentData {
     return grammars;
   }
 
-  private Grammar generateGrammarByType(GrammarType type) {
+  private Grammar generateGrammarByType(GrammarType type, int indexOfGrammar) {
     Grammar grammar = null;
     switch (type) {
       case TERMINAL:
-        grammar = new TerminalGrammar();
+        grammar = new TerminalGrammar(indexOfGrammar);
         break;
       case NONTERMINAL:
-        grammar = new NonterminaltGrammar();
+        grammar = new NonterminaltGrammar(indexOfGrammar);
         break;
       case TERMINAL_FRAGMENT:
       default:

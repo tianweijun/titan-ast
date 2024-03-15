@@ -6,10 +6,10 @@
 #define AST__RUNTIME__GRAMMAR_H_
 #include "GrammarAction.h"
 #include "GrammarType.h"
-#include "Runtime.h"
+#include "AstGrammar.h"
 #include <string>
 
-class DLL_PUBLIC Grammar {
+class Grammar {
 public:
   Grammar();
   Grammar(std::string name, GrammarType type, GrammarAction action);
@@ -19,6 +19,7 @@ public:
   ~Grammar();
   bool compare(const Grammar &o) const;
   bool equals(const Grammar &o) const;
+  AstGrammar toAstGrammar() const;
 
   std::string name;
   GrammarType type;
@@ -30,7 +31,7 @@ enum class LookaheadMatchingMode : int {
   LAZINESS = 1
 };
 
-class DLL_PUBLIC TerminalGrammar : public Grammar {
+class TerminalGrammar : public Grammar {
 public:
   TerminalGrammar();
   TerminalGrammar(std::string name, GrammarType type, GrammarAction action);
@@ -42,7 +43,7 @@ public:
   LookaheadMatchingMode lookaheadMatchingMode;
 };
 
-class DLL_PUBLIC NonterminaltGrammar : public Grammar {
+class NonterminaltGrammar : public Grammar {
 public:
   NonterminaltGrammar();
   NonterminaltGrammar(std::string name, GrammarType type, GrammarAction action);

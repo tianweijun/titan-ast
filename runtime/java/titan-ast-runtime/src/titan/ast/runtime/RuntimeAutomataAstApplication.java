@@ -2,6 +2,7 @@ package titan.ast.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * RuntimeAutomataAstApplication.
@@ -9,35 +10,34 @@ import java.io.InputStream;
  * @author tian wei jun
  */
 public class RuntimeAutomataAstApplication implements Cloneable {
-  PersistentAutomataAstApplication persistentAutomataAstApplication;
-
-  public Grammar[] getGrammars() {
-    Grammar[] oriGrammars =
-        persistentAutomataAstApplication.persistentObject.persistentData.grammars;
-    Grammar[] grammars = new Grammar[oriGrammars.length];
-    System.arraycopy(oriGrammars, 0, grammars, 0, oriGrammars.length);
-    return grammars;
-  }
+  AutomataData automataData;
+  TokenAutomata tokenAutomata;
+  AstAutomata astAutomata;
 
   public Ast buildAst(String sourceFilePath) {
-    return persistentAutomataAstApplication.buildAst(sourceFilePath);
+    List<Token> tokens = tokenAutomata.buildToken(sourceFilePath);
+    return astAutomata.buildAst(tokens);
   }
 
   public Ast buildAst(InputStream sourceByteInputStream) {
-    Ast ast = persistentAutomataAstApplication.buildAst(sourceByteInputStream);
-    if (null != sourceByteInputStream) {
-      try {
-        sourceByteInputStream.close();
-      } catch (Exception e) {
-        throw new AstRuntimeException(e);
-      }
+    List<Token> tokens = tokenAutomata.buildToken(sourceByteInputStream);
+    return astAutomata.buildAst(tokens);
+  }
+
+  public AstGrammar[] getGrammars() {
+    Grammar[] oriGrammars = automataData.grammars;
+    AstGrammar[] grammars = new AstGrammar[oriGrammars.length];
+    for (int indexOfGrammar = 0; indexOfGrammar < oriGrammars.length; indexOfGrammar++) {
+      Grammar oriGrammar = oriGrammars[indexOfGrammar];
+      grammars[indexOfGrammar] = new AstGrammar(oriGrammar.name, oriGrammar.type);
     }
-    return ast;
+    return grammars;
   }
 
   public void setContext(InputStream automataByteInputStream) {
-    persistentAutomataAstApplication =
-        new PersistentAutomataAstApplication(automataByteInputStream);
+    PersistentData persistentData = new PersistentData(automataByteInputStream);
+    AutomataData automataData = buildAutomataData(persistentData);
+    setContext(automataData);
     if (null != automataByteInputStream) {
       try {
         automataByteInputStream.close();
@@ -48,7 +48,21 @@ public class RuntimeAutomataAstApplication implements Cloneable {
   }
 
   public void setContext(String automataFilePath) {
-    persistentAutomataAstApplication = new PersistentAutomataAstApplication(automataFilePath);
+    PersistentData persistentData = new PersistentData(automataFilePath);
+    AutomataData automataData = buildAutomataData(persistentData);
+    setContext(automataData);
+  }
+
+  public void setContext(AutomataData automataData) {
+    this.setAutomataData(automataData);
+    tokenAutomata = new TokenAutomataBuilder().build(automataData);
+    astAutomata = new AstAutomataBuilder().build(automataData);
+  }
+
+  private AutomataData buildAutomataData(PersistentData persistentData) {
+    PersistentObject persistentObject = new PersistentObject(persistentData);
+    AutomataData automataData = persistentObject.toAutomataData();
+    return automataData;
   }
 
   public void displayGraphicalViewOfAst(Ast ast) {
@@ -62,7 +76,10 @@ public class RuntimeAutomataAstApplication implements Cloneable {
     } catch (CloneNotSupportedException e) {
       throw new AstRuntimeException(e);
     }
-    app.persistentAutomataAstApplication = this.persistentAutomataAstApplication.clone();
     return app;
+  }
+
+  public void setAutomataData(AutomataData automataData) {
+    this.automataData = automataData;
   }
 }

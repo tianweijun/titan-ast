@@ -10,7 +10,7 @@ import java.io.InputStream;
  */
 public class ByteBufferedInputStream {
   private static final int STANDARD_BUFFER_CAPACITY = 512;
-  private final int eof = -1;
+  private static final int EOF = -1;
 
   public int nextReadIndex = 0;
 
@@ -55,7 +55,7 @@ public class ByteBufferedInputStream {
       fillBuffer();
       return read();
     }
-    return eof;
+    return EOF;
   }
 
   private void fillBuffer() { // nextPos >= limit
@@ -110,7 +110,7 @@ public class ByteBufferedInputStream {
     } else { // 还有可用数据
       limitOfInvalidData = nextPos;
     }
-    mark = eof;
+    mark = EOF;
   }
 
   public void mark() {
@@ -125,7 +125,7 @@ public class ByteBufferedInputStream {
       close();
       throw new AstRuntimeException(e);
     }
-    if (countOfRead == eof) {
+    if (countOfRead == EOF) {
       isReadAllFromFile = true;
     }
     return Math.max(countOfRead, 0);

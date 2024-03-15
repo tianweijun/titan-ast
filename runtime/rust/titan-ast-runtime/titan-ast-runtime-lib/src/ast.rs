@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum GrammarAction {
+pub(crate) enum GrammarAction {
     Text = 0,
     Skip = 1,
 }
@@ -15,28 +15,30 @@ pub enum GrammarType {
 }
 
 #[derive(Debug, Clone)]
-pub struct NonterminalGrammar {
-    pub name: String,
-    pub type_: GrammarType,
-    pub action: GrammarAction,
+pub(crate) struct NonterminalGrammar {
+    pub(crate) index: usize,
+    pub(crate) name: String,
+    pub(crate) type_: GrammarType,
+    pub(crate) action: GrammarAction,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum LookaheadMatchingMode {
+pub(crate) enum LookaheadMatchingMode {
     Greediness = 0,
     Laziness = 1,
 }
 
 #[derive(Debug, Clone)]
-pub struct TerminalGrammar {
-    pub name: String,
-    pub type_: GrammarType,
-    pub action: GrammarAction,
-    pub lookahead_matching_mode: LookaheadMatchingMode,
+pub(crate) struct TerminalGrammar {
+    pub(crate) index: usize,
+    pub(crate) name: String,
+    pub(crate) type_: GrammarType,
+    pub(crate) action: GrammarAction,
+    pub(crate) lookahead_matching_mode: LookaheadMatchingMode,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Grammar {
+pub(crate) enum Grammar {
     TerminalGrammar(TerminalGrammar),
     NonterminalGrammar(NonterminalGrammar),
 }
@@ -48,7 +50,7 @@ pub struct AstToken {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub enum TokenType {
+pub(crate) enum TokenType {
     Text = 0,
     Skip = 1,
 }
@@ -68,15 +70,15 @@ pub struct TokenData {
 }
 
 #[derive(Debug, Clone)]
-pub struct Token {
-    pub start: usize,
-    pub data: TokenData,
-    pub terminal: Grammar,
-    pub type_: TokenType,
+pub(crate) struct Token {
+    pub(crate) start: usize,
+    pub(crate) data: TokenData,
+    pub(crate) terminal: Grammar,
+    pub(crate) type_: TokenType,
 }
 
 impl Grammar {
-    pub fn is_greediness(&self) -> bool {
+    pub(crate) fn is_greediness(&self) -> bool {
         return match self {
             Grammar::TerminalGrammar(terminal) => {
                 terminal.lookahead_matching_mode == LookaheadMatchingMode::Greediness
@@ -85,17 +87,36 @@ impl Grammar {
         };
     }
 
-    pub fn get_action(&self) -> GrammarAction {
+    pub(crate) fn get_action(&self) -> GrammarAction {
         match self {
             Grammar::TerminalGrammar(terminal) => terminal.action.clone(),
             Grammar::NonterminalGrammar(nonterminal) => nonterminal.action.clone(),
         }
     }
+
+    pub(crate) fn get_ast_grammar(&self) -> AstGrammar {
+        match self {
+            Grammar::TerminalGrammar(terminal) => AstGrammar {
+                name: terminal.name.clone(),
+                type_: terminal.type_.clone(),
+            },
+            Grammar::NonterminalGrammar(nonterminal) => AstGrammar {
+                name: nonterminal.name.clone(),
+                type_: nonterminal.type_.clone(),
+            },
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AstGrammar {
+    pub name: String,
+    pub type_: GrammarType,
 }
 
 #[derive(Debug, Clone)]
 pub struct Ast {
-    pub grammar: Grammar,
+    pub grammar: AstGrammar,
     pub alias: Option<String>,
     pub token: Option<AstToken>,
     pub children: Vec<Ast>,
@@ -112,31 +133,25 @@ impl Default for Ast {
     }
 }
 
+impl Default for AstGrammar {
+    fn default() -> Self {
+        Self {
+            name: "".to_string(),
+            type_: GrammarType::Terminal,
+        }
+    }
+}
+
 impl Default for Grammar {
     fn default() -> Self {
         Grammar::TerminalGrammar(Default::default())
     }
 }
 
-impl TerminalGrammar {
-    pub fn new(
-        name: String,
-        type_: GrammarType,
-        action: GrammarAction,
-        lookahead_matching_mode: LookaheadMatchingMode,
-    ) -> TerminalGrammar {
-        return TerminalGrammar {
-            name,
-            type_,
-            action,
-            lookahead_matching_mode,
-        };
-    }
-}
-
 impl Default for TerminalGrammar {
     fn default() -> Self {
         Self {
+            index: 0,
             name: Default::default(),
             type_: GrammarType::Terminal,
             action: GrammarAction::Skip,
@@ -145,19 +160,10 @@ impl Default for TerminalGrammar {
     }
 }
 
-impl NonterminalGrammar {
-    pub fn new(name: String, type_: GrammarType, action: GrammarAction) -> Self {
-        return NonterminalGrammar {
-            name,
-            type_,
-            action,
-        };
-    }
-}
-
 impl Default for NonterminalGrammar {
     fn default() -> Self {
         Self {
+            index: 0,
             name: Default::default(),
             type_: GrammarType::Nonterminal,
             action: GrammarAction::Skip,
@@ -167,25 +173,25 @@ impl Default for NonterminalGrammar {
 
 impl PartialEq for TerminalGrammar {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
+        self.index == other.index
     }
 }
 impl Eq for TerminalGrammar {}
 impl Hash for TerminalGrammar {
     fn hash<H: Hasher>(&self, hasher: &mut H) {
-        self.name.hash(hasher);
+        self.index.hash(hasher);
     }
 }
 
 impl PartialEq for NonterminalGrammar {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
+        self.index == other.index
     }
 }
 impl Eq for NonterminalGrammar {}
 impl Hash for NonterminalGrammar {
     fn hash<H: Hasher>(&self, hasher: &mut H) {
-        self.name.hash(hasher);
+        self.index.hash(hasher);
     }
 }
 

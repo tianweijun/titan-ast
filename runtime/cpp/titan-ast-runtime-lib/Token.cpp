@@ -21,3 +21,5 @@ const Token *Token::clone() const {
   auto *token = new Token(this->terminal, this->start, this->text, this->type);
   return token;
 }
+
+AstToken Token::toAstToken() const { return AstToken(this->start,this->text); }

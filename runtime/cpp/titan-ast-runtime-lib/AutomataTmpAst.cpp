@@ -34,7 +34,7 @@ const AutomataTmpAst *AutomataTmpAst::clone() const {
 }
 
 Ast *AutomataTmpAst::toAst() const {
-  Ast *ast = new Ast(*this->grammar);
+  Ast *ast = new Ast(this->grammar->toAstGrammar());
   if (this->alias) {
     ast->alias = *this->alias;
   }

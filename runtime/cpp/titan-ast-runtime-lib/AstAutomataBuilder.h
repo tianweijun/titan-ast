@@ -6,10 +6,10 @@
 #define TITAN_AST_RUNTIME_RUNTIME_ASTAUTOMATABUILDER_H_
 
 #include "AstAutomata.h"
-#include "PersistentObject.h"
+#include "AutomataData.h"
 class AstAutomataBuilder {
 public:
-  AstAutomata *build(PersistentObject *ptrPersistentObject);
+  AstAutomata *build(AutomataData *automataData);
 };
 
 #endif // TITAN_AST_RUNTIME_RUNTIME_ASTAUTOMATABUILDER_H_

@@ -25,28 +25,8 @@ void PersistentObject::initByPersistentData(PersistentData *persistentData) {
 }
 
 PersistentObject::~PersistentObject() {
-  delete astDfa;
-  astDfa = nullptr;
-
-  if (nullptr != nonterminalFollowMap) {
-    for (auto iter = nonterminalFollowMap->begin();
-         iter != nonterminalFollowMap->end(); iter++) {
-      auto follows = iter->second;
-      delete follows;
-    }
-  }
-  delete nonterminalFollowMap;
-  nonterminalFollowMap = nullptr;
-
-  delete tokenDfa;
-  tokenDfa = nullptr;
-
-  delete keyWordAutomata;
-  keyWordAutomata = nullptr;
-
-  delete persistentData;
-  persistentData = nullptr;
-  // startGrammar delete by persistentData.grammars
+  // persistentData delete by initByPersistentData caller
+  //other delete by AutomataData
 }
 
 void PersistentObject::init() {
@@ -122,4 +102,27 @@ void PersistentObject::initGrammars() const {
 
 void PersistentObject::initStringPool() const {
   persistentData->getStringPoolByInputStream();
+}
+
+/**
+ * all heap data is moved
+ */
+void* PersistentObject::setAutomataData(AutomataData* automataData) const {
+  //matadata
+  automataData->stringPool = this->persistentData->stringPool;
+  automataData->sizeOfStringPool = this->persistentData->sizeOfStringPool;
+  automataData->grammars = this->persistentData->grammars;
+  automataData->sizeOfGramamrs = this->persistentData->sizeOfGramamrs;
+  automataData->productionRules = this->persistentData->productionRules;
+  automataData->sizeOfProductionRules = this->persistentData->sizeOfProductionRules;
+  //token dfa
+  automataData->keyWordAutomata = keyWordAutomata;
+  automataData->tokenDfa = tokenDfa;
+  //ast dfa
+  automataData->astAutomataType = astAutomataType;
+  automataData->astDfa = astDfa;
+  automataData->startGrammar = startGrammar;
+
+  automataData->eofGrammar = eofGrammar;
+  automataData->nonterminalFollowMap = nonterminalFollowMap;
 }

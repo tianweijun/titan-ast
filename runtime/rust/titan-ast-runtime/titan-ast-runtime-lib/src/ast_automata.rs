@@ -27,6 +27,12 @@ pub(crate) enum AstAutomataType {
     FollowFilterBacktrackingBottomUpAstAutomata = 1,
 }
 
+impl Default for AstAutomataType {
+    fn default() -> Self {
+        Self::BacktrackingBottomUpAstAutomata
+    }
+}
+
 impl TryFrom<i32> for AstAutomataType {
     type Error = ();
 

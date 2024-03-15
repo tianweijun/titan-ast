@@ -22,7 +22,7 @@ pub(crate) struct SuperDfaTokenAutomata {
 
 impl TokenBuilder for SuperDfaTokenAutomata {
     fn build_token(&mut self, source_code_file_path: &String) -> Result<Vec<Token>, AstAppError> {
-        let mut tokens = self.build_token(source_code_file_path)?;
+        let mut tokens = self.do_build_token(source_code_file_path)?;
         match &self.sub_dfa_token_automata {
             SubDfaTokenAutomata::DfaTokenAutomata(_) => Ok(tokens),
             SubDfaTokenAutomata::KeyWordDfaTokenAutomata(key_word_dfa_token_automata) => {
@@ -34,7 +34,10 @@ impl TokenBuilder for SuperDfaTokenAutomata {
 }
 
 impl SuperDfaTokenAutomata {
-    fn build_token(&mut self, source_code_file_path: &String) -> Result<Vec<Token>, AstAppError> {
+    fn do_build_token(
+        &mut self,
+        source_code_file_path: &String,
+    ) -> Result<Vec<Token>, AstAppError> {
         //init
         self.byte_buffered_input_stream
             .init(source_code_file_path)?;
