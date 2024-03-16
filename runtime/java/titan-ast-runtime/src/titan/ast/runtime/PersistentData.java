@@ -22,7 +22,6 @@ public class PersistentData {
   ProductionRule[] productionRules;
 
   ByteBuffer intByteBuffer = ByteBuffer.allocate(4);
-  int syntaxDfaStateId = 0;
 
   public PersistentData() {
     intByteBuffer.order(ByteOrder.BIG_ENDIAN);
@@ -201,7 +200,7 @@ public class PersistentData {
     for (int indexOfSyntaxDfaState = 0;
         indexOfSyntaxDfaState < sizeOfSyntaxDfaStates;
         indexOfSyntaxDfaState++) {
-      syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState(++syntaxDfaStateId);
+      syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState(indexOfSyntaxDfaState);
     }
     // countOfSyntaxDfaStates-(type-countOfEdges-[ch,dest]{countOfEdges}-countOfProductions-productions)
     for (int indexOfSyntaxDfaState = 0;

@@ -4,7 +4,7 @@ use std::hash::{Hash, Hasher};
 use crate::ast::Grammar;
 #[derive(Clone)]
 pub(crate) struct SyntaxDfaState {
-    pub(crate) id: usize,
+    pub(crate) index: usize,
     pub(crate) type_: i32,
     pub(crate) edges: HashMap<usize, usize>,
     pub(crate) closing_production_rules: Vec<usize>,
@@ -12,13 +12,13 @@ pub(crate) struct SyntaxDfaState {
 
 impl PartialEq for SyntaxDfaState {
     fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
+        self.index == other.index
     }
 }
 impl Eq for SyntaxDfaState {}
 impl Hash for SyntaxDfaState {
     fn hash<H: Hasher>(&self, hasher: &mut H) {
-        self.id.hash(hasher);
+        self.index.hash(hasher);
     }
 }
 
@@ -56,7 +56,7 @@ impl Default for ProductionRule {
 impl From<SyntaxDfa> for ReducingSyntaxDfa {
     fn from(value: SyntaxDfa) -> Self {
         Self {
-            states: value.states.clone(),
+            states: value.states,
         }
     }
 }

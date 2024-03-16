@@ -9,7 +9,7 @@
 PersistentData::PersistentData(const std::string *automataFilePath)
     : intByteBuffer(ByteBuffer(4, true)), stringPool(nullptr),
       sizeOfStringPool(0), grammars(nullptr), sizeOfGramamrs(0),
-      productionRules(nullptr), sizeOfProductionRules(0),syntaxDfaStateId(0) {
+      productionRules(nullptr), sizeOfProductionRules(0) {
   init(automataFilePath);
 }
 
@@ -58,7 +58,7 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
   auto **syntaxDfaStates = new SyntaxDfaState *[sizeOfSyntaxDfaStates];
   for (int indexOfSyntaxDfaState = 0;
        indexOfSyntaxDfaState < sizeOfSyntaxDfaStates; indexOfSyntaxDfaState++) {
-    syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState(++syntaxDfaStateId);
+    syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState(indexOfSyntaxDfaState);
   }
   // countOfSyntaxDfaStates-(type-countOfEdges-[ch,dest]{countOfEdges}-countOfProductions-productions)
   for (int indexOfSyntaxDfaState = 0;
@@ -158,7 +158,7 @@ Grammar **PersistentData::getGrammarsByInputStream() {
   for (int indexOfGrammar = 0; indexOfGrammar < _sizeOfGramamrs;
        indexOfGrammar++) {
     auto type = GrammarType(readInt());
-    auto *grammar = newGrammarByType(type);
+    auto *grammar = newGrammarByType(type,indexOfGrammar);
     grammar->name = *(stringPool[readInt()]);
     grammar->action = GrammarAction(readInt());
     if (type == GrammarType::TERMINAL) {
@@ -172,14 +172,14 @@ Grammar **PersistentData::getGrammarsByInputStream() {
   return heapGrammars;
 }
 
-Grammar *PersistentData::newGrammarByType(GrammarType type) {
+Grammar *PersistentData::newGrammarByType(GrammarType type,int indexOfGrammar) {
   Grammar *grammar = nullptr;
   switch (type) {
   case GrammarType::TERMINAL:
-    grammar = new TerminalGrammar();
+    grammar = new TerminalGrammar(indexOfGrammar);
     break;
   case GrammarType::NONTERMINAL:
-    grammar = new NonterminaltGrammar();
+    grammar = new NonterminaltGrammar(indexOfGrammar);
     break;
   case GrammarType::TERMINAL_FRAGMENT:
   default:
@@ -230,25 +230,25 @@ AstAutomataType PersistentData::getAstAutomataTypeByInputStream() {
   return type;
 }
 
-std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
-         PtrGrammarCompare> *
+std::map<const Grammar *, std::set<const Grammar *, PtrGrammarContentCompare> *,
+         PtrGrammarContentCompare> *
 PersistentData::getNonterminalFollowMapByInputStream() {
   int size = readInt();
   auto *nonterminalFollowMap =
       new std::map<const Grammar *,
-                   std::set<const Grammar *, PtrGrammarCompare> *,
-                   PtrGrammarCompare>();
+                   std::set<const Grammar *, PtrGrammarContentCompare> *,
+                   PtrGrammarContentCompare>();
   for (int indexOfNonterminal = 0; indexOfNonterminal < size;
        indexOfNonterminal++) {
     Grammar *nonterminal = getGrammarByInputStream();
 
     int sizeOfFollow = readInt();
-    auto follow = new std::set<const Grammar *, PtrGrammarCompare>();
+    auto follow = new std::set<const Grammar *, PtrGrammarContentCompare>();
     for (int indexOfFollow = 0; indexOfFollow < sizeOfFollow; indexOfFollow++) {
       follow->insert(getGrammarByInputStream());
     }
 
-    std::pair<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *>
+    std::pair<const Grammar *, std::set<const Grammar *, PtrGrammarContentCompare> *>
         pair(nonterminal, follow);
     nonterminalFollowMap->insert(pair);
   }

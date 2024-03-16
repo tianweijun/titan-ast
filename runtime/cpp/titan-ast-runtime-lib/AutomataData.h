@@ -37,8 +37,8 @@ public:
 
   const Grammar *eofGrammar;
   const std::map<const Grammar *,
-                 std::set<const Grammar *, PtrGrammarCompare> *,
-                 PtrGrammarCompare> *nonterminalFollowMap;
+                 std::set<const Grammar *, PtrGrammarContentCompare> *,
+                 PtrGrammarContentCompare> *nonterminalFollowMap;
 };
 
 #endif // TITAN_AST_RUNTIME_RUNTIME_AUTOMATADATA_H_

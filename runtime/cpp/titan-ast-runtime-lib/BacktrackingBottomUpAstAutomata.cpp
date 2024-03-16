@@ -11,16 +11,6 @@
 #include <sstream>
 #include <string>
 
-size_t BacktrackingBottomUpHash::operator()(
-    const BacktrackingBottomUpBranch *t) const {
-  return t->hashCode();
-}
-
-bool BacktrackingBottomUpEqual::operator()(
-    const BacktrackingBottomUpBranch *t1,
-    const BacktrackingBottomUpBranch *t2) const {
-  return t1->equals(t2);
-}
 
 bool BacktrackingBottomUpCompare::operator()(
     const BacktrackingBottomUpBranch *t1,
@@ -328,54 +318,53 @@ bool BacktrackingBottomUpAstAutomata::addNewBacktrackingBottomUpBranch(
   }
   return hasInsert;
 }
+
+/**
+ * 错误信息最开始处，错误信息所有可能的范围.
+ * @return error info
+ */
 std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
   auto sizeOfTokens = tokenReducingSymbolInputStream.sizeOfTokenReducingSymbols;
-  int indexOfLastToken = sizeOfTokens <= 0 ? 0 : sizeOfTokens - 1;
+  if (sizeOfTokens <= 0) {
+    return "";
+  }
+  int indexOfLastToken = sizeOfTokens - 1;
 
   int startIndexOfToken = indexOfLastToken;
   int endIndexOfToken = 0;
   for (auto branch : triedBottomUpBranchs) {
     int lastIndexOfBranch = branch->reducingSymbols.back()->endIndexOfToken;
-    if (startIndexOfToken > lastIndexOfBranch) {
+    if (startIndexOfToken > lastIndexOfBranch) { // 错误开始处尽量小
       startIndexOfToken = lastIndexOfBranch;
     }
-    if (endIndexOfToken < lastIndexOfBranch) {
+    if (endIndexOfToken < lastIndexOfBranch) { // 错误结束处尽量大
       endIndexOfToken = lastIndexOfBranch;
     }
   }
-  if (startIndexOfToken == indexOfLastToken || startIndexOfToken < 0) {
-    startIndexOfToken = 0;
-  }
-  if (endIndexOfToken == 0) {
-    endIndexOfToken = indexOfLastToken > 1 ? 1 : indexOfLastToken;
-  } else {
-    if (endIndexOfToken + 1 < indexOfLastToken) {
-      endIndexOfToken += 1;
-    }
+
+  if (endIndexOfToken + 1 <=
+      indexOfLastToken) { // 如果还有下一个token，将他加入过来，错误信息必须涵盖可能的位置。
+    endIndexOfToken += 1;
   }
 
   int startIndexByte = 0;
   int endIndexByte = 0;
 
   std::stringstream tokenInfo;
-  if (sizeOfTokens > 0) {
-    auto tokenReducingSymbols =
-        tokenReducingSymbolInputStream.tokenReducingSymbols;
-    AutomataTmpToken *startToken = &tokenReducingSymbols[startIndexOfToken];
-    AutomataTmpToken *endToken = &tokenReducingSymbols[endIndexOfToken];
-    startIndexByte = startToken->start;
-    endIndexByte = endToken->start + endToken->text->length();
+  auto tokenReducingSymbols =
+      tokenReducingSymbolInputStream.tokenReducingSymbols;
+  AutomataTmpToken *startToken = &tokenReducingSymbols[startIndexOfToken];
+  AutomataTmpToken *endToken = &tokenReducingSymbols[endIndexOfToken];
+  startIndexByte = startToken->start;
+  endIndexByte = endToken->start + (int)endToken->text->length();
 
-    for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken;
-         indexOfToken++) {
-      AutomataTmpToken *token = &tokenReducingSymbols[indexOfToken];
-      tokenInfo << *(token->text) << " ";
-    }
+  for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken;
+       indexOfToken++) {
+    AutomataTmpToken *token = &tokenReducingSymbols[indexOfToken];
+    tokenInfo << *(token->text) << " ";
   }
   auto strTokenInfo = tokenInfo.str();
-  if (!strTokenInfo.empty()) {
-    strTokenInfo.pop_back();
-  }
+  strTokenInfo.pop_back();
 
   std::stringstream errorInfo;
   errorInfo << "generate ast failed,error near [" << startIndexByte << ","

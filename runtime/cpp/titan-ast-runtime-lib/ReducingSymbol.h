@@ -17,9 +17,7 @@ public:
   ~ReducingSymbol();
 
   // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
-  bool compare(const ReducingSymbol *o) const;
-  // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
-  bool equals(const ReducingSymbol *o) const;
+  int compare(const ReducingSymbol *that) const;
   ReducingSymbol *clone() const;
   // ast
   const AutomataTmpAst *astOfCurrentDfaState;
@@ -27,7 +25,6 @@ public:
   const SyntaxDfaState *currentDfaState;
   // token流中的位置
   int endIndexOfToken;
-  size_t hashCode() const;
 };
 
 #endif // AST__REDUCINGSYMBOL_H_

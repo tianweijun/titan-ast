@@ -21,7 +21,6 @@ pub(crate) struct PersistentData {
 
     byte_input_stream: Option<File>,
     i32_byte_buffer: ByteBuffer,
-    syntax_dfa_state_id: usize,
 }
 
 impl Clone for PersistentData {
@@ -32,7 +31,6 @@ impl Clone for PersistentData {
             production_rules: self.production_rules.clone(),
             byte_input_stream: None,
             i32_byte_buffer: self.i32_byte_buffer.clone(),
-            syntax_dfa_state_id: 0,
         }
     }
 }
@@ -112,7 +110,7 @@ impl PersistentData {
         syntax_dfa.states = Vec::with_capacity(size_of_syntax_dfa_states);
 
         // countOfSyntaxDfaStates-(type-countOfEdges-[ch,dest]{countOfEdges}-countOfProductions-productions)
-        for _ in 0..size_of_syntax_dfa_states {
+        for index_of_syntax_dfa_states in 0..size_of_syntax_dfa_states {
             let type_ = self.read_i32();
 
             let size_of_edges = self.read_i32() as usize;
@@ -129,14 +127,11 @@ impl PersistentData {
                 closing_production_rules.push(index_of_production_rule);
             }
 
-            self.syntax_dfa_state_id += 1;
-            let id = self.syntax_dfa_state_id;
-
             syntax_dfa.states.push(SyntaxDfaState {
-                id,
-                type_,
-                edges,
-                closing_production_rules,
+                index: index_of_syntax_dfa_states,
+                type_: type_,
+                edges: edges,
+                closing_production_rules: closing_production_rules,
             });
         }
         return syntax_dfa;
@@ -303,7 +298,6 @@ impl Default for PersistentData {
                 limit: 0,
             },
             production_rules: Default::default(),
-            syntax_dfa_state_id: 0,
         }
     }
 }

@@ -23,5 +23,9 @@ pub(crate) fn build(automata_data: &AutomataData) -> SuperBacktrackingBottomUpAs
         sub_ast_automata: sub_backtracking_bottom_up_ast_automata,
         ast_dfa: automata_data.ast_dfa.clone(),
         start_grammar: automata_data.start_grammar,
+        token_reducing_symbol_input_stream: Default::default(),
+        result: Default::default(),
+        bottom_up_branchs: Default::default(),
+        tried_bottom_up_branchs: Default::default(),
     };
 }

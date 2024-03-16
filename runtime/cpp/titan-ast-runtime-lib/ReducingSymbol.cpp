@@ -25,27 +25,16 @@ ReducingSymbol *ReducingSymbol::clone() const {
 }
 
 // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
-bool ReducingSymbol::equals(const ReducingSymbol *o) const {
-  // o->reducedGrammar->name == this->reducedGrammar->name;
-  return this->endIndexOfToken == o->endIndexOfToken &&
-         this->currentDfaState == o->currentDfaState &&
-         this->astOfCurrentDfaState->equals(o->astOfCurrentDfaState);
-}
-
-// for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
-bool ReducingSymbol::compare(const ReducingSymbol *o) const {
-  if (this->astOfCurrentDfaState->grammar != o->astOfCurrentDfaState->grammar) {
-    return reinterpret_cast<uintptr_t>(this->astOfCurrentDfaState->grammar) <
-           reinterpret_cast<uintptr_t>(o->astOfCurrentDfaState->grammar);
+int ReducingSymbol::compare(const ReducingSymbol *that) const {
+  int compare = endIndexOfToken - that->endIndexOfToken;
+  if (0 != compare) {
+    return compare;
   }
 
-  return reinterpret_cast<uintptr_t>(this->currentDfaState) <
-         reinterpret_cast<uintptr_t>(o->currentDfaState);
-}
+  compare = currentDfaState->index - that->currentDfaState->index;
+  if (0 != compare) {
+    return compare;
+  }
 
-size_t ReducingSymbol::hashCode() const {
-  size_t hashCode = (endIndexOfToken & 0xFF) << 16;
-  hashCode += (((long)currentDfaState) & 0xFF) << 8;
-  hashCode += (astOfCurrentDfaState->hashCode() & 0xFF);
-  return hashCode;
+  return astOfCurrentDfaState->grammar->index - that->astOfCurrentDfaState->grammar->index;
 }

@@ -15,16 +15,6 @@
 #include <list>
 #include <set>
 
-class BacktrackingBottomUpHash {
-public:
-  size_t operator()(const BacktrackingBottomUpBranch *t) const;
-};
-class BacktrackingBottomUpEqual {
-public:
-  bool operator()(const BacktrackingBottomUpBranch *t1,
-                  const BacktrackingBottomUpBranch *t2) const;
-};
-
 class BacktrackingBottomUpCompare {
 public:
   bool operator()(const BacktrackingBottomUpBranch *t1,

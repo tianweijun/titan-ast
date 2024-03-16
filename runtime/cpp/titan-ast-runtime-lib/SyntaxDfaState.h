@@ -13,18 +13,16 @@ class ProductionRule;
 
 class SyntaxDfaState {
 public:
-  SyntaxDfaState(int id);
+  SyntaxDfaState(int index);
   SyntaxDfaState(const SyntaxDfaState &syntaxDfaState) = delete;
   SyntaxDfaState(const SyntaxDfaState &&syntaxDfaState) = delete;
   ~SyntaxDfaState();
 
-  int id;
+  int index;
   int type;
   // 转移
   std::map<const Grammar *, SyntaxDfaState *> edges;
   std::list<ProductionRule *> closingProductionRules;
-  bool equals(const SyntaxDfaState *o) const;
-  bool compare(const SyntaxDfaState *o) const;
 };
 
 #endif // AST__SYNTAXDFASTATE_H_

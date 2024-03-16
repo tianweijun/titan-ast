@@ -23,7 +23,7 @@ KeyWordAutomata::~KeyWordAutomata() = default;
 std::list<Token *> *
 KeyWordAutomata::buildToken(std::list<Token *> *tokens) const {
   for (auto token : *tokens) {
-    if (rootKeyWord->equals(token->terminal)) {
+    if (rootKeyWord->index == token->terminal.index) {
       auto findIt = textTerminalMap.find(&token->text);
       if (findIt != textTerminalMap.end()) {
         auto terminal = findIt->second;

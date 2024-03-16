@@ -1,8 +1,7 @@
 package titan.ast.runtime;
 
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Objects;
+import java.util.ListIterator;
 
 /**
  * 自顶向上归约分支.
@@ -28,36 +27,6 @@ public class BacktrackingBottomUpBranch
     return copy;
   }
 
-  // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BacktrackingBottomUpBranch that = (BacktrackingBottomUpBranch) o;
-    return reducingSymbols.equals(that.reducingSymbols);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(reducingSymbols);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder stringBuilder = new StringBuilder();
-    for (ReducingSymbol reducingSymbol : reducingSymbols) {
-      stringBuilder
-          .append("-")
-          .append(reducingSymbol.astOfCurrentDfaState.grammar.name)
-          .append(" ");
-    }
-    return stringBuilder.toString();
-  }
-
   @Override
   public int compareTo(BacktrackingBottomUpBranch that) {
     LinkedList<ReducingSymbol> thatReducingSymbols = that.reducingSymbols;
@@ -71,16 +40,30 @@ public class BacktrackingBottomUpBranch
     if (this.reducingSymbols.size() != thatReducingSymbols.size()) {
       return this.reducingSymbols.size() - thatReducingSymbols.size();
     }
-    Iterator<ReducingSymbol> thisReducingSymbolsIt = this.reducingSymbols.iterator();
-    Iterator<ReducingSymbol> thatReducingSymbolsIt = thatReducingSymbols.iterator();
-    while (thisReducingSymbolsIt.hasNext()) {
-      ReducingSymbol thisReducingSymbol = thisReducingSymbolsIt.next();
-      ReducingSymbol thatReducingSymbol = thatReducingSymbolsIt.next();
+    ListIterator<ReducingSymbol> thisReducingSymbolsIt =
+        this.reducingSymbols.listIterator(this.reducingSymbols.size());
+    ListIterator<ReducingSymbol> thatReducingSymbolsIt =
+        thatReducingSymbols.listIterator(thatReducingSymbols.size());
+    while (thisReducingSymbolsIt.hasPrevious()) {
+      ReducingSymbol thisReducingSymbol = thisReducingSymbolsIt.previous();
+      ReducingSymbol thatReducingSymbol = thatReducingSymbolsIt.previous();
       int reducingSymbolCompare = thisReducingSymbol.compareTo(thatReducingSymbol);
       if (0 != reducingSymbolCompare) {
         return reducingSymbolCompare;
       }
     }
     return 0;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (ReducingSymbol reducingSymbol : reducingSymbols) {
+      stringBuilder
+          .append("-")
+          .append(reducingSymbol.astOfCurrentDfaState.grammar.name)
+          .append(" ");
+    }
+    return stringBuilder.toString();
   }
 }

@@ -1,7 +1,5 @@
 package titan.ast.runtime;
 
-import java.util.Objects;
-
 /**
  * 分析栈存放的文法符号.
  *
@@ -32,35 +30,22 @@ public class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+  public int compareTo(ReducingSymbol that) {
+    int compare = endIndexOfToken - that.endIndexOfToken;
+    if (0 != compare) {
+      return compare;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ReducingSymbol that = (ReducingSymbol) o;
-    return endIndexOfToken == that.endIndexOfToken
-        && astOfCurrentDfaState.equals(that.astOfCurrentDfaState)
-        && currentDfaState.equals(that.currentDfaState);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(astOfCurrentDfaState, currentDfaState, endIndexOfToken);
+    compare = currentDfaState.index - that.currentDfaState.index;
+    if (0 != compare) {
+      return compare;
+    }
+
+    return astOfCurrentDfaState.grammar.index - that.astOfCurrentDfaState.grammar.index;
   }
 
   @Override
   public String toString() {
     return null == astOfCurrentDfaState ? "" : astOfCurrentDfaState.toString();
-  }
-
-  @Override
-  public int compareTo(ReducingSymbol that) {
-    int compare = astOfCurrentDfaState.grammar.compareTo(that.astOfCurrentDfaState.grammar);
-    if (0 != compare) {
-      return compare;
-    }
-    return currentDfaState.compareTo(that.currentDfaState);
   }
 }

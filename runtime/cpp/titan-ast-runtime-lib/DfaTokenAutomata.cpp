@@ -48,7 +48,7 @@ bool DfaTokenAutomata::buildOneToken() {
   auto type =
       TokenTypeNamespace::getByGrammarAction(terminalState->terminal->action);
   auto *token =
-      new Token(*terminalState->terminal, startIndexOfToken, text, type);
+      new Token(terminalState->terminal->getGrammar(), startIndexOfToken, text, type);
   tokens->push_back(token);
 
   return true;

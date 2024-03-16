@@ -32,7 +32,6 @@ public:
   int sizeOfGramamrs;
   ProductionRule **productionRules;
   int sizeOfProductionRules;
-  int syntaxDfaStateId;
 
   SyntaxDfa *getSyntaxDfaByInputStream();
   void getProductionRulesByInputStream();
@@ -40,12 +39,12 @@ public:
   TokenDfa *getTokenDfaByInputStream();
   KeyWordAutomata *getKeyWordAutomataByInputStream();
   Grammar **getGrammarsByInputStream();
-  Grammar *newGrammarByType(GrammarType type);
+  Grammar *newGrammarByType(GrammarType type,int indexOfGrammar);
   std::string *readByteString(int countOfStringBytes);
   std::string **getStringPoolByInputStream();
   AstAutomataType getAstAutomataTypeByInputStream();
-  std::map<const Grammar *, std::set<const Grammar *, PtrGrammarCompare> *,
-           PtrGrammarCompare> *
+  std::map<const Grammar *, std::set<const Grammar *, PtrGrammarContentCompare> *,
+           PtrGrammarContentCompare> *
   getNonterminalFollowMapByInputStream();
 
   void doRead(byte bytes[], int offset, int length);

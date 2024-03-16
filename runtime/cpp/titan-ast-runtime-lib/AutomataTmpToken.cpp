@@ -35,23 +35,5 @@ void AutomataTmpToken::shallowCopy(Token *token) {
   this->text = &token->text;
   this->type = token->type;
 }
-bool AutomataTmpToken::equals(const AutomataTmpToken *o) const {
-  return this->terminal == o->terminal && this->start == o->start &&
-         this->text == o->text && this->type == o->type;
-}
 
-bool AutomataTmpToken::compare(const AutomataTmpToken *o) const {
-  if (!this->terminal->equals(*o->terminal)) {
-    return this->terminal->compare(*o->terminal);
-  }
-  if (this->start != o->start) {
-    return this->start < o->start;
-  }
-  if ((*this->text) != (*o->text)) {
-    return (*this->text) < (*o->text);
-  }
-  if (this->type != o->type) {
-    return this->type < o->type;
-  }
-  return false;
-}
+

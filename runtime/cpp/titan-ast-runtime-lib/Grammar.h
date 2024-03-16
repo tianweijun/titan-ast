@@ -11,19 +11,19 @@
 
 class Grammar {
 public:
-  Grammar();
-  Grammar(std::string name, GrammarType type, GrammarAction action);
-  Grammar(const Grammar &grammar);
-  Grammar(Grammar &&grammar) noexcept;
+  explicit Grammar(int index);
+  Grammar(const Grammar &grammar) = default;
+  Grammar(Grammar &&grammar) noexcept = default;
   Grammar &operator=(const Grammar &other);
   ~Grammar();
-  bool compare(const Grammar &o) const;
-  bool equals(const Grammar &o) const;
   AstGrammar toAstGrammar() const;
+  Grammar getGrammar() const;
 
+  int index;
   std::string name;
   GrammarType type;
   GrammarAction action;
+
 };
 
 enum class LookaheadMatchingMode : int {
@@ -33,11 +33,7 @@ enum class LookaheadMatchingMode : int {
 
 class TerminalGrammar : public Grammar {
 public:
-  TerminalGrammar();
-  TerminalGrammar(std::string name, GrammarType type, GrammarAction action);
-  TerminalGrammar(const TerminalGrammar &grammar);
-  TerminalGrammar(TerminalGrammar &&grammar) noexcept;
-  TerminalGrammar &operator=(const TerminalGrammar &other);
+  explicit TerminalGrammar(int index);
   ~TerminalGrammar();
 
   LookaheadMatchingMode lookaheadMatchingMode;
@@ -45,25 +41,14 @@ public:
 
 class NonterminaltGrammar : public Grammar {
 public:
-  NonterminaltGrammar();
-  NonterminaltGrammar(std::string name, GrammarType type, GrammarAction action);
-  NonterminaltGrammar(const NonterminaltGrammar &grammar);
-  NonterminaltGrammar(NonterminaltGrammar &&grammar) noexcept;
-  NonterminaltGrammar &operator=(const NonterminaltGrammar &other);
+  explicit NonterminaltGrammar(int index);
   ~NonterminaltGrammar();
-};
-
-class PtrGrammarCompare {
-public:
-  bool operator()(const Grammar *t1, const Grammar *t2) const {
-    return reinterpret_cast<uintptr_t>(t1) < reinterpret_cast<uintptr_t>(t2);
-  }
 };
 
 class PtrGrammarContentCompare {
 public:
   bool operator()(const Grammar *t1, const Grammar *t2) const {
-    return t1->compare(*t2);
+    return t1->index<t2->index;
   }
 };
 

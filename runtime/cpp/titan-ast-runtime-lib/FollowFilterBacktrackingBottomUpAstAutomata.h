@@ -15,8 +15,8 @@ public:
       const SyntaxDfa *astDfa, const Grammar *startGrammar,
       Grammar **innerGrammars, int countOfInnerGrammars,
       const std::map<const Grammar *,
-                     std::set<const Grammar *, PtrGrammarCompare> *,
-                     PtrGrammarCompare> *nonterminalFollowMap,
+                     std::set<const Grammar *, PtrGrammarContentCompare> *,
+                     PtrGrammarContentCompare> *nonterminalFollowMap,
       const Grammar *eofGrammar);
 
   AstAutomataType getType() override;
@@ -27,8 +27,8 @@ protected:
 
 public:
   const std::map<const Grammar *,
-                 std::set<const Grammar *, PtrGrammarCompare> *,
-                 PtrGrammarCompare> *nonterminalFollowMap;
+                 std::set<const Grammar *, PtrGrammarContentCompare> *,
+                 PtrGrammarContentCompare> *nonterminalFollowMap;
   const Grammar *eofGrammar;
 };
 

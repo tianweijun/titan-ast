@@ -72,29 +72,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     shiftBottomUpBranch(bottomUpBranch);
   }
 
-  void shiftBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
-    ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
-    // 将输入流定位到分支读取的位置
-    tokenReducingSymbolInputStream.nextReadIndex = topReducingSymbol.endIndexOfToken + 1;
-    // 移进一个token
-    if (tokenReducingSymbolInputStream.hasNext()) {
-      Token token = tokenReducingSymbolInputStream.read();
-      SyntaxDfaState nextDfaState = topReducingSymbol.currentDfaState.edges.get(token.terminal);
-      // 连通的
-      if (null != nextDfaState) {
-        // 归约的符号
-        ReducingSymbol terminalReducingSymbol = new ReducingSymbol();
-        terminalReducingSymbol.astOfCurrentDfaState = new AutomataTmpAst(token);
-        terminalReducingSymbol.currentDfaState = nextDfaState;
-        terminalReducingSymbol.endIndexOfToken = tokenReducingSymbolInputStream.nextReadIndex - 1;
-        // 归约的符号进栈
-        BacktrackingBottomUpBranch terminalBottomUpBranch = bottomUpBranch.clone();
-        terminalBottomUpBranch.reducingSymbols.addLast(terminalReducingSymbol);
-        addNewBacktrackingBottomUpBranch(terminalBottomUpBranch);
-      }
-    }
-  }
-
   void reduceBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
     ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
     SyntaxDfaState currentDfaState = topReducingSymbol.currentDfaState;
@@ -176,6 +153,29 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     }
   }
 
+  void shiftBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
+    ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
+    // 将输入流定位到分支读取的位置
+    tokenReducingSymbolInputStream.nextReadIndex = topReducingSymbol.endIndexOfToken + 1;
+    // 移进一个token
+    if (tokenReducingSymbolInputStream.hasNext()) {
+      Token token = tokenReducingSymbolInputStream.read();
+      SyntaxDfaState nextDfaState = topReducingSymbol.currentDfaState.edges.get(token.terminal);
+      // 连通的
+      if (null != nextDfaState) {
+        // 归约的符号
+        ReducingSymbol terminalReducingSymbol = new ReducingSymbol();
+        terminalReducingSymbol.astOfCurrentDfaState = new AutomataTmpAst(token);
+        terminalReducingSymbol.currentDfaState = nextDfaState;
+        terminalReducingSymbol.endIndexOfToken = tokenReducingSymbolInputStream.nextReadIndex - 1;
+        // 归约的符号进栈
+        BacktrackingBottomUpBranch terminalBottomUpBranch = bottomUpBranch.clone();
+        terminalBottomUpBranch.reducingSymbols.addLast(terminalReducingSymbol);
+        addNewBacktrackingBottomUpBranch(terminalBottomUpBranch);
+      }
+    }
+  }
+
   boolean isAcceptedBottomUpBranch(BacktrackingBottomUpBranch bottomUpBranch) {
     ReducingSymbol topReducingSymbol = bottomUpBranch.reducingSymbols.getLast();
     tokenReducingSymbolInputStream.nextReadIndex = topReducingSymbol.endIndexOfToken + 1;
@@ -183,26 +183,6 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     return tokenReducingSymbolInputStream.hasReadAll()
         && bottomUpBranch.reducingSymbols.size() == 2
         && startGrammar.equals(topReducingSymbol.astOfCurrentDfaState.grammar);
-  }
-
-  private void clear() {
-    tokenReducingSymbolInputStream = null;
-    bottomUpBranchs.clear();
-    triedBottomUpBranchs.clear();
-    result = null;
-  }
-
-  private void init(List<Token> sourceTokens) {
-    clear();
-    tokenReducingSymbolInputStream = new TokenReducingSymbolInputStream(sourceTokens);
-
-    ReducingSymbol connectedSignOfStartGrammarReducingSymbol =
-        getConnectedSignOfStartGrammarReducingSymbol();
-
-    BacktrackingBottomUpBranch beginningBottomUpBranch = new BacktrackingBottomUpBranch();
-    beginningBottomUpBranch.reducingSymbols.addLast(connectedSignOfStartGrammarReducingSymbol);
-
-    addNewBacktrackingBottomUpBranch(beginningBottomUpBranch);
   }
 
   /**
@@ -242,49 +222,70 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     }
   }
 
+  private void clear() {
+    tokenReducingSymbolInputStream = null;
+    bottomUpBranchs.clear();
+    triedBottomUpBranchs.clear();
+    result = null;
+  }
+
+  private void init(List<Token> sourceTokens) {
+    clear();
+    tokenReducingSymbolInputStream = new TokenReducingSymbolInputStream(sourceTokens);
+
+    ReducingSymbol connectedSignOfStartGrammarReducingSymbol =
+        getConnectedSignOfStartGrammarReducingSymbol();
+
+    BacktrackingBottomUpBranch beginningBottomUpBranch = new BacktrackingBottomUpBranch();
+    beginningBottomUpBranch.reducingSymbols.addLast(connectedSignOfStartGrammarReducingSymbol);
+
+    addNewBacktrackingBottomUpBranch(beginningBottomUpBranch);
+  }
+
+  /**
+   * 错误信息最开始处，错误信息所有可能的范围.
+   *
+   * @return error info
+   */
   private String getNoResultErrorInfo() {
     ArrayList<Token> tokenReducingSymbols = tokenReducingSymbolInputStream.tokenReducingSymbols;
-    int indexOfLastToken = tokenReducingSymbols.isEmpty() ? 0 : tokenReducingSymbols.size() - 1;
+    if (tokenReducingSymbols.isEmpty()) {
+      return "";
+    }
+
+    int indexOfLastToken = tokenReducingSymbols.size() - 1;
 
     int startIndexOfToken = indexOfLastToken;
     int endIndexOfToken = 0;
     for (BacktrackingBottomUpBranch branch : triedBottomUpBranchs) {
-      int lastIndexOfBranch = branch.reducingSymbols.getLast().endIndexOfToken;
-      if (startIndexOfToken > lastIndexOfBranch) {
+      int lastIndexOfBranch = branch.reducingSymbols.getLast().endIndexOfToken - 1;
+      if (lastIndexOfBranch < 0) {
+        lastIndexOfBranch = 0;
+      }
+      if (startIndexOfToken > lastIndexOfBranch) { // 错误开始处尽量小
         startIndexOfToken = lastIndexOfBranch;
       }
-      if (endIndexOfToken < lastIndexOfBranch) {
+      if (endIndexOfToken < lastIndexOfBranch) { // 错误结束处尽量大
         endIndexOfToken = lastIndexOfBranch;
       }
     }
-    if (startIndexOfToken == indexOfLastToken || startIndexOfToken < 0) {
-      startIndexOfToken = 0;
-    }
-    if (endIndexOfToken == 0) {
-      endIndexOfToken = Math.min(indexOfLastToken, 1);
-    } else {
-      if (endIndexOfToken + 1 < indexOfLastToken) {
-        endIndexOfToken += 1;
-      }
+    if (endIndexOfToken + 1 <= indexOfLastToken) { // 如果还有下一个token，将他加入过来，错误信息必须涵盖可能的位置。
+      endIndexOfToken += 1;
     }
     int startIndexByte = 0;
     int endIndexByte = 0;
 
-    StringBuilder tokenInfo = new StringBuilder();
-    if (!tokenReducingSymbols.isEmpty()) {
-      Token startToken = tokenReducingSymbols.get(startIndexOfToken);
-      Token endToken = tokenReducingSymbols.get(endIndexOfToken);
-      startIndexByte = startToken.start;
-      endIndexByte = endToken.start + endToken.text.length();
+    Token startToken = tokenReducingSymbols.get(startIndexOfToken);
+    Token endToken = tokenReducingSymbols.get(endIndexOfToken);
+    startIndexByte = startToken.start;
+    endIndexByte = endToken.start + endToken.text.length();
 
-      for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken; indexOfToken++) {
-        Token token = tokenReducingSymbols.get(indexOfToken);
-        tokenInfo.append(token.text).append(" ");
-      }
-      if (tokenInfo.length() > 0) {
-        tokenInfo.delete(tokenInfo.length() - 1, tokenInfo.length());
-      }
+    StringBuilder tokenInfo = new StringBuilder();
+    for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken; indexOfToken++) {
+      Token token = tokenReducingSymbols.get(indexOfToken);
+      tokenInfo.append(token.text).append(" ");
     }
+    tokenInfo.delete(tokenInfo.length() - 1, tokenInfo.length());
 
     return String.format(
         "generate ast failed,error near [%d,%d):%s",

@@ -37,48 +37,19 @@ bool BacktrackingBottomUpBranch::compare(
   if (this->reducingSymbols.size() != o->reducingSymbols.size()) {
     return this->reducingSymbols.size() < o->reducingSymbols.size();
   }
-  auto thisReducingSymbolsIt = this->reducingSymbols.begin();
-  auto oReducingSymbolsIt = o->reducingSymbols.begin();
-  while (thisReducingSymbolsIt != this->reducingSymbols.end()) {
+  auto thisReducingSymbolsIt = this->reducingSymbols.rbegin();
+  auto oReducingSymbolsIt = o->reducingSymbols.rbegin();
+  while (thisReducingSymbolsIt != this->reducingSymbols.rend()) {
     ReducingSymbol *thisReducingSymbol = *thisReducingSymbolsIt;
     ReducingSymbol *oReducingSymbol = *oReducingSymbolsIt;
-    if (!thisReducingSymbol->equals(oReducingSymbol)) {
-      return thisReducingSymbol->compare(oReducingSymbol);
+
+    auto compare = thisReducingSymbol->compare(oReducingSymbol);
+
+    if (0 != compare) {
+      return compare < 0;
     }
     thisReducingSymbolsIt++;
     oReducingSymbolsIt++;
   }
   return false;
-}
-
-bool BacktrackingBottomUpBranch::equals(
-    const BacktrackingBottomUpBranch *o) const {
-  if (this->reducingSymbols.size() != o->reducingSymbols.size()) {
-    return false;
-  }
-  auto thisReducingSymbolsIt = this->reducingSymbols.begin();
-  auto oReducingSymbolsIt = o->reducingSymbols.begin();
-  while (thisReducingSymbolsIt != this->reducingSymbols.end()) {
-    ReducingSymbol *thisReducingSymbol = *thisReducingSymbolsIt;
-    ReducingSymbol *oReducingSymbol = *oReducingSymbolsIt;
-    if (!thisReducingSymbol->equals(oReducingSymbol)) {
-      return false;
-    }
-    thisReducingSymbolsIt++;
-    oReducingSymbolsIt++;
-  }
-  return true;
-}
-
-size_t BacktrackingBottomUpBranch::hashCode() const {
-  size_t reducingSymbolsHashCode = 0;
-  for (auto reducingSymbol : reducingSymbols) {
-    reducingSymbolsHashCode += reducingSymbol->hashCode();
-  }
-  return std::hash<size_t>()(reducingSymbolsHashCode);
-}
-
-bool BacktrackingBottomUpBranch::operator==(
-    const BacktrackingBottomUpBranch &o) const {
-  return equals(&o);
 }

@@ -3,6 +3,7 @@ mod ast_automata_builder;
 mod automata_data;
 mod automata_tmp_ast;
 mod backtracking_bottom_up_ast_automata;
+mod backtracking_bottom_up_branch;
 mod byte_buffer;
 mod byte_buffered_input_stream;
 mod dfa_token_automata;
@@ -13,18 +14,22 @@ mod key_word_automata;
 mod key_word_dfa_token_automata;
 mod persistent_data;
 mod persistent_object;
+mod reducing_symbol;
 mod super_backtracking_bottom_up_ast_automata;
 mod super_dfa_token_automata;
 mod syntax_dfa;
 mod token_automata;
 mod token_automata_builder;
 mod token_dfa;
+mod token_reducing_symbol_input_stream;
 
 pub mod ast;
 pub mod ast_application;
 
 #[cfg(test)]
 mod tests_in_lib {
+    use std::collections::BTreeSet;
+
     use crate::{ast_application::RuntimeAutomataAstApplication, token_automata::TokenBuilder};
 
     #[test]
@@ -87,13 +92,9 @@ mod tests_in_lib {
 
     #[test]
     fn simple_test() {
-        let mut v = vec![1; 9];
-        println!("{}-{}:{:?}", v.len(), v.capacity(), v);
-        v.push(5);
-        println!("{}-{}:{:?}", v.len(), v.capacity(), v);
-        v.push(6);
-        println!("{}-{}:{:?}", v.len(), v.capacity(), v);
-        v.clear();
-        println!("{}-{}:{:?}", v.len(), v.capacity(), v);
+        let mut tree_set = BTreeSet::from([1, 2, 3, 4, 5, 99, 87, 6, 9]);
+        print!("{:?}", tree_set);
+
+        let reducing_symbol = 0;
     }
 }

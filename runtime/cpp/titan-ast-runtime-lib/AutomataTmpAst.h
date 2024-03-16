@@ -23,10 +23,6 @@ public:
 
   const AutomataTmpAst *clone() const;
 
-  bool equals(const AutomataTmpAst *o) const;
-  bool compare(const AutomataTmpAst *o) const;
-  size_t hashCode() const;
-
   const Grammar *const grammar;
   const std::string *const alias;
   // grammar.type == GrammarType.TERMINAL

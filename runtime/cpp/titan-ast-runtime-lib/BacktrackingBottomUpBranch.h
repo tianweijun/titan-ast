@@ -20,9 +20,6 @@ public:
   BacktrackingBottomUpBranch *clone() const;
   // for BacktrackingBottomUpAstAutomata.triedBottomUpBranchs(set)
   bool compare(const BacktrackingBottomUpBranch *o) const;
-  bool equals(const BacktrackingBottomUpBranch *o) const;
-  bool operator==(const BacktrackingBottomUpBranch &o) const;
-  size_t hashCode() const;
 
   std::list<ReducingSymbol *> reducingSymbols;
 };

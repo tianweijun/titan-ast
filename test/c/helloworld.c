@@ -1,5 +1,6 @@
-#include <stdio.h>
 
+
+#include <stdio.h>
 
 int main(){
     int n = 100;
@@ -15,4 +16,4 @@ int sum( int n ){
     }
 
     return sum;
-}
+}/**/
