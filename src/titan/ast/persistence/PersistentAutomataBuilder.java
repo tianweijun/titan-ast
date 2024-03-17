@@ -1,6 +1,7 @@
 package titan.ast.persistence;
 
 import java.io.File;
+import titan.ast.AstContext;
 import titan.ast.logger.Logger;
 
 /**
@@ -21,8 +22,7 @@ public class PersistentAutomataBuilder {
   }
 
   private void savePersistentDataToFile(File outputFile) {
-    PersistentData persistentData = new PersistentData();
-    persistentData.init();
+    PersistentData persistentData = new PersistentData(AstContext.get());
     new PersistentDataFile().save(persistentData, outputFile);
   }
 }

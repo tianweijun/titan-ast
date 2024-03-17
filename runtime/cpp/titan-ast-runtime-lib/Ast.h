@@ -10,9 +10,9 @@
 #include "Runtime.h"
 #include "Token.h"
 #include "AstGrammar.h"
-#include <list>
 #include <map>
 #include <string>
+#include <vector>
 
 class DLL_PUBLIC Ast {
 public:
@@ -28,7 +28,7 @@ public:
   std::string alias;
   // grammar.type == GrammarType.TERMINAL
   AstToken token;
-  std::list<Ast *> children;
+  std::vector<Ast *> children;
 };
 
 #endif // AST__RUNTIME__AST_H_

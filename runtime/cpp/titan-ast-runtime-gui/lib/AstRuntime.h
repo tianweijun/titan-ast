@@ -67,7 +67,7 @@ class DLL_PUBLIC Ast {
   std::string alias;
   // grammar.type == GrammarType.TERMINAL
   AstToken token;
-  std::list<Ast *> children;
+  std::vector<Ast *> children;
 };
 
 class DLL_PUBLIC RuntimeAutomataAstApplication {

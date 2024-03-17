@@ -1,7 +1,7 @@
 package titan.ast.runtime;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,8 +13,8 @@ public class SyntaxDfaState {
   public int index = 0;
   public int type = FaStateType.NONE.getValue();
   // 转移
-  public Map<Grammar, SyntaxDfaState> edges = new LinkedHashMap<>();
-  public LinkedList<ProductionRule> closingProductionRules = new LinkedList<>();
+  public Map<Grammar, SyntaxDfaState> edges = new HashMap<>();
+  public ArrayList<ProductionRule> closingProductionRules = new ArrayList<>();
 
   public SyntaxDfaState(int index) {
     this.index = index;

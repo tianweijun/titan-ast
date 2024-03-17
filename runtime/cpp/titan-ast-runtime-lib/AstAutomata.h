@@ -4,6 +4,7 @@
 
 #ifndef AST_RUNTIME_RUNTIME_ASTAUTOMATA_H_
 #define AST_RUNTIME_RUNTIME_ASTAUTOMATA_H_
+#include <list>
 #include "Ast.h"
 #include "AstAutomataType.h"
 class AstAutomata {

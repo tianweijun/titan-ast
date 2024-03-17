@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
-import titan.ast.grammar.syntax.AstAutomata;
 import titan.ast.grammar.syntax.ProductionRule;
 import titan.ast.grammar.syntax.SyntaxDfa;
 import titan.ast.grammar.syntax.SyntaxDfaState;
@@ -34,13 +33,11 @@ public class PersistentData {
   public LinkedHashMap<ProductionRule, Integer> productionRuleIntegerMap;
   // KeyWordAutomata
   // AstAutomata
-  AstAutomata astAutomata;
   // ----------data end-----------
   AstContext astContext;
 
-  public void init() {
-    astContext = AstContext.get();
-    astAutomata = astContext.languageGrammar.astAutomata;
+  public PersistentData(AstContext astContext) {
+    this.astContext = astContext;
   }
 
   public int[] initTokenDfaStates(TokenDfa tokenDfa) {
@@ -81,16 +78,16 @@ public class PersistentData {
     int countOfGrammars =
         languageGrammar.terminals.size() + languageGrammar.nonterminals.size() + 2;
     grammarIntegerMap = new LinkedHashMap<>(countOfGrammars);
-    int intSymbolOfGrammar = 0;
+    int indexOfGrammar = 0;
 
     for (Grammar terminal : languageGrammar.terminals.values()) {
-      grammarIntegerMap.put(terminal, intSymbolOfGrammar++);
+      grammarIntegerMap.put(terminal, indexOfGrammar++);
     }
-    grammarIntegerMap.put(languageGrammar.epsilon, intSymbolOfGrammar++);
-    grammarIntegerMap.put(languageGrammar.eof, intSymbolOfGrammar++);
+    grammarIntegerMap.put(languageGrammar.epsilon, indexOfGrammar++);
+    grammarIntegerMap.put(languageGrammar.eof, indexOfGrammar++);
 
     for (Grammar nonterminal : languageGrammar.nonterminals.values()) {
-      grammarIntegerMap.put(nonterminal, intSymbolOfGrammar++);
+      grammarIntegerMap.put(nonterminal, indexOfGrammar++);
     }
   }
 

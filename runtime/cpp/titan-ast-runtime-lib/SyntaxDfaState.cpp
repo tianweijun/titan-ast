@@ -5,9 +5,9 @@
 #include "SyntaxDfaState.h"
 
 SyntaxDfaState::SyntaxDfaState(int index)
-    : index(index),type(0), edges(std::map<const Grammar *, SyntaxDfaState *>()),
-      closingProductionRules(std::list<ProductionRule *>()) {
-}
+    : index(index), type(0),
+      edges(std::unordered_map<const Grammar *, SyntaxDfaState *,PtrGrammarContentHash,PtrGrammarContentEq>()),
+      closingProductionRules(std::vector<ProductionRule *>()) {}
 
 // edges grammar delete by PersistentData.gammars
 // edges SyntaxDfaState delete by dfa

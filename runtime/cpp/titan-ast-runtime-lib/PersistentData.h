@@ -12,8 +12,9 @@
 #include "TokenDfa.h"
 #include "TokenDfaState.h"
 #include <fstream>
-#include <set>
 #include <string>
+#include <map>
+#include <unordered_set>
 
 class PersistentData {
 public:
@@ -43,8 +44,9 @@ public:
   std::string *readByteString(int countOfStringBytes);
   std::string **getStringPoolByInputStream();
   AstAutomataType getAstAutomataTypeByInputStream();
-  std::map<const Grammar *, std::set<const Grammar *, PtrGrammarContentCompare> *,
-           PtrGrammarContentCompare> *
+  std::unordered_map<const Grammar *,
+                     std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq> *,
+                     PtrGrammarContentHash,PtrGrammarContentEq> *
   getNonterminalFollowMapByInputStream();
 
   void doRead(byte bytes[], int offset, int length);

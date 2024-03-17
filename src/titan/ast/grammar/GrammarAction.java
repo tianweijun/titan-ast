@@ -39,4 +39,17 @@ public enum GrammarAction {
   public String toString() {
     return name;
   }
+
+  public static titan.ast.runtime.GrammarAction toRuntimeAction(GrammarAction action) {
+    titan.ast.runtime.GrammarAction runtimeAction = titan.ast.runtime.GrammarAction.SKIP;
+    switch (action) {
+      case TEXT:
+        runtimeAction = titan.ast.runtime.GrammarAction.TEXT;
+        break;
+      case SKIP:
+        runtimeAction = titan.ast.runtime.GrammarAction.SKIP;
+        break;
+    }
+    return runtimeAction;
+  }
 }

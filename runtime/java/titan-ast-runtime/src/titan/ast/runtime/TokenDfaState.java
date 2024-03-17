@@ -1,6 +1,6 @@
 package titan.ast.runtime;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -14,5 +14,5 @@ public class TokenDfaState {
   // token语法名字
   public Grammar terminal = null;
   // 转移
-  public Map<Integer, TokenDfaState> edges = new LinkedHashMap<>();
+  public Map<Integer, TokenDfaState> edges = new HashMap<>();
 }

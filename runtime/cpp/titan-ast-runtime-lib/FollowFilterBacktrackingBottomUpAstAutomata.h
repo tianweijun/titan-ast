@@ -5,6 +5,7 @@
 #ifndef AST_RUNTIME_RUNTIME_FOLLOWFILTERBACKTRACKINGBOTTOMUPASTAUTOMATA_H_
 #define AST_RUNTIME_RUNTIME_FOLLOWFILTERBACKTRACKINGBOTTOMUPASTAUTOMATA_H_
 
+#include <unordered_set>
 #include "BacktrackingBottomUpAstAutomata.h"
 
 class FollowFilterBacktrackingBottomUpAstAutomata
@@ -14,9 +15,10 @@ public:
   FollowFilterBacktrackingBottomUpAstAutomata(
       const SyntaxDfa *astDfa, const Grammar *startGrammar,
       Grammar **innerGrammars, int countOfInnerGrammars,
-      const std::map<const Grammar *,
-                     std::set<const Grammar *, PtrGrammarContentCompare> *,
-                     PtrGrammarContentCompare> *nonterminalFollowMap,
+      const std::unordered_map<
+          const Grammar *,
+          std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq> *,
+          PtrGrammarContentHash, PtrGrammarContentEq> *nonterminalFollowMap,
       const Grammar *eofGrammar);
 
   AstAutomataType getType() override;
@@ -26,9 +28,9 @@ protected:
   reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch) override;
 
 public:
-  const std::map<const Grammar *,
-                 std::set<const Grammar *, PtrGrammarContentCompare> *,
-                 PtrGrammarContentCompare> *nonterminalFollowMap;
+  const std::unordered_map<const Grammar *,
+                           std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq> *,
+                           PtrGrammarContentHash,PtrGrammarContentEq> *nonterminalFollowMap;
   const Grammar *eofGrammar;
 };
 

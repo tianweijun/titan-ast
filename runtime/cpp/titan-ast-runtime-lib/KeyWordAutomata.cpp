@@ -3,20 +3,16 @@
 //
 
 #include "KeyWordAutomata.h"
-bool TextTerminalMapCompare::operator()(const std::string *t1,
-                                        const std::string *t2) const {
-  return *t1 < *t2;
-}
 
 KeyWordAutomata::KeyWordAutomata()
     : emptyOrNot(KeyWordAutomata::EMPTY), rootKeyWord(nullptr),
       textTerminalMap(
-          std::map<std::string *, Grammar *, TextTerminalMapCompare>()) {}
+          std::unordered_map<std::string *, Grammar *, TextTerminalMapHash,TextTerminalMapEq>()) {}
 
 KeyWordAutomata::KeyWordAutomata(int isEmpty, const Grammar *rootKeyWord)
     : emptyOrNot(isEmpty), rootKeyWord(rootKeyWord),
       textTerminalMap(
-          std::map<std::string *, Grammar *, TextTerminalMapCompare>()) {}
+          std::unordered_map<std::string *, Grammar *, TextTerminalMapHash,TextTerminalMapEq>()) {}
 
 KeyWordAutomata::~KeyWordAutomata() = default;
 

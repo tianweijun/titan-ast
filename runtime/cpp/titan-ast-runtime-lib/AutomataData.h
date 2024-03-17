@@ -6,6 +6,8 @@
 #define TITAN_AST_RUNTIME_RUNTIME_AUTOMATADATA_H_
 
 #include <set>
+#include <map>
+#include <unordered_set>
 #include "Grammar.h"
 #include "KeyWordAutomata.h"
 #include "SyntaxDfa.h"
@@ -36,9 +38,9 @@ public:
   const Grammar *startGrammar;
 
   const Grammar *eofGrammar;
-  const std::map<const Grammar *,
-                 std::set<const Grammar *, PtrGrammarContentCompare> *,
-                 PtrGrammarContentCompare> *nonterminalFollowMap;
+  const std::unordered_map<const Grammar *,
+                           std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq> *,
+                           PtrGrammarContentHash,PtrGrammarContentEq> *nonterminalFollowMap;
 };
 
 #endif // TITAN_AST_RUNTIME_RUNTIME_AUTOMATADATA_H_

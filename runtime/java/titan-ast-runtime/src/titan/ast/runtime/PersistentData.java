@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class PersistentData {
         grammar = new TerminalGrammar(indexOfGrammar);
         break;
       case NONTERMINAL:
-        grammar = new NonterminaltGrammar(indexOfGrammar);
+        grammar = new NonterminalGrammar(indexOfGrammar);
         break;
       case TERMINAL_FRAGMENT:
       default:
@@ -163,6 +164,7 @@ public class PersistentData {
         tokenDfaState.terminal = grammars[intOfTerminal];
       }
       int sizeOfEdges = readInt();
+      tokenDfaState.edges = new HashMap<>(sizeOfEdges);
       for (int indexOfEdge = 0; indexOfEdge < sizeOfEdges; indexOfEdge++) {
         int ch = readInt();
         TokenDfaState chToState = tokenDfaStates[readInt()];
@@ -209,12 +211,14 @@ public class PersistentData {
       SyntaxDfaState syntaxDfaState = syntaxDfaStates[indexOfSyntaxDfaState];
       syntaxDfaState.type = readInt();
       int sizeOfEdges = readInt();
+      syntaxDfaState.edges = new HashMap<>(sizeOfEdges);
       for (int indexOfEdge = 0; indexOfEdge < sizeOfEdges; indexOfEdge++) {
         Grammar ch = grammars[readInt()];
         SyntaxDfaState chToState = syntaxDfaStates[readInt()];
         syntaxDfaState.edges.put(ch, chToState);
       }
       int sizeOfProductions = readInt();
+      syntaxDfaState.closingProductionRules = new ArrayList<>(sizeOfProductions);
       for (int indexOfProduction = 0; indexOfProduction < sizeOfProductions; indexOfProduction++) {
         syntaxDfaState.closingProductionRules.add(productionRules[readInt()]);
       }

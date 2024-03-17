@@ -44,5 +44,6 @@ Ast *AutomataTmpAst::toAst() const {
   for (auto thisChild : this->children) {
     ast->children.push_back(thisChild->toAst());
   }
+  ast->children.shrink_to_fit();
   return ast;
 }

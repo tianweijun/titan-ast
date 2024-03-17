@@ -6,7 +6,7 @@
 
 TokenDfaState::TokenDfaState()
     : type((int)FaStateEnumType::NONE), weight(0), terminal(nullptr),
-      edges(std::map<byte, TokenDfaState *>()) {}
+      edges(std::unordered_map<byte, TokenDfaState *>()) {}
 // terminal delete by PersistentData.grammars
 // TokenDfaState in edges delete by TokenDfa
 TokenDfaState::~TokenDfaState() = default;

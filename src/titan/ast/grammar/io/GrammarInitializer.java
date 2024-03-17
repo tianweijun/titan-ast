@@ -8,7 +8,7 @@ import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarAction;
 import titan.ast.grammar.GrammarAttribute;
 import titan.ast.grammar.LanguageGrammar;
-import titan.ast.grammar.NonterminaltGrammar;
+import titan.ast.grammar.NonterminalGrammar;
 import titan.ast.grammar.TerminalFragmentGrammar;
 import titan.ast.grammar.TerminalGrammar;
 import titan.ast.runtime.AstRuntimeException;
@@ -187,7 +187,7 @@ public class GrammarInitializer {
     Grammar grammar = null;
     switch (state) {
       case NONTERMINAL:
-        grammar = new NonterminaltGrammar(null);
+        grammar = new NonterminalGrammar(null);
         break;
       case TERMINAL:
       case KEY_WORD:

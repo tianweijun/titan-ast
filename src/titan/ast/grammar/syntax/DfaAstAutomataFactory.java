@@ -29,8 +29,7 @@ public class DfaAstAutomataFactory {
         astAutomata = getBacktrackingBottomUpAstAutomata(astContext);
         break;
       case FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
-        astAutomata = getDesiredFollowFilterAstAutomata(astContext);
-        break;
+        astAutomata = getFollowFilterBacktrackingBottomUpAstAutomata(astContext);
     }
     return astAutomata;
   }
@@ -41,7 +40,8 @@ public class DfaAstAutomataFactory {
         languageGrammar.astDfa, languageGrammar.getStartGrammar());
   }
 
-  private AstAutomata getDesiredFollowFilterAstAutomata(AstContext astContext) {
+  private FollowFilterBacktrackingBottomUpAstAutomata
+      getFollowFilterBacktrackingBottomUpAstAutomata(AstContext astContext) {
     LanguageGrammar languageGrammar = astContext.languageGrammar;
     return new FollowFilterBacktrackingBottomUpAstAutomataBuilder(
             languageGrammar, astContext.nonterminalProductionRulesMap)

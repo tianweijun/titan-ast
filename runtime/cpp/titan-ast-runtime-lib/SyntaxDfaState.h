@@ -6,8 +6,8 @@
 #define AST__SYNTAXDFASTATE_H_
 #include "Grammar.h"
 #include "ProductionRule.h"
-#include <list>
-#include <map>
+#include <vector>
+#include <unordered_map>
 
 class ProductionRule;
 
@@ -21,8 +21,9 @@ public:
   int index;
   int type;
   // 转移
-  std::map<const Grammar *, SyntaxDfaState *> edges;
-  std::list<ProductionRule *> closingProductionRules;
+  std::unordered_map<const Grammar *, SyntaxDfaState *,PtrGrammarContentHash,PtrGrammarContentEq>
+      edges;
+  std::vector<ProductionRule *> closingProductionRules;
 };
 
 #endif // AST__SYNTAXDFASTATE_H_

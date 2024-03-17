@@ -61,10 +61,7 @@ void PersistentObject::initFollowFilterBacktrackingBottomUpAstAutomata() {
 }
 
 void PersistentObject::initNonterminalFollowMap() {
-  nonterminalFollowMap = reinterpret_cast<const std::map<
-      const Grammar *, std::set<const Grammar *, PtrGrammarContentCompare> *,
-      PtrGrammarContentCompare> *>(
-      persistentData->getNonterminalFollowMapByInputStream());
+  nonterminalFollowMap = persistentData->getNonterminalFollowMapByInputStream();
 }
 
 void PersistentObject::initEofGrammar() {

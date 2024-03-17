@@ -52,4 +52,19 @@ public:
   }
 };
 
+class PtrGrammarContentHash {
+public:
+  size_t operator()(const Grammar *t1) const {
+    return t1->index;
+  }
+};
+
+class PtrGrammarContentEq {
+public:
+  bool operator()(const Grammar *t1, const Grammar *t2) const {
+    return t1->index==t2->index;
+  }
+};
+
+
 #endif // AST__RUNTIME__GRAMMAR_H_

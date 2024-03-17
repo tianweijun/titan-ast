@@ -49,7 +49,7 @@ public class LanguageGrammar {
   }
 
   private void initAugmentedNonterminal() {
-    augmentedNonterminal = new NonterminaltGrammar("augmentedNonterminal");
+    augmentedNonterminal = new NonterminalGrammar("augmentedNonterminal");
     augmentedNonterminal.type = GrammarType.NONTERMINAL;
     augmentedNonterminal.text.add(new GrammarToken(GrammarTokenType.TEXT, startGrammarName));
     nonterminals.put(augmentedNonterminal.name, augmentedNonterminal);

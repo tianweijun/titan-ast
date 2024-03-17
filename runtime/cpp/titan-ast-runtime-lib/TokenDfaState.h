@@ -7,7 +7,7 @@
 
 #include "FaStateType.h"
 #include "Grammar.h"
-#include <map>
+#include <unordered_map>
 
 using byte = uint8_t;
 
@@ -23,7 +23,7 @@ public:
   // token语法名字
   Grammar *terminal;
   // 转移
-  std::map<byte, TokenDfaState *> edges;
+  std::unordered_map<byte, TokenDfaState *> edges;
 };
 
 #endif // AST__TOKENDFASTATE_H_

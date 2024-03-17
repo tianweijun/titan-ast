@@ -25,7 +25,7 @@ void PersistentData::init(const std::string *automataFilePath) {
 
 PersistentData::~PersistentData() {
   inputStream.close();
-  //other delete by AutomataData
+  // other delete by AutomataData
 }
 
 void PersistentData::getProductionRulesByInputStream() {
@@ -58,7 +58,8 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
   auto **syntaxDfaStates = new SyntaxDfaState *[sizeOfSyntaxDfaStates];
   for (int indexOfSyntaxDfaState = 0;
        indexOfSyntaxDfaState < sizeOfSyntaxDfaStates; indexOfSyntaxDfaState++) {
-    syntaxDfaStates[indexOfSyntaxDfaState] = new SyntaxDfaState(indexOfSyntaxDfaState);
+    syntaxDfaStates[indexOfSyntaxDfaState] =
+        new SyntaxDfaState(indexOfSyntaxDfaState);
   }
   // countOfSyntaxDfaStates-(type-countOfEdges-[ch,dest]{countOfEdges}-countOfProductions-productions)
   for (int indexOfSyntaxDfaState = 0;
@@ -66,6 +67,10 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
     SyntaxDfaState *syntaxDfaState = syntaxDfaStates[indexOfSyntaxDfaState];
     syntaxDfaState->type = readInt();
     int sizeOfEdges = readInt();
+    syntaxDfaState->edges =
+        std::unordered_map<const Grammar *, SyntaxDfaState *,
+                           PtrGrammarContentHash, PtrGrammarContentEq>(
+            sizeOfEdges);
     for (int indexOfEdge = 0; indexOfEdge < sizeOfEdges; indexOfEdge++) {
       Grammar *ch = grammars[readInt()];
       SyntaxDfaState *chToState = syntaxDfaStates[readInt()];
@@ -78,6 +83,7 @@ SyntaxDfa *PersistentData::getSyntaxDfaByInputStream() {
       syntaxDfaState->closingProductionRules.push_back(
           productionRules[readInt()]);
     }
+    syntaxDfaState->closingProductionRules.shrink_to_fit();
   }
   auto *syntaxDfa = new SyntaxDfa(syntaxDfaStates[0],
                                   (const SyntaxDfaState **)syntaxDfaStates,
@@ -108,6 +114,8 @@ TokenDfa *PersistentData::getTokenDfaByInputStream() {
       tokenDfaState->terminal = grammars[intOfTerminal];
     }
     int sizeOfEdges = readInt();
+    tokenDfaState->edges =
+        std::unordered_map<byte, TokenDfaState *>(sizeOfEdges);
     for (int indexOfEdge = 0; indexOfEdge < sizeOfEdges; indexOfEdge++) {
       int ch = readInt();
       TokenDfaState *chToState = tokenDfaStates[readInt()];
@@ -135,7 +143,9 @@ KeyWordAutomata *PersistentData::getKeyWordAutomataByInputStream() {
 
   int keyWordsSize = readInt();
 
-  auto textTerminalMap = &(keyWordAutomata->textTerminalMap);
+  keyWordAutomata->textTerminalMap =
+      std::unordered_map<std::string *, Grammar *, TextTerminalMapHash,
+                         TextTerminalMapEq>(keyWordsSize);
   for (int indexOfKeyWords = 0; indexOfKeyWords < keyWordsSize;
        indexOfKeyWords++) {
     int intOfText = readInt();
@@ -145,7 +155,7 @@ KeyWordAutomata *PersistentData::getKeyWordAutomataByInputStream() {
     Grammar *terminal = grammars[intOfTerminal];
 
     std::pair<std::string *, Grammar *> pair(text, terminal);
-    textTerminalMap->insert(pair);
+    keyWordAutomata->textTerminalMap.insert(pair);
   }
 
   return keyWordAutomata;
@@ -158,7 +168,7 @@ Grammar **PersistentData::getGrammarsByInputStream() {
   for (int indexOfGrammar = 0; indexOfGrammar < _sizeOfGramamrs;
        indexOfGrammar++) {
     auto type = GrammarType(readInt());
-    auto *grammar = newGrammarByType(type,indexOfGrammar);
+    auto *grammar = newGrammarByType(type, indexOfGrammar);
     grammar->name = *(stringPool[readInt()]);
     grammar->action = GrammarAction(readInt());
     if (type == GrammarType::TERMINAL) {
@@ -172,7 +182,8 @@ Grammar **PersistentData::getGrammarsByInputStream() {
   return heapGrammars;
 }
 
-Grammar *PersistentData::newGrammarByType(GrammarType type,int indexOfGrammar) {
+Grammar *PersistentData::newGrammarByType(GrammarType type,
+                                          int indexOfGrammar) {
   Grammar *grammar = nullptr;
   switch (type) {
   case GrammarType::TERMINAL:
@@ -230,25 +241,27 @@ AstAutomataType PersistentData::getAstAutomataTypeByInputStream() {
   return type;
 }
 
-std::map<const Grammar *, std::set<const Grammar *, PtrGrammarContentCompare> *,
-         PtrGrammarContentCompare> *
+std::unordered_map<const Grammar *,
+                   std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq> *,
+                   PtrGrammarContentHash,PtrGrammarContentEq> *
 PersistentData::getNonterminalFollowMapByInputStream() {
   int size = readInt();
   auto *nonterminalFollowMap =
-      new std::map<const Grammar *,
-                   std::set<const Grammar *, PtrGrammarContentCompare> *,
-                   PtrGrammarContentCompare>();
+      new std::unordered_map<const Grammar *,
+                             std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq> *,
+                             PtrGrammarContentHash,PtrGrammarContentEq>(size);
   for (int indexOfNonterminal = 0; indexOfNonterminal < size;
        indexOfNonterminal++) {
     Grammar *nonterminal = getGrammarByInputStream();
 
     int sizeOfFollow = readInt();
-    auto follow = new std::set<const Grammar *, PtrGrammarContentCompare>();
+    auto follow = new std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq>(sizeOfFollow);
     for (int indexOfFollow = 0; indexOfFollow < sizeOfFollow; indexOfFollow++) {
       follow->insert(getGrammarByInputStream());
     }
 
-    std::pair<const Grammar *, std::set<const Grammar *, PtrGrammarContentCompare> *>
+    std::pair<const Grammar *,
+              std::unordered_set<const Grammar *, PtrGrammarContentHash,PtrGrammarContentEq> *>
         pair(nonterminal, follow);
     nonterminalFollowMap->insert(pair);
   }

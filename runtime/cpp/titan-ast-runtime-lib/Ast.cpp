@@ -7,11 +7,11 @@
 
 Ast::Ast(AstGrammar grammar)
     : grammar(grammar), alias(std::string()), token(AstToken()),
-      children(std::list<Ast *>()) {}
+      children(std::vector<Ast *>()) {}
 
 Ast::Ast(AstGrammar grammar, std::string alias)
     : grammar(grammar), alias(alias), token(AstToken()),
-      children(std::list<Ast *>()) {}
+      children(std::vector<Ast *>()) {}
 
 Ast::~Ast() {
   for (auto ast : children) {

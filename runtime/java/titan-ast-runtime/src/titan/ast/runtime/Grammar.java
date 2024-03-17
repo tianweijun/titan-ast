@@ -5,26 +5,14 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class Grammar implements Comparable<Grammar> {
-  int index;
-  String name = "";
-  GrammarType type = GrammarType.TERMINAL;
-  GrammarAction action = GrammarAction.TEXT;
+public class Grammar {
+  public int index;
+  public String name = "";
+  public GrammarType type = GrammarType.TERMINAL;
+  public GrammarAction action = GrammarAction.TEXT;
 
   public Grammar(int index) {
     this.index = index;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public GrammarType getType() {
-    return type;
-  }
-
-  public GrammarAction getAction() {
-    return action;
   }
 
   @Override
@@ -34,10 +22,5 @@ public class Grammar implements Comparable<Grammar> {
 
   public AstGrammar toAstGrammar() {
     return new AstGrammar(name, type);
-  }
-
-  @Override
-  public int compareTo(Grammar that) {
-    return this.index - that.index;
   }
 }

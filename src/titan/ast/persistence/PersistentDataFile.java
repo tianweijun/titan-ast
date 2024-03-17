@@ -8,7 +8,6 @@ import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
-import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarType;
 import titan.ast.grammar.TerminalGrammar;
@@ -55,7 +54,7 @@ public class PersistentDataFile {
   }
 
   private void writeAstAutomata() {
-    AstAutomata astAutomata = persistentData.astAutomata;
+    AstAutomata astAutomata = persistentData.astContext.languageGrammar.astAutomata;
 
     AstAutomataType astAutomataType = astAutomata.getType();
     writeInt(astAutomataType.ordinal());
@@ -128,7 +127,7 @@ public class PersistentDataFile {
 
   private void writeTokenDfa() {
     int[] tokenDfaData =
-        persistentData.initTokenDfaStates(AstContext.get().languageGrammar.tokenDfa);
+        persistentData.initTokenDfaStates(persistentData.astContext.languageGrammar.tokenDfa);
     for (int data : tokenDfaData) {
       writeInt(data);
     }
@@ -136,7 +135,7 @@ public class PersistentDataFile {
 
   private void writeKeyWordAutomata() {
     LinkedHashMap<Grammar, Integer> grammarIntegerMap = persistentData.grammarIntegerMap;
-    KeyWordAutomata keyWordAutomata = AstContext.get().languageGrammar.keyWordAutomata;
+    KeyWordAutomata keyWordAutomata = persistentData.astContext.languageGrammar.keyWordAutomata;
 
     writeInt(keyWordAutomata.emptyOrNot);
 

@@ -14,8 +14,11 @@ import titan.ast.grammar.token.KeyWordAutomataBuilder;
 import titan.ast.grammar.token.TokenAutomataBuilder;
 import titan.ast.logger.Logger;
 import titan.ast.output.AstGuiOutputer;
+import titan.ast.persistence.AutomataDataBuilder;
 import titan.ast.persistence.PersistentAutomataBuilder;
 import titan.ast.runtime.AstRuntimeException;
+import titan.ast.runtime.AutomataData;
+import titan.ast.runtime.RuntimeAutomataAstApplication;
 import titan.ast.target.Ast;
 import titan.ast.target.Token;
 
@@ -153,6 +156,15 @@ public class GrammarFileAutomataAstApplication {
 
   public void displayGraphicalViewOfAst(Ast ast) {
     new AstGuiOutputer().output(ast);
+  }
+
+  public RuntimeAutomataAstApplication getRuntimeAutomataAstApplication() {
+    AutomataDataBuilder automataDataBuilder = new AutomataDataBuilder(AstContext.get());
+    AutomataData automataData = automataDataBuilder.build();
+    RuntimeAutomataAstApplication runtimeAutomataAstApplication =
+        new RuntimeAutomataAstApplication();
+    runtimeAutomataAstApplication.setContext(automataData);
+    return runtimeAutomataAstApplication;
   }
 
   public void isAmbiguous() {

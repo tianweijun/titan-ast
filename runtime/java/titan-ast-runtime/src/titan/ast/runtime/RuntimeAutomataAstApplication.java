@@ -54,15 +54,14 @@ public class RuntimeAutomataAstApplication implements Cloneable {
   }
 
   public void setContext(AutomataData automataData) {
-    this.setAutomataData(automataData);
+    this.automataData = automataData;
     tokenAutomata = new TokenAutomataBuilder().build(automataData);
     astAutomata = new AstAutomataBuilder().build(automataData);
   }
 
   private AutomataData buildAutomataData(PersistentData persistentData) {
     PersistentObject persistentObject = new PersistentObject(persistentData);
-    AutomataData automataData = persistentObject.toAutomataData();
-    return automataData;
+    return persistentObject.toAutomataData();
   }
 
   public void displayGraphicalViewOfAst(Ast ast) {
@@ -77,9 +76,5 @@ public class RuntimeAutomataAstApplication implements Cloneable {
       throw new AstRuntimeException(e);
     }
     return app;
-  }
-
-  public void setAutomataData(AutomataData automataData) {
-    this.automataData = automataData;
   }
 }
