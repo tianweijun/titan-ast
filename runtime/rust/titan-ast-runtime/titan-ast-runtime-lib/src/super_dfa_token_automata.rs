@@ -77,7 +77,7 @@ impl SuperDfaTokenAutomata {
 
             let token = Token {
                 start: self.start_index_of_token,
-                data: TokenData { data: bytes },
+                text: TokenData { data: bytes },
                 type_: terminal.get_action().into(),
                 terminal: terminal,
             };

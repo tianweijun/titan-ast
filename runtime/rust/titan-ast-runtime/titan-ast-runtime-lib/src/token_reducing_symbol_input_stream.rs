@@ -34,6 +34,21 @@ impl TokenReducingSymbolInputStream {
     pub(crate) fn has_read_all(&self) -> bool {
         return self.next_read_index >= self.token_reducing_symbols.len();
     }
+
+    pub(crate) fn clear(&mut self) {
+        self.token_reducing_symbols.clear();
+        self.next_read_index = 0;
+    }
+
+    pub(crate) fn get_token_ref(&self, index_of_token: usize) -> &Token {
+        return &(self.token_reducing_symbols[index_of_token]);
+    }
+
+    pub(crate) fn get_token_terminal_index(&self, index_of_token: usize) -> usize {
+        return self.token_reducing_symbols[index_of_token]
+            .terminal
+            .get_index();
+    }
 }
 
 impl Default for TokenReducingSymbolInputStream {

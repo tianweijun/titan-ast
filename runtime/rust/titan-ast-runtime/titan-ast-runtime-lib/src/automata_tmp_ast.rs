@@ -1,10 +1,12 @@
 #[derive(Clone)]
 pub(crate) struct AutomataTmpAst {
-    pub grammar: usize, //ast dfa pool
-    pub alias: usize,   //ast dfa production rule pool
-    pub token: i32,     //token input stream
-    pub children: Vec<AutomataTmpAst>,
+    pub(crate) grammar: usize,       //ast dfa pool
+    pub(crate) alias: Option<usize>, //ast dfa production rule pool
+    pub(crate) token: Option<usize>, //token input stream
+    pub(crate) children: Vec<AutomataTmpAst>,
 }
+
+impl AutomataTmpAst {}
 
 impl Default for AutomataTmpAst {
     fn default() -> Self {

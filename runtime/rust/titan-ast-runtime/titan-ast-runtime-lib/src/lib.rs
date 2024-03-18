@@ -33,20 +33,31 @@ mod tests_in_lib {
     use crate::{ast_application::RuntimeAutomataAstApplication, token_automata::TokenBuilder};
 
     #[test]
+    fn build_json_ast() {
+        let automata_file_path =
+            "D:/github-pro/titan/titan-ast/test/json/automata.data".to_string();
+        let source_file_path =
+            "D://github-pro/titan/titan-ast/test/json/titanLanguageConfig.json".to_string();
+        build_ast(&automata_file_path, &source_file_path);
+    }
+
+    #[test]
     fn build_c_ast() {
+        let automata_file_path = "D:/github-pro/titan/titan-ast/test/c/automata.data".to_string();
+        let source_file_path = "D://github-pro/titan/titan-ast/test/c/helloworld.c".to_string();
+        build_ast(&automata_file_path, &source_file_path);
+    }
+
+    fn build_ast(automata_file_path: &String, source_file_path: &String) {
         let mut app = RuntimeAutomataAstApplication::default();
 
-        let automata_file_path = String::from("D:/github-pro/titan/titan-ast/test/c/automata.data");
-        let set_context_result = app.set_context(&automata_file_path);
+        let set_context_result = app.set_context(automata_file_path);
         if set_context_result.is_err() {
             println!("{}", set_context_result.err().unwrap());
             return;
         }
 
-        let source_code_file_path =
-            String::from("D://github-pro/titan/titan-ast/test/c/helloworld.c");
-
-        let build_ast_result = app.build_ast(&source_code_file_path);
+        let build_ast_result = app.build_ast(source_file_path);
 
         match build_ast_result {
             Ok(ast) => println!("{:#?}", ast),
@@ -81,7 +92,7 @@ mod tests_in_lib {
                     };
                     println!(
                         "$-->>>>>{}-{}<<<<<--$",
-                        String::from_utf8_lossy(&(t[i].data.data)).to_string(),
+                        String::from_utf8_lossy(&(t[i].text.data)).to_string(),
                         grammar_name
                     );
                 }

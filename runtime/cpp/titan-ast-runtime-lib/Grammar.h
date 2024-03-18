@@ -39,10 +39,10 @@ public:
   LookaheadMatchingMode lookaheadMatchingMode;
 };
 
-class NonterminaltGrammar : public Grammar {
+class NonterminalGrammar : public Grammar {
 public:
-  explicit NonterminaltGrammar(int index);
-  ~NonterminaltGrammar();
+  explicit NonterminalGrammar(int index);
+  ~NonterminalGrammar();
 };
 
 class PtrGrammarContentCompare {

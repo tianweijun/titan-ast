@@ -11,7 +11,6 @@
 #include <sstream>
 #include <string>
 
-
 bool BacktrackingBottomUpCompare::operator()(
     const BacktrackingBottomUpBranch *t1,
     const BacktrackingBottomUpBranch *t2) const {
@@ -279,7 +278,7 @@ ReducingSymbol *BacktrackingBottomUpAstAutomata::
     getConnectedSignOfStartGrammarReducingSymbol() {
   auto *connectedSignOfStartGrammarReducingSymbol = new ReducingSymbol();
   connectedSignOfStartGrammarReducingSymbol->astOfCurrentDfaState =
-      new AutomataTmpAst(startGrammar, nullptr);
+      new AutomataTmpAst(startGrammar, nullptr);// 应该是augmentedNonterminal,简化为startGrammar
   connectedSignOfStartGrammarReducingSymbol->endIndexOfToken = -1;
   connectedSignOfStartGrammarReducingSymbol->currentDfaState = astDfa->start;
   return connectedSignOfStartGrammarReducingSymbol;
@@ -295,26 +294,27 @@ bool BacktrackingBottomUpAstAutomata::addNewBacktrackingBottomUpBranch(
 
   bool hasInsert = bottomUpBranchs.insert(newBacktrackingBottomUpBranch).second;
   if (hasInsert) {
-    if (!triedBottomUpBranchs.empty()) {
-      int minEndIndexOfTask =
-          (*bottomUpBranchs.begin())->reducingSymbols.back()->endIndexOfToken;
-
-      auto firstTriedBranch = *triedBottomUpBranchs.begin();
-      int minEndIndexOfTriedBranch =
-          firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
-      while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
-        triedBottomUpBranchs.erase(firstTriedBranch);
-        delete firstTriedBranch;
-        if (triedBottomUpBranchs.empty()) {
-          break;
-        }
-        firstTriedBranch = *triedBottomUpBranchs.begin();
-        minEndIndexOfTriedBranch =
-            firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
-      }
-      // std::cout<<minEndIndexOfTask<<":"<<bottomUpBranchs.size()<<"
-      // "<<triedBottomUpBranchs.size()<<std::endl;
+    if (triedBottomUpBranchs.empty()) {
+      return hasInsert;
     }
+    int minEndIndexOfTask =
+        (*bottomUpBranchs.begin())->reducingSymbols.back()->endIndexOfToken;
+
+    auto firstTriedBranch = *triedBottomUpBranchs.begin();
+    int minEndIndexOfTriedBranch =
+        firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
+    while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
+      triedBottomUpBranchs.erase(firstTriedBranch);
+      delete firstTriedBranch;
+      if (triedBottomUpBranchs.empty()) {
+        break;
+      }
+      firstTriedBranch = *triedBottomUpBranchs.begin();
+      minEndIndexOfTriedBranch =
+          firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
+    }
+    // std::cout<<minEndIndexOfTask<<":"<<bottomUpBranchs.size()<<"
+    // "<<triedBottomUpBranchs.size()<<std::endl;
   }
   return hasInsert;
 }
@@ -334,6 +334,9 @@ std::string BacktrackingBottomUpAstAutomata::getNoResultErrorInfo() {
   int endIndexOfToken = 0;
   for (auto branch : triedBottomUpBranchs) {
     int lastIndexOfBranch = branch->reducingSymbols.back()->endIndexOfToken;
+    if(lastIndexOfBranch < 0) {
+      lastIndexOfBranch = 0;
+    }
     if (startIndexOfToken > lastIndexOfBranch) { // 错误开始处尽量小
       startIndexOfToken = lastIndexOfBranch;
     }

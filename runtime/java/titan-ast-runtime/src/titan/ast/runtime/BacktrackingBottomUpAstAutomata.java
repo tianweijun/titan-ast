@@ -193,7 +193,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
   private ReducingSymbol getConnectedSignOfStartGrammarReducingSymbol() {
     ReducingSymbol connectedSignOfStartGrammarReducingSymbol = new ReducingSymbol();
     connectedSignOfStartGrammarReducingSymbol.astOfCurrentDfaState =
-        new AutomataTmpAst(startGrammar, "");
+        new AutomataTmpAst(startGrammar, ""); // 应该是augmentedNonterminal,简化为startGrammar
     connectedSignOfStartGrammarReducingSymbol.endIndexOfToken = -1;
     connectedSignOfStartGrammarReducingSymbol.currentDfaState = astDfa.start;
     return connectedSignOfStartGrammarReducingSymbol;
@@ -205,19 +205,19 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       return;
     }
     if (bottomUpBranchs.add(newBacktrackingBottomUpBranch)) {
-      if (!triedBottomUpBranchs.isEmpty()) {
-        int minEndIndexOfTask = bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
-
-        int minEndIndexOfTriedBranch =
-            triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
-        while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
-          triedBottomUpBranchs.pollFirst();
-          if (triedBottomUpBranchs.isEmpty()) {
-            break;
-          }
-          minEndIndexOfTriedBranch =
-              triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+      if (triedBottomUpBranchs.isEmpty()) {
+        return;
+      }
+      int minEndIndexOfTask = bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+      int minEndIndexOfTriedBranch =
+          triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+      while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
+        triedBottomUpBranchs.pollFirst();
+        if (triedBottomUpBranchs.isEmpty()) {
+          break;
         }
+        minEndIndexOfTriedBranch =
+            triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
       }
     }
   }
@@ -258,7 +258,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     int startIndexOfToken = indexOfLastToken;
     int endIndexOfToken = 0;
     for (BacktrackingBottomUpBranch branch : triedBottomUpBranchs) {
-      int lastIndexOfBranch = branch.reducingSymbols.getLast().endIndexOfToken - 1;
+      int lastIndexOfBranch = branch.reducingSymbols.getLast().endIndexOfToken;
       if (lastIndexOfBranch < 0) {
         lastIndexOfBranch = 0;
       }

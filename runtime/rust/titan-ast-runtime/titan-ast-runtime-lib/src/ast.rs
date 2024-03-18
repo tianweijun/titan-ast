@@ -72,7 +72,7 @@ pub struct TokenData {
 #[derive(Debug, Clone)]
 pub(crate) struct Token {
     pub(crate) start: usize,
-    pub(crate) data: TokenData,
+    pub(crate) text: TokenData,
     pub(crate) terminal: Grammar,
     pub(crate) type_: TokenType,
 }
@@ -91,6 +91,13 @@ impl Grammar {
         match self {
             Grammar::TerminalGrammar(terminal) => terminal.action.clone(),
             Grammar::NonterminalGrammar(nonterminal) => nonterminal.action.clone(),
+        }
+    }
+
+    pub(crate) fn get_index(&self) -> usize {
+        match self {
+            Grammar::TerminalGrammar(terminal) => terminal.index,
+            Grammar::NonterminalGrammar(nonterminal) => nonterminal.index,
         }
     }
 

@@ -17,7 +17,7 @@ impl KeyWordAutomata {
         for i in 0..tokens.len() {
             let token = &mut tokens[i];
             if token.terminal == self.root_key_word {
-                let key_word_grammar = self.text_terminal_map.get(&token.data);
+                let key_word_grammar = self.text_terminal_map.get(&token.text);
                 if let Some(key_word) = key_word_grammar {
                     (*token).terminal = (*key_word).clone();
                 }

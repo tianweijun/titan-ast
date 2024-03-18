@@ -24,7 +24,7 @@ Grammar Grammar::getGrammar() const{
     grammar.lookaheadMatchingMode = ((TerminalGrammar*)this)->lookaheadMatchingMode;
     return grammar;
   }else{
-    NonterminaltGrammar grammar(this->index);
+    NonterminalGrammar grammar(this->index);
     grammar.type = this->type;
     grammar.name = this->name;
     grammar.action = this->action;
@@ -42,9 +42,9 @@ TerminalGrammar::TerminalGrammar(int index)
 
 TerminalGrammar::~TerminalGrammar() = default;
 
-// ------------------NonterminaltGrammar----------------------
-NonterminaltGrammar::NonterminaltGrammar(int index) : Grammar(index) {
+// ------------------NonterminalGrammar----------------------
+NonterminalGrammar::NonterminalGrammar(int index) : Grammar(index) {
   this->type = GrammarType::NONTERMINAL;
 }
 
-NonterminaltGrammar::~NonterminaltGrammar() = default;
+NonterminalGrammar::~NonterminalGrammar() = default;

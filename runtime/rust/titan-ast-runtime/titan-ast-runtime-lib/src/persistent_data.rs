@@ -84,8 +84,7 @@ impl PersistentData {
         self.production_rules = Vec::with_capacity(count_of_production_rules);
 
         for _ in 0..count_of_production_rules {
-            let index_of_grammar = self.read_i32() as usize;
-            let grammar = self.grammars[index_of_grammar].clone();
+            let grammar = self.read_i32() as usize;
 
             let index_of_alias_in_string_pool = self.read_i32();
             let mut alias: Option<String> = None;
@@ -105,6 +104,7 @@ impl PersistentData {
 
     pub(crate) fn get_syntax_dfa_by_input_stream(&mut self) -> SyntaxDfa {
         let mut syntax_dfa: SyntaxDfa = SyntaxDfa::default();
+        syntax_dfa.start = 0;
 
         let size_of_syntax_dfa_states = self.read_i32() as usize;
         syntax_dfa.states = Vec::with_capacity(size_of_syntax_dfa_states);

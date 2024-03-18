@@ -190,7 +190,7 @@ Grammar *PersistentData::newGrammarByType(GrammarType type,
     grammar = new TerminalGrammar(indexOfGrammar);
     break;
   case GrammarType::NONTERMINAL:
-    grammar = new NonterminaltGrammar(indexOfGrammar);
+    grammar = new NonterminalGrammar(indexOfGrammar);
     break;
   case GrammarType::TERMINAL_FRAGMENT:
   default:
