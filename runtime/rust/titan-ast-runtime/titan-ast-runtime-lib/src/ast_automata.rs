@@ -15,6 +15,30 @@ pub(crate) enum SubBacktrackingBottomUpAstAutomata {
     FollowFilterBacktrackingBottomUpAstAutomata(FollowFilterBacktrackingBottomUpAstAutomata),
 }
 
+impl SubBacktrackingBottomUpAstAutomata {
+    pub(crate) fn get_type(&self) -> AstAutomataType {
+        match self {
+            SubBacktrackingBottomUpAstAutomata::BacktrackingBottomUpAstAutomata(_) => {
+                AstAutomataType::BacktrackingBottomUpAstAutomata
+            }
+            SubBacktrackingBottomUpAstAutomata::FollowFilterBacktrackingBottomUpAstAutomata(_) => {
+                AstAutomataType::FollowFilterBacktrackingBottomUpAstAutomata
+            }
+        }
+    }
+
+    pub(crate) fn get_follow_filter_backtracking_bottom_up_ast_automata_ref(
+        &self,
+    ) -> Option<&FollowFilterBacktrackingBottomUpAstAutomata> {
+        match self {
+            SubBacktrackingBottomUpAstAutomata::BacktrackingBottomUpAstAutomata(_) => None,
+            SubBacktrackingBottomUpAstAutomata::FollowFilterBacktrackingBottomUpAstAutomata(
+                follow_automata,
+            ) => Some(follow_automata),
+        }
+    }
+}
+
 impl Default for SubBacktrackingBottomUpAstAutomata {
     fn default() -> Self {
         Self::BacktrackingBottomUpAstAutomata(Default::default())

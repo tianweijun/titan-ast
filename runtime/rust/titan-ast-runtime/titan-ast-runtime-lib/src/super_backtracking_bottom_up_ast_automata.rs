@@ -7,6 +7,7 @@ use crate::{
     backtracking_bottom_up_branch::BacktrackingBottomUpBranch,
     error::AstAppError,
     fa::FaStateType,
+    follow_filter_backtracking_bottom_up_ast_automata,
     reducing_symbol::ReducingSymbol,
     syntax_dfa::SyntaxDfa,
     token_reducing_symbol_input_stream::TokenReducingSymbolInputStream,
@@ -70,6 +71,66 @@ impl SuperBacktrackingBottomUpAstAutomata {
     }
 
     fn reduce_bottom_up_branch(&mut self, bottom_up_branch: &BacktrackingBottomUpBranch) {
+        match self.sub_ast_automata.get_type() {
+            crate::ast_automata::AstAutomataType::BacktrackingBottomUpAstAutomata => {
+                self.super_reduce_bottom_up_branch(bottom_up_branch);
+            }
+            crate::ast_automata::AstAutomataType::FollowFilterBacktrackingBottomUpAstAutomata => {
+                self.reduce_bottom_up_branch_by_follow_filter(bottom_up_branch);
+            }
+        }
+    }
+
+    fn reduce_bottom_up_branch_by_follow_filter(
+        &mut self,
+        bottom_up_branch: &BacktrackingBottomUpBranch,
+    ) {
+        let follow_filter_backtracking_bottom_up_ast_automata = self
+            .sub_ast_automata
+            .get_follow_filter_backtracking_bottom_up_ast_automata_ref()
+            .unwrap();
+        let top_reducing_symbol = bottom_up_branch.reducing_symbols.last().unwrap();
+        self.token_reducing_symbol_input_stream.next_read_index =
+            (top_reducing_symbol.end_index_of_token + 1) as usize;
+
+        let mut terminal_of_next_token: usize = 0;
+        if self.token_reducing_symbol_input_stream.has_read_all() {
+            terminal_of_next_token = follow_filter_backtracking_bottom_up_ast_automata.eof_grammar;
+        } else {
+            let index_of_token = self.token_reducing_symbol_input_stream.read();
+            terminal_of_next_token = self
+                .token_reducing_symbol_input_stream
+                .get_token_terminal_index(index_of_token);
+        }
+
+        let index_of_current_dfa_state = top_reducing_symbol.current_dfa_state;
+        let current_dfa_state = self.ast_dfa.get_state(index_of_current_dfa_state);
+
+        let mut do_reduce_production_rules: Vec<usize> =
+            Vec::with_capacity(current_dfa_state.closing_production_rules.len());
+
+        for index_of_closing_production_rule in current_dfa_state.closing_production_rules.iter() {
+            let nonterminal = self
+                .ast_dfa
+                .get_production_rule_grammar(*index_of_closing_production_rule);
+            let follow = follow_filter_backtracking_bottom_up_ast_automata
+                .nonterminal_follow_map
+                .get(&nonterminal)
+                .unwrap();
+            if follow.contains(&terminal_of_next_token) {
+                do_reduce_production_rules.push(*index_of_closing_production_rule);
+            }
+        }
+
+        for index_of_closing_production_rule in do_reduce_production_rules {
+            self.do_reduce(bottom_up_branch, index_of_closing_production_rule);
+        }
+    }
+
+    pub(crate) fn super_reduce_bottom_up_branch(
+        &mut self,
+        bottom_up_branch: &BacktrackingBottomUpBranch,
+    ) {
         let top_reducing_symbol = bottom_up_branch.reducing_symbols.last().unwrap();
         let index_of_current_dfa_state = top_reducing_symbol.current_dfa_state;
         let current_dfa_state = self.ast_dfa.get_state(index_of_current_dfa_state);

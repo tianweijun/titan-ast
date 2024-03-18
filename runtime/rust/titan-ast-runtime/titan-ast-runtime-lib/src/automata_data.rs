@@ -21,7 +21,7 @@ pub(crate) struct AutomataData {
     pub(crate) ast_automata_type: AstAutomataType,
     pub(crate) start_grammar: usize,
     pub(crate) ast_dfa: SyntaxDfa,
-    pub(crate) eof_grammar: Grammar,
+    pub(crate) eof_grammar: usize,
     pub(crate) nonterminal_follow_map: HashMap<usize, HashSet<usize>>,
 }
 

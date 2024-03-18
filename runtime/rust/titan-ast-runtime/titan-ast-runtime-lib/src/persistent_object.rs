@@ -16,7 +16,7 @@ pub(crate) struct PersistentObject {
     pub(crate) ast_automata_type: AstAutomataType,
     pub(crate) start_grammar: usize,
     pub(crate) ast_dfa: SyntaxDfa,
-    pub(crate) eof_grammar: Grammar,
+    pub(crate) eof_grammar: usize,
     pub(crate) nonterminal_follow_map: HashMap<usize, HashSet<usize>>,
 }
 
@@ -50,7 +50,7 @@ impl PersistentObject {
         self.start_grammar = self.persistent_data.get_index_of_grammar_by_input_stream();
         self.init_ast_dfa();
 
-        self.eof_grammar = self.persistent_data.get_grammar_by_input_stream();
+        self.eof_grammar = self.persistent_data.get_index_of_grammar_by_input_stream();
         self.nonterminal_follow_map = self
             .persistent_data
             .get_nonterminal_follow_map_by_input_stream();

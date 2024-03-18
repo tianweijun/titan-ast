@@ -69,11 +69,6 @@ impl PersistentData {
         return index_of_grammar;
     }
 
-    pub(crate) fn get_grammar_by_input_stream(&mut self) -> Grammar {
-        let index_of_grammar = self.read_i32() as usize;
-        return self.grammars[index_of_grammar].clone();
-    }
-
     pub(crate) fn get_ast_automata_type_by_input_stream(&mut self) -> AstAutomataType {
         let int_of_ast_automata_type = self.read_i32();
         return int_of_ast_automata_type.try_into().unwrap();

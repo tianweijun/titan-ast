@@ -1,5 +1,6 @@
 use crate::{
     ast_automata::SubBacktrackingBottomUpAstAutomata, automata_data::AutomataData,
+    follow_filter_backtracking_bottom_up_ast_automata::FollowFilterBacktrackingBottomUpAstAutomata,
     super_backtracking_bottom_up_ast_automata::SuperBacktrackingBottomUpAstAutomata,
 };
 
@@ -15,7 +16,10 @@ pub(crate) fn build(automata_data: &AutomataData) -> SuperBacktrackingBottomUpAs
         crate::ast_automata::AstAutomataType::FollowFilterBacktrackingBottomUpAstAutomata => {
             sub_backtracking_bottom_up_ast_automata =
                 SubBacktrackingBottomUpAstAutomata::FollowFilterBacktrackingBottomUpAstAutomata(
-                    Default::default(),
+                    FollowFilterBacktrackingBottomUpAstAutomata {
+                        eof_grammar: automata_data.eof_grammar,
+                        nonterminal_follow_map: automata_data.nonterminal_follow_map.clone(),
+                    },
                 )
         }
     }

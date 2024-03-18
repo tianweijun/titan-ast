@@ -27,8 +27,7 @@ impl TokenReducingSymbolInputStream {
     }
 
     pub(crate) fn has_next(&self) -> bool {
-        return self.next_read_index >= 0
-            && self.next_read_index < self.token_reducing_symbols.len();
+        return self.next_read_index < self.token_reducing_symbols.len();
     }
 
     pub(crate) fn has_read_all(&self) -> bool {

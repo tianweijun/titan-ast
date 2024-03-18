@@ -53,6 +53,10 @@ impl SyntaxDfa {
     pub(crate) fn get_production_rule(&self, index: usize) -> ProductionRule {
         return self.production_rules[index].clone();
     }
+
+    pub(crate) fn get_production_rule_grammar(&self, index: usize) -> usize {
+        return self.production_rules[index].grammar;
+    }
 }
 
 #[derive(Clone)]
