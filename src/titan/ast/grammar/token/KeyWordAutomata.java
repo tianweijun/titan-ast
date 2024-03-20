@@ -1,12 +1,10 @@
 package titan.ast.grammar.token;
 
 import java.util.HashMap;
-import java.util.List;
 import titan.ast.grammar.Grammar;
-import titan.ast.target.Token;
 
 /**
- * .
+ * 只保留依赖的数据，真正的实现在runtime里面.
  *
  * @author tian wei jun
  */
@@ -19,16 +17,4 @@ public class KeyWordAutomata {
   public Grammar rootKeyWord = null;
 
   public HashMap<String, Grammar> textTerminalMap = new HashMap<>();
-
-  public List<Token> buildToken(List<Token> tokens) {
-    for (Token token : tokens) {
-      if (token.terminal == rootKeyWord) {
-        Grammar terminal = textTerminalMap.get(token.text);
-        if (null != terminal) {
-          token.terminal = terminal;
-        }
-      }
-    }
-    return tokens;
-  }
 }

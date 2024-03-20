@@ -76,7 +76,8 @@ public class CommandLineAstApplication {
       GrammarFileAutomataAstApplication grammarFileAutomataAstApplication,
       CommandLineParameters commandLineParameters) {
     if (commandLineParameters.isBuildingAstByGrammarFile()) {
-      titan.ast.target.Ast ast =
+      grammarFileAutomataAstApplication.setRuntimeAutomataAstApplication();
+      titan.ast.runtime.Ast ast =
           grammarFileAutomataAstApplication.buildAst(commandLineParameters.sourceFilePath);
       if (commandLineParameters.graphicalViewOfAst) {
         grammarFileAutomataAstApplication.displayGraphicalViewOfAst(ast);
@@ -87,8 +88,7 @@ public class CommandLineAstApplication {
   private void buildAstByAutomataFile(CommandLineParameters commandLineParameters) {
     if (commandLineParameters.isBuildingAstByAutomataFile()) {
       RuntimeAutomataAstApplication runtimeAutomataAstApplication =
-          new RuntimeAutomataAstApplication();
-      runtimeAutomataAstApplication.setContext(commandLineParameters.automataFilePath);
+          new RuntimeAutomataAstApplication(commandLineParameters.automataFilePath);
       titan.ast.runtime.Ast ast =
           runtimeAutomataAstApplication.buildAst(commandLineParameters.sourceFilePath);
       if (commandLineParameters.graphicalViewOfAst) {

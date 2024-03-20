@@ -16,8 +16,8 @@ public class Application {
     } else {
       return;
     }
-    RuntimeAutomataAstApplication runtimeAstApplication = new RuntimeAutomataAstApplication();
-    runtimeAstApplication.setContext(automataFilePath);
+    RuntimeAutomataAstApplication runtimeAstApplication =
+        new RuntimeAutomataAstApplication(automataFilePath);
 
     Ast ast = runtimeAstApplication.buildAst(sourceCodeFilePath);
     runtimeAstApplication.displayGraphicalViewOfAst(ast);

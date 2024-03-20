@@ -1,7 +1,7 @@
 package titan.ast.test.debug;
 
 import titan.ast.grammar.GrammarFileAutomataAstApplication;
-import titan.ast.target.Ast;
+import titan.ast.runtime.Ast;
 
 public class DebugShowGraphicalViewOfAstByGrammarFileTest {
 

@@ -18,7 +18,7 @@ public class RuntimeAutomataAstApplicationTest {
     grammarFileAutomataAstApplication.setAstAutomataContext(grammarFilePath);
 
     RuntimeAutomataAstApplication runtimeAutomataAstApplication =
-        grammarFileAutomataAstApplication.getRuntimeAutomataAstApplication();
+        grammarFileAutomataAstApplication.buildRuntimeAutomataAstApplication();
     grammarFileAutomataAstApplication.clear(); // helper gc
 
     String sourceCodeFilePath = "D://github-pro/titan/titan-ast/test/c/helloworld.c";

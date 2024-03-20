@@ -20,8 +20,7 @@ public class DiyShowGraphicalViewOfAstByAutomataFileTest {
       "--graphicalViewOfAst"
     };
     RuntimeAutomataAstApplication runtimeAutomataAstApplication =
-        new RuntimeAutomataAstApplication();
-    runtimeAutomataAstApplication.setContext(testArgs[1]);
+        new RuntimeAutomataAstApplication(testArgs[1]);
 
     Ast ast = runtimeAutomataAstApplication.buildAst(testArgs[3]);
     runtimeAutomataAstApplication.displayGraphicalViewOfAst(ast);

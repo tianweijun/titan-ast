@@ -2,7 +2,7 @@ package titan.ast.grammar.token;
 
 import java.io.InputStream;
 import java.util.List;
-import titan.ast.target.Token;
+import titan.ast.runtime.Token;
 
 /**
  * .

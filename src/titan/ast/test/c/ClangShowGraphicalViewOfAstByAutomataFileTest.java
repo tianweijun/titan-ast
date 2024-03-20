@@ -17,8 +17,8 @@ public class ClangShowGraphicalViewOfAstByAutomataFileTest {
 
     // String sourceCodeFilePath = "D:/test/c_runtime/helloworld.c";
 
-    RuntimeAutomataAstApplication runtimeAstApplication = new RuntimeAutomataAstApplication();
-    runtimeAstApplication.setContext(automataFilePath);
+    RuntimeAutomataAstApplication runtimeAstApplication =
+        new RuntimeAutomataAstApplication(automataFilePath);
 
     Ast ast = runtimeAstApplication.buildAst(sourceCodeFilePath);
 

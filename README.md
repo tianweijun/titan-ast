@@ -96,11 +96,11 @@ java -jar  titan-ast.jar  -automataFilePath D:/github-pro/titan/titan-ast/test/c
 import titan-ast.jar and using it like this:
 
 ```java
-    String automataFilePath = "D:/java-ws/titan-ast/test/c/automata.data";
-    String sourceCodeFilePath = "D:/java-ws/titan-ast/test/c/helloworld.c";
+    String automataFilePath = "D:/github-pro/titan/titan-ast/test/c/automata.data";
+    String sourceCodeFilePath = "D:/github-pro/titan/titan-ast/test/c/helloworld.c";
 
-    RuntimeAutomataAstApplication runtimeAstApplication = new RuntimeAutomataAstApplication();
-    runtimeAstApplication.setContext(automataFilePath);
+    RuntimeAutomataAstApplication runtimeAstApplication =
+        new RuntimeAutomataAstApplication(automataFilePath);
 
     Ast ast = runtimeAstApplication.buildAst(sourceCodeFilePath);
     runtimeAstApplication.displayGraphicalViewOfAst(ast);

@@ -1,8 +1,8 @@
 package titan.ast.grammar.syntax;
 
 import java.util.List;
-import titan.ast.target.Ast;
-import titan.ast.target.Token;
+import titan.ast.runtime.Ast;
+import titan.ast.runtime.Token;
 
 /**
  * ast的自动机.

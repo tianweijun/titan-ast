@@ -1,11 +1,7 @@
 package titan.ast.grammar.token;
 
-import java.io.InputStream;
-import java.util.List;
-import titan.ast.target.Token;
-
 /**
- * 识别token的dfa.
+ * 识别token的dfa,增加了keyword的判定，只保留依赖的数据，真正的实现在runtime里面.
  *
  * @author tian wei jun
  */
@@ -22,17 +18,5 @@ public class KeyWordDfaTokenAutomata extends DfaTokenAutomata {
   public KeyWordDfaTokenAutomata(KeyWordAutomata keyWordAutomata, TokenDfa dfa) {
     super(dfa);
     this.keyWordAutomata = keyWordAutomata;
-  }
-
-  /**
-   * 根据输入流构造tokens.
-   *
-   * @param byteInputStream 将要识别文本的输入流.
-   * @return
-   */
-  @Override
-  public List<Token> buildToken(InputStream byteInputStream) {
-    List<Token> ret = super.buildToken(byteInputStream);
-    return keyWordAutomata.buildToken(ret);
   }
 }

@@ -13,14 +13,11 @@ import titan.ast.grammar.syntax.ProductionRuleBuilder;
 import titan.ast.grammar.token.KeyWordAutomataBuilder;
 import titan.ast.grammar.token.TokenAutomataBuilder;
 import titan.ast.logger.Logger;
-import titan.ast.output.AstGuiOutputer;
 import titan.ast.persistence.AutomataDataBuilder;
 import titan.ast.persistence.PersistentAutomataBuilder;
-import titan.ast.runtime.AstRuntimeException;
+import titan.ast.runtime.Ast;
 import titan.ast.runtime.AutomataData;
 import titan.ast.runtime.RuntimeAutomataAstApplication;
-import titan.ast.target.Ast;
-import titan.ast.target.Token;
 
 /**
  * 语法文件的应用.
@@ -28,6 +25,7 @@ import titan.ast.target.Token;
  * @author tian wei jun
  */
 public class GrammarFileAutomataAstApplication {
+  RuntimeAutomataAstApplication runtimeAutomataAstApplication = null;
 
   public void setAstAutomataContext(String grammarFilePath) {
     AstContext.init();
@@ -50,20 +48,20 @@ public class GrammarFileAutomataAstApplication {
     buildAstAutomataContext();
   }
 
-  public void initGrammar(String grammarFilePath) {
+  private void initGrammar(String grammarFilePath) {
     new LanguageGrammarInitializer().initGrammarByFile(grammarFilePath);
   }
 
-  public void initGrammar(List<String> grammarFilePaths) {
+  private void initGrammar(List<String> grammarFilePaths) {
     new LanguageGrammarInitializer().initGrammarByFiles(grammarFilePaths);
   }
 
-  public void initGrammar(InputStream grammarFileInputStream) {
+  private void initGrammar(InputStream grammarFileInputStream) {
     new LanguageGrammarInitializer().initGrammarByInputStream(grammarFileInputStream);
   }
 
   /** 为了参与语法自动机的构建,keyWords不参与任何tokenDfa的构建，仅仅是LanguageGrammarInitializer.init(). */
-  public void addKeyWord2Terminals() {
+  private void addKeyWord2Terminals() {
     LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
     // 将keyword 添加到 terminals
     for (Grammar keyWord : languageGrammar.keyWords) {
@@ -76,13 +74,13 @@ public class GrammarFileAutomataAstApplication {
    *
    * @param nonterminals nonterminals
    */
-  public void buildProductionRule(LinkedHashMap<String, Grammar> nonterminals) {
+  private void buildProductionRule(LinkedHashMap<String, Grammar> nonterminals) {
     ProductionRuleBuilder productionRuleBuilder = new ProductionRuleBuilder(nonterminals);
     AstContext.get().nonterminalProductionRulesMap = productionRuleBuilder.build();
   }
 
   /** call after LanguageGrammarInitializer.init() */
-  public void buildAstAutomataContext() {
+  private void buildAstAutomataContext() {
     // LanguageGrammarInitializer.init()
     LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
 
@@ -129,41 +127,25 @@ public class GrammarFileAutomataAstApplication {
   }
 
   public Ast buildAst(String sourceFilePath) {
-    AstContext astContext = AstContext.get();
-    LanguageGrammar languageGrammar = astContext.languageGrammar;
-    // token
-    List<Token> tokens = languageGrammar.tokenAutomata.buildToken(sourceFilePath);
-    // ast
-    return languageGrammar.astAutomata.buildAst(tokens);
+    return runtimeAutomataAstApplication.buildAst(sourceFilePath);
   }
 
   public Ast buildAst(InputStream sourceInputStream) {
-    AstContext astContext = AstContext.get();
-    LanguageGrammar languageGrammar = astContext.languageGrammar;
-    // token
-    List<Token> tokens = languageGrammar.tokenAutomata.buildToken(sourceInputStream);
-    // ast
-    Ast ast = languageGrammar.astAutomata.buildAst(tokens);
-    if (null != sourceInputStream) {
-      try {
-        sourceInputStream.close();
-      } catch (Exception e) {
-        throw new AstRuntimeException(e);
-      }
-    }
-    return ast;
+    return runtimeAutomataAstApplication.buildAst(sourceInputStream);
   }
 
   public void displayGraphicalViewOfAst(Ast ast) {
-    new AstGuiOutputer().output(ast);
+    runtimeAutomataAstApplication.displayGraphicalViewOfAst(ast);
   }
 
-  public RuntimeAutomataAstApplication getRuntimeAutomataAstApplication() {
+  public void setRuntimeAutomataAstApplication() {
+    this.runtimeAutomataAstApplication = buildRuntimeAutomataAstApplication();
+  }
+
+  public RuntimeAutomataAstApplication buildRuntimeAutomataAstApplication() {
     AutomataDataBuilder automataDataBuilder = new AutomataDataBuilder(AstContext.get());
     AutomataData automataData = automataDataBuilder.build();
-    RuntimeAutomataAstApplication runtimeAutomataAstApplication =
-        new RuntimeAutomataAstApplication();
-    runtimeAutomataAstApplication.setContext(automataData);
+    this.runtimeAutomataAstApplication = new RuntimeAutomataAstApplication(automataData);
     return runtimeAutomataAstApplication;
   }
 

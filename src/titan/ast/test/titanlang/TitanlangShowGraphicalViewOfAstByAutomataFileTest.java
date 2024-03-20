@@ -19,8 +19,8 @@ public class TitanlangShowGraphicalViewOfAstByAutomataFileTest {
     StopWatch stopWatch = new StopWatch();
 
     stopWatch.start();
-    RuntimeAutomataAstApplication runtimeAstApplication = new RuntimeAutomataAstApplication();
-    runtimeAstApplication.setContext(automataFilePath);
+    RuntimeAutomataAstApplication runtimeAstApplication =
+        new RuntimeAutomataAstApplication(automataFilePath);
     stopWatch.stop();
     Logger.info("build runtimeAstApplication,time:", Long.toString(stopWatch.getMillTime()));
 

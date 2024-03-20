@@ -14,6 +14,18 @@ public class RuntimeAutomataAstApplication implements Cloneable {
   TokenAutomata tokenAutomata;
   AstAutomata astAutomata;
 
+  public RuntimeAutomataAstApplication(InputStream automataByteInputStream) {
+    setContext(automataByteInputStream);
+  }
+
+  public RuntimeAutomataAstApplication(String automataFilePath) {
+    setContext(automataFilePath);
+  }
+
+  public RuntimeAutomataAstApplication(AutomataData automataData) {
+    setContext(automataData);
+  }
+
   public Ast buildAst(String sourceFilePath) {
     List<Token> tokens = tokenAutomata.buildToken(sourceFilePath);
     return astAutomata.buildAst(tokens);
@@ -75,6 +87,7 @@ public class RuntimeAutomataAstApplication implements Cloneable {
     } catch (CloneNotSupportedException e) {
       throw new AstRuntimeException(e);
     }
+    app.setContext(app.automataData);
     return app;
   }
 }

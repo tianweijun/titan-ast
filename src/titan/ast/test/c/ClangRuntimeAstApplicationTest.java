@@ -28,8 +28,8 @@ public class ClangRuntimeAstApplicationTest {
 
     ArrayList<Future<Ast>> futures = new ArrayList<>(countOfTask);
 
-    RuntimeAutomataAstApplication runtimeAstApplication = new RuntimeAutomataAstApplication();
-    runtimeAstApplication.setContext(automataFilePath);
+    RuntimeAutomataAstApplication runtimeAstApplication =
+        new RuntimeAutomataAstApplication(automataFilePath);
     ArrayList<RuntimeAutomataAstApplication> apps = new ArrayList<>(countOfTask);
     apps.add(runtimeAstApplication);
     for (int i = 1; i < countOfTask; i++) {

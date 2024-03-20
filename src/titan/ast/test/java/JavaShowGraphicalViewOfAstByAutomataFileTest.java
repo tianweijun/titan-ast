@@ -33,8 +33,8 @@ public class JavaShowGraphicalViewOfAstByAutomataFileTest {
     */
 
     stopWatch.start();
-    RuntimeAutomataAstApplication runtimeAstApplication = new RuntimeAutomataAstApplication();
-    runtimeAstApplication.setContext(automataFilePath);
+    RuntimeAutomataAstApplication runtimeAstApplication =
+        new RuntimeAutomataAstApplication(automataFilePath);
     stopWatch.stop();
     Logger.info("build runtimeAstApplication,time:", Long.toString(stopWatch.getMillTime()));
 
