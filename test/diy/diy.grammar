@@ -1,0 +1,42 @@
+
+// grammar diy ;
+
+@StartGrammar diy ;
+
+@NonterminalGrammar begin ;
+diy :
+  set+
+;
+
+set :
+ Set Identifier Equal Identifier End
+;
+
+@NonterminalGrammar end ;
+
+@TerminalGrammar begin ;
+
+Identifier :
+  IdentifierChar+
+;
+
+ WS
+    : [\s\t\n\r]+ -> skip
+    ;
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+
+IdentifierChar : [a-zA-Z_0-9] ;
+
+Test :   (~[a] | ~[)  ;
+
+@TerminalFragmentGrammar end ;
+
+@KeyWord RootKeyWord(Identifier) begin ;
+
+Set : 'set' ;
+Equal : 'equal' | 'Equal'   ;
+End : 'end' ;
+
+@KeyWord end ;

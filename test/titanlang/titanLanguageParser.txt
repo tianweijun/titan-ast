@@ -1,0 +1,763 @@
+
+/*
+*
+* titan language parser 
+*
+*/
+
+
+@StartGrammar compilationUnit ;
+
+@NonterminalGrammar begin ;
+
+constLiteral :
+  '-'? UnsignedIntegerLiteral  #integerLiteral
+  | '-'? UnsignedFloatingPointNumberLiteral #floatingPointNumberLiteral
+  | CharLiteral #charLiteral
+  | StringLiteral #stringLiteral
+;
+
+// ---------------------generics start----------------------
+
+wildcard : '?' ;
+
+genericArgument :
+   instanceTypeName
+   | constLiteral
+   | wildcard
+;
+
+genericArgumentList :
+   genericArgument (',' genericArgument)*
+;
+
+genericArguments :
+   '<' genericArgumentList '>'
+;
+
+genericParameterBounds :
+    instanceTypeName ( '&' instanceTypeName )*
+;
+
+genericParameter :
+   identifier ( ':' genericParameterBounds )?
+;
+
+genericParameterList :
+   genericParameter ( ',' genericParameter)*
+;
+
+genericParameters :
+  '<' genericParameterList '>'
+;
+
+// ---------------------generics end------------------------
+
+// --------------------path start-------------------------
+
+pathSegment :
+   identifier
+;
+
+// 具名路径或相对具名路径
+plainPath :
+  pathSegment (':' ':' pathSegment)*
+;
+
+useItem :
+   identifier // not function type,module scope,InstanceTypeAlias
+   | 'function' ':' identifier // function
+   | 'var' ':' identifier // var
+;
+
+usePathTree :
+  (plainPath ':' ':')? useItem ( 'as' identifier )? #useItem
+  | (plainPath ':' ':')?  '{' usePathTree (',' usePathTree)* '}'
+;
+
+// moduleIdentifierSegment: no (crate,super,self)
+modulePlainPath :
+  moduleIdentifierSegment (':' ':' moduleIdentifierSegment)*
+;
+
+moduleIdentifier :
+    ( modulePlainPath ':' ':' )? moduleIdentifierSegment
+;
+
+// --------------------path end-------------------------
+
+// --------------------type start-------------------------
+
+instanceTypeNameModifier :
+  'const'
+;
+
+/*
+function(params)->retType和Pointer<const function(params)->retType>是等价的.
+*/
+functionInstanceTypeName :
+  instanceTypeNameModifier* 'function' '(' parameterTypeList? ')' functionReturnType?
+;
+
+notFunctionInstanceTypeName :
+  instanceTypeNameModifier* ( plainPath ':' ':' )? identifier genericArguments?
+;
+
+instanceTypeName :
+   notFunctionInstanceTypeName | functionInstanceTypeName
+;
+
+noGenericParameterNotFunctionTypeName :
+    ( plainPath ':' ':' )? identifier genericArguments?
+;
+
+// --------------------type end-------------------------
+
+// --------------------statement start-------------------------
+
+typeAliasStatement :
+    'type' identifier '='  instanceTypeName  ';'
+;
+
+useDeclarationStatement : 'use' usePathTree ';' ;
+
+emptyStatement :
+   ';'
+;
+
+expressionStatement :
+   expression ';'
+;
+
+returnStatement :
+     'return' expression? ';'
+;
+
+variableDeclarator :
+  variableDeclaratorPattern (':' instanceTypeName)? ('=' expression)?
+;
+
+letStatement :
+   'let' variableDeclarator (',' variableDeclarator)* ';'
+;
+
+iteratorLoopStatement :
+   'for' pattern 'in' expression blockAsPartOfStatement
+;
+
+forLoopStatement :
+  'for' '(' statement expressionStatement statement ')' blockAsPartOfStatement
+;
+
+predicateLoopStatement :
+   'while' expression blockAsPartOfStatement
+;
+
+infiniteLoopStatement :
+  'loop' blockAsPartOfStatement
+;
+
+breakStatement :
+  'break' ';'
+;
+
+continueStatement :
+  'continue'  ';'
+;
+
+loopStatement :
+  iteratorLoopStatement
+  | forLoopStatement
+  | predicateLoopStatement
+  | infiniteLoopStatement
+;
+
+blockStatement :
+ '{' blockStatementItem* '}'
+;
+
+ifThenStatement :
+   'if' expression  blockAsPartOfStatement
+;
+
+ifThenElseStatement :
+   'if'  expression  blockAsPartOfStatement 'else' blockAsPartOfStatement
+;
+
+ifStatement :
+ ifThenStatement
+ | ifThenElseStatement
+;
+
+matchStatement :
+  'match' expression '{' matchArm+ '}'
+;
+
+matchArm :
+   pattern '=' '>' '{' statement? '}'
+;
+
+// (useDeclarationStatement,typeAliasStatement)只用于module起始部分，不算做常规语句。
+statement :
+  emptyStatement
+  | expressionStatement
+  | letStatement
+  | returnStatement
+  | loopStatement
+  | breakStatement
+  | continueStatement
+  | blockStatement
+  | ifStatement
+  | matchStatement
+;
+
+blockAsPartOfStatement :
+  '{' blockAsPartOfStatementItem* '}'
+;
+
+blockAsPartOfStatementItem :
+   typeDefinition
+   | statement
+;
+
+blockStatementItem :
+   typeDefinition
+   | statement
+;
+
+// --------------------statement end--------------------------
+
+// --------------------pattern start--------------------------
+
+pattern :
+     patternNoTopAlt ('|' patternNoTopAlt)*
+;
+
+patternNoTopAlt :
+   identifierPattern
+   | fieldTypePattern
+;
+
+identifierPattern :
+   identifier
+;
+
+fieldTypePattern :
+   instanceTypeName '{' fieldTypePatternElements? '}'
+;
+
+fieldTypePatternElements :
+   fieldTypePatternFields
+;
+
+fieldTypePatternFields :
+  fieldTypePatternField (',' fieldTypePatternField)*
+;
+
+fieldTypePatternField :
+   identifier ':' pattern
+;
+
+// variableDeclarator
+variableDeclaratorPattern :
+   identifierPattern
+;
+
+// --------------------pattern end--------------------------
+
+// --------------------annotation start-------------------------
+
+annotationInstanceTypeName :
+  ( plainPath ':' ':' )? identifier
+;
+
+annotationInitListValue :
+	constLiteral
+  | annotationInstanceTypeName annotationInitList
+;
+
+annotationInitListField :
+  identifier ':' annotationInitListValue
+;
+
+annotationInitList :
+  '{' '}' #emptyAnnotationInitList
+  | '{' annotationInitListField ( ',' annotationInitListField )* '}' #fieldsAnnotationInitList
+  | '{' annotationInitListValue ( ',' annotationInitListValue )* '}' #valuesAnnotationInitList
+;
+
+markerAnnotation :
+   '@' annotationInstanceTypeName
+;
+
+normalAnnotation :
+  '@' annotationInstanceTypeName annotationInitList
+;
+
+annotation :
+  markerAnnotation
+  | normalAnnotation
+;
+
+// --------------------annotation end-------------------------
+
+// --------------------function start-------------------------
+
+parameterModifiers :
+   annotation*
+;
+
+variableParameterType :
+   '.' '.' '.'
+;
+
+lastParameterType :
+  normalParameterType | variableParameterType
+;
+
+normalParameterType :
+  instanceTypeName
+;
+
+parameterTypeList :
+  lastParameterType
+  | normalParameterType ( ',' normalParameterType )*  ',' lastParameterType
+;
+
+functionReturnType :
+  '-' '>' instanceTypeName
+;
+
+selfParameter :
+   parameterModifiers? 'self'
+;
+
+normalParameter :
+   parameterModifiers? identifier ':' instanceTypeName
+;
+
+variableParameter :
+  parameterModifiers? '.' '.' '.'
+;
+
+lastParameter :
+   normalParameter
+   | variableParameter
+;
+
+singleParameter :
+  selfParameter | normalParameter | variableParameter
+;
+
+multiParameter :
+       selfParameter (',' normalParameter)*  ',' lastParameter
+   | normalParameter (',' normalParameter)*  ',' lastParameter
+;
+
+parameters :
+  singleParameter | multiParameter
+;
+
+functionBlockItem :
+    typeDefinition
+    | statement
+;
+
+functionBlock :
+	'{' functionBlockItem* '}'
+;
+
+functionBody :
+  functionBlock
+  | ';'
+;
+
+functionModifiers :
+   annotation* visibility?
+;
+
+functionDefinition :
+   functionModifiers? 'function' identifier genericParameters? '(' parameters? ')'
+   functionReturnType? functionBody
+;
+
+anonymousFunction :
+  'function'  '(' parameters? ')' functionReturnType? functionBody #anonymousFunction
+  | '(' parameters? ')' '-' '>' instanceTypeName? functionBody  #lambdaFunction
+;
+
+// --------------------function end---------------------------
+
+// --------------------type definition start------------------------
+
+fieldModifiers :
+   annotation* visibility?
+;
+
+superType :
+  'extends' noGenericParameterNotFunctionTypeName
+;
+
+typeModifiers :
+   annotation* visibility?
+;
+
+field :
+   fieldModifiers? identifier ':' instanceTypeName
+;
+
+fieldList :
+   field (',' field)*
+;
+
+fieldTypeDefinitionBody :
+    '{' fieldList? '}'
+;
+
+structDefinition :
+   typeModifiers? 'struct' identifier genericParameters? fieldTypeDefinitionBody
+;
+
+classDefinition :
+   typeModifiers? 'class' identifier genericParameters? superType? fieldTypeDefinitionBody
+;
+
+annotationDefinition :
+   typeModifiers? 'annotation' identifier fieldTypeDefinitionBody
+;
+
+enumDefinition :
+  typeModifiers? 'enum' identifier genericParameters? enumTypeDefinitionBody
+;
+
+traitDefinition :
+  traitModifiers? 'trait' identifier genericParameters? extendsTraits? traitBody
+;
+
+// -- enum --
+enumItemAttachment :
+  '{' fieldList '}'
+;
+
+enumItem :
+  identifier enumItemAttachment?
+;
+
+enumItemList :
+  enumItem (',' enumItem)*
+;
+
+enumTypeDefinitionBody :
+  '{' enumItemList '}'
+;
+
+// -- enum end --
+
+// --tarit --
+extendsTraits :
+  'extends' noGenericParameterNotFunctionTypeNameList
+;
+
+noGenericParameterNotFunctionTypeNameList :
+  noGenericParameterNotFunctionTypeName (',' noGenericParameterNotFunctionTypeName)*
+;
+
+traitModifiers :
+   annotation* visibility?
+;
+
+traitBodyItem :
+  functionDefinition
+;
+
+traitBody :
+  '{' traitBodyItem* '}'
+;
+
+// --tarit end --
+
+typeDefinition :
+     functionDefinition
+     | structDefinition
+     | annotationDefinition
+     | classDefinition
+     | enumDefinition
+     | traitDefinition
+     | inherentImplementation
+     | traitImplementation
+;
+
+
+// --------------------type definition end--------------------------
+
+// --------------------implementation start-------------------------
+
+implementationModifiers :
+   annotation*
+;
+
+implementationBodyItem :
+     functionDefinition
+;
+
+implementationBody :
+  '{' implementationBodyItem* '}'
+;
+
+inherentImplementation :
+  implementationModifiers? 'implement' genericParameters? noGenericParameterNotFunctionTypeName implementationBody
+;
+
+traitImplementation :
+  implementationModifiers? 'implement' genericParameters? noGenericParameterNotFunctionTypeName 'for' noGenericParameterNotFunctionTypeName
+  implementationBody
+;
+
+// --------------------implementation end---------------------------
+
+moduleModifiers :
+   annotation* visibility?
+;
+
+visibilityArgument :
+  plainPath
+;
+
+visibility : 'public'  visibilityArgument? ;
+
+moduleBodyItem :
+     module
+     | typeDefinition
+     | letStatement
+;
+
+moduleBody :
+  '{' useDeclarationStatement* typeAliasStatement* moduleBodyItem* '}'
+;
+
+module :
+    moduleModifiers? 'module' moduleIdentifier moduleBody
+;
+
+compilationUnit :
+  module+
+;
+
+
+
+// --------------------expression start-------------------------
+
+literalExpression :
+   UnsignedIntegerLiteral
+   | UnsignedFloatingPointNumberLiteral
+   | CharLiteral
+   | StringLiteral
+;
+
+expression :
+   assignmentExpression
+;
+
+assignmentExpression :
+  conditionalOrExpression
+	|	leftValueExpression assignmentOperator expression
+;
+
+leftValueExpression :
+     identifier
+     | plainPath ':' ':' identifier
+;
+
+assignmentOperator :
+  '='
+  | '+' '='
+  | '-' '='
+  | '*' '='
+  | '/' '='
+  | '%' '='
+  | '&' '='
+  | '^' '='
+  | '|' '='
+  |	'<' '<' '='
+  |	'>' '>' '='
+  |	'>' '>' '>' '='
+;
+
+conditionalOrExpression :
+  conditionalAndExpression
+	|	conditionalOrExpression '|' '|' conditionalAndExpression
+;
+
+conditionalAndExpression :
+  inclusiveOrExpression
+	|	conditionalAndExpression '&' '&' inclusiveOrExpression
+;
+
+inclusiveOrExpression :
+  exclusiveOrExpression
+	|	inclusiveOrExpression '|' exclusiveOrExpression
+;
+
+exclusiveOrExpression :
+  andExpression
+	|	exclusiveOrExpression '^' andExpression
+;
+
+andExpression :
+  equalityExpression
+	|	andExpression '&' equalityExpression
+;
+
+equalityExpression :
+  relationalExpression
+	|	equalityExpression '=' '=' relationalExpression
+	|	equalityExpression '!' '=' relationalExpression
+;
+
+relationalExpression :
+  shiftExpression
+	|	relationalExpression '<' shiftExpression
+	|	relationalExpression '>' shiftExpression
+	|	relationalExpression '<' '=' shiftExpression
+	|	relationalExpression '>' '=' shiftExpression
+;
+
+shiftExpression :
+  additiveExpression
+	|	shiftExpression '<' '<' additiveExpression
+	|	shiftExpression '>' '>' additiveExpression
+	|	shiftExpression '>' '>' '>' additiveExpression
+;
+
+additiveExpression :
+  multiplicativeExpression
+	|	additiveExpression '+' multiplicativeExpression
+	|	additiveExpression '-' multiplicativeExpression
+;
+
+multiplicativeExpression :
+  unaryExpression
+	|	multiplicativeExpression '*' unaryExpression
+	|	multiplicativeExpression '/' unaryExpression
+	|	multiplicativeExpression '%' unaryExpression
+;
+
+unaryExpression :
+	unaryExpressionNotPlusMinus
+  | '+' unaryExpression
+	|	'-' unaryExpression
+;
+
+unaryExpressionNotPlusMinus :
+  primaryExpression
+	|	'~' unaryExpression
+	|	'!' unaryExpression
+	;
+
+primaryExpression :
+	leftValueExpression
+	| literalExpression
+  | 'self'
+  | methodInvocation
+  | '(' expression ')'
+  | anonymousFunction
+  | initListExpression
+;
+
+methodInvocation :
+   expression '(' argumentList? ')'
+;
+
+argumentList :
+   expression (',' expression)*
+;
+
+initListExpression :
+  instanceTypeName '{' initList? '}'
+;
+
+initList :
+  initListField ( ',' initListField )* #fieldsInitList
+  | expression ( ',' expression )* #valuesInitList
+;
+
+initListField :
+  identifier ':' expression
+;
+
+// --------------------expression end-------------------------
+
+// ---------------------word start----------------------
+
+keyWord :
+  Crate |
+  Super |
+  SelfValue |
+  Module |
+  Use |
+  Type |
+  Var |
+  Struct |
+  Annotation |
+  Enum |
+  Class |
+  Function |
+  Trait |
+  SelfType |
+  Public |
+  Const |
+  Implement |
+  Extends |
+  Let |
+  As |
+  Loop |
+  While |
+  For |
+  In |
+  Continue |
+  Break |
+  Match |
+  If |
+  Else |
+  Return
+;
+
+identifier :
+  Identifier | keyWord
+;
+
+moduleIdentifierSegment :
+  Identifier |
+  Module |
+  Use |
+  Type |
+  Var |
+  Struct |
+  Annotation |
+  Enum |
+  Class |
+  Function |
+  Trait |
+  SelfType |
+  Public |
+  Const |
+  Implement |
+  Extends |
+  Let |
+  As |
+  Loop |
+  While |
+  For |
+  In |
+  Continue |
+  Break |
+  Match |
+  If |
+  Else |
+  Return
+;
+
+// ---------------------word end------------------------
+
+
+@NonterminalGrammar end ;

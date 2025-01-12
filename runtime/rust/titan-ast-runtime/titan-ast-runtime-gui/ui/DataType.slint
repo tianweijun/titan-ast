@@ -1,0 +1,86 @@
+
+export struct LineTreeData{
+    x : [int],
+    y: [int],
+    width : [int],
+    height : [int],
+    from_x : [int],
+    from_y : [int],
+    to_x : [int],
+    to_y : [int],
+}
+
+export struct TextTreeData{
+    x : [int],
+    y: [int],
+    width : [int],//( font-size + 12) * text.length
+    height : [int],
+    text : [string],
+}
+
+export struct TreeData{
+    width : int,
+    height : int,
+    font_size : int,
+    lines : LineTreeData,
+    texts : TextTreeData,    
+}
+
+export global GlobalTreeData {
+    out property <TreeData> tree_data: {
+        width : 4000,
+        height : 2500,
+        font_size : 16,
+        lines : { },
+        texts : { },
+    };
+    //width-height
+    in property <int> width;
+    in property <int> height;
+    //text
+    in property <int> text_font_size;
+    in property <[int]> text_x_array;
+    in property <[int]> text_y_array;
+    in property <[int]> text_width_array;
+    in property <[int]> text_height_array;
+    in property <[string]> text_text_array;
+    //line
+    in property <[int]> line_x_array;
+    in property <[int]> line_y_array;
+    in property <[int]> line_width_array;
+    in property <[int]> line_height_array;
+    in property <[int]> line_from_x_array;
+    in property <[int]> line_from_y_array;
+    in property <[int]> line_to_x_array;
+    in property <[int]> line_to_y_array;
+    //callback
+    callback get_and_render_tree_data(float);
+    public function update_tree_data(scale: float) {
+        get_and_render_tree_data(scale);
+    }
+    public function render_tree_data() {
+        tree_data = {
+            width : width,
+            height : height,
+            font_size : text_font_size,
+            lines : {
+                x : line_x_array,
+                y: line_y_array,
+                width : line_width_array,
+                height : line_height_array,
+                from_x : line_from_x_array,
+                from_y : line_from_y_array,
+                to_x : line_to_x_array,
+                to_y : line_to_y_array,
+            },
+            texts : 
+                {
+                x : text_x_array,
+                y:  text_y_array,
+                width : text_width_array,
+                height : text_height_array,
+                text : text_text_array,
+            },
+        };
+    }
+}

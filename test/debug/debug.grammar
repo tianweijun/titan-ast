@@ -1,0 +1,37 @@
+
+@StartGrammar expressionStatement ;
+
+@NonterminalGrammar begin ;
+
+expressionStatement : expression ';' ;
+
+expression : assignmentExpression ;
+
+assignmentExpression : unaryExpression ;
+
+unaryExpression : postfixExpression ;
+
+postfixExpression : methodExpression ;
+
+methodExpression : 'method' '(' 'var'* ')' ;
+
+
+@NonterminalGrammar end ;
+
+@TerminalGrammar begin ;
+
+Var : 'var' ;
+Method : 'method' ;
+OpenBracket : '(' ;
+ClosingBracket : ')' ;
+Semi : ';' ;
+
+
+ WS
+    : [\s\t\n\r]+ -> skip
+    ;
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+
+@TerminalFragmentGrammar end ;

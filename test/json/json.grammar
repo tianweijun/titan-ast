@@ -1,0 +1,72 @@
+
+// grammar JSON ;
+
+@StartGrammar json ;
+
+@NonterminalGrammar begin ;
+json
+   : value
+   ;
+
+obj
+   : '{' pair (',' pair)* '}'
+   | '{' '}'
+   ;
+
+pair
+   : String ':' value
+   ;
+
+arr
+   : '[' value ( ',' value)* ']'
+   | '[' ']'
+   ;
+
+value
+   : String
+   | Number
+   | obj
+   | arr
+   | 'true'
+   | 'false'
+   | 'null'
+   ;
+@NonterminalGrammar end ;
+
+@TerminalGrammar begin ;
+LeftBrace : '{' ;
+RightBrace : '}' ;
+Comma : ',' ;
+Colon : ':' ;
+LeftBracket : '[' ;
+RightBracket : ']' ;
+
+True : 'true' ;
+False : 'false' ;
+Null : 'null' ;
+
+Number
+   : '-'? Int ('.' [0-9]+ )? Exp?
+   ;
+
+String
+   : '"' ~["]* '"'
+   ;
+
+WordSpace
+    : [\s\t\n\r]+ -> skip
+    ;
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+
+Int
+   : '0' | [1-9] [0-9]*
+   ;
+
+// no leading zeros
+
+Exp
+   : [Ee] [+\-]? Int
+   ;
+@TerminalFragmentGrammar end ;

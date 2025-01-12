@@ -1,0 +1,48 @@
+import "./fonts/JetBrainsMono-Regular.ttf";
+
+import { Button, VerticalBox, Slider } from "std-widgets.slint";
+import { TreeViewer } from "TreeViewer.slint";
+import {GlobalTreeData } from "DataType.slint";
+
+export { GlobalTreeData }
+
+export component AstWindow inherits Window {
+    min-width: 1340px;
+    min-height: 768px;
+    title: "ast";
+    default-font-family: "JetBrains Mono";
+    default-font-size: 16px;
+    background: white;
+    no-frame: false;
+    icon: @image-url("./imgs/logo.png");
+    private property <length> slider-height: 20px;
+    VerticalBox {
+        width: parent.width;
+        height: parent.height;
+        Rectangle {
+            width: parent.width;
+            height: parent.height - root.slider-height - parent.spacing - parent.padding * 2;
+            background: white;
+            TreeViewer {
+                width: parent.width;
+                height: parent.height;
+            }
+        }
+
+        Rectangle {
+            width: parent.width;
+            height: root.slider-height;
+            background: #6cc7b847;
+            Slider {
+                value: 0;
+                minimum: -1000;
+                maximum: 1000;
+                width: parent.width;
+                height: parent.height;
+                changed(v) => {
+                    GlobalTreeData.update_tree_data(v / 500 + 1.0);
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,423 @@
+
+@TerminalGrammar begin ;
+
+// §3.10.5 String Literals
+
+StringLiteral
+	:	'"' StringCharacters? '"'
+	;
+
+// §3.10.4 Character Literals
+
+CharacterLiteral
+	:	'\'' SingleCharacter '\''
+	|	'\'' EscapeSequence '\''
+	;
+
+
+BlockComment
+    nfa(start,end)
+     :
+               start'/\*'prefix2
+               prefix2[\*]suffix1 prefix2~[\*]prefix2
+               suffix1[/]end suffix1[\*]suffix1 suffix1~[/\*]prefix2
+     -> skip
+;
+
+LineComment
+    nfa(start,end)
+     :
+      start'//'prefix2
+      prefix2[]end prefix2[\n]end prefix2~[\n]prefix2
+    -> skip
+;
+
+// §3.10.1 Integer Literals
+
+IntegerLiteral
+	:	DecimalIntegerLiteral
+	|	HexIntegerLiteral
+	|	OctalIntegerLiteral
+	|	BinaryIntegerLiteral
+	;
+
+// §3.10.2 Floating-Point Literals
+
+FloatingPointLiteral
+	:	DecimalFloatingPointLiteral
+	|	HexadecimalFloatingPointLiteral
+	;
+
+// §3.10.3 Boolean Literals
+
+BooleanLiteral
+	:	'true'
+	|	'false'
+	;
+
+// §3.10.7 The Null Literal
+
+NullLiteral
+	:	'null'
+	;
+
+LSHIFT_ASSIGN : '<<=' ;
+RSHIFT_ASSIGN : '>>=' ;
+URSHIFT_ASSIGN : '>>>=' ;
+ELLIPSIS : '...' ;
+
+ADD_ASSIGN : '+=' ;
+SUB_ASSIGN : '-=' ;
+MUL_ASSIGN : '*=' ;
+DIV_ASSIGN : '/=' ;
+AND_ASSIGN : '&=' ;
+OR_ASSIGN : '|=' ;
+XOR_ASSIGN : '^=' ;
+MOD_ASSIGN : '%=' ;
+
+EQUAL : '==' ;
+LE : '<=' ;
+GE : '>=' ;
+NOTEQUAL : '!=' ;
+AND : '&&' ;
+OR : '||' ;
+INC : '++' ;
+DEC : '--' ;
+ARROW : '->' ;
+COLONCOLON : '::' ;
+
+// §3.11 Separators
+
+LPAREN : '(' ;
+RPAREN : ')' ;
+LBRACE : '{' ;
+RBRACE : '}' ;
+LBRACK : '[' ;
+RBRACK : ']' ;
+SEMI : ';' ;
+COMMA : ',' ;
+DOT : '.' ;
+
+// §3.12 Operators
+
+ASSIGN : '=' ;
+GT : '>' ;
+LT : '<' ;
+BANG : '!' ;
+TILDE : '~' ;
+QUESTION : '?' ;
+COLON : ':' ;
+ADD : '+' ;
+SUB : '-' ;
+MUL : '*' ;
+DIV : '/' ;
+BITAND : '&' ;
+BITOR : '|' ;
+CARET : '^' ;
+MOD : '%' ;
+
+// §3.8 Identifiers (must appear after all keywords in the grammar)
+
+Identifier
+	:	IdentifierStart IdentifierPart*
+	;
+
+
+AT : '@' ;
+
+//
+// Whitespace and comments
+//
+
+WS  :  [\s\t\r\n\f]+ -> skip
+    ;
+
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+
+DecimalIntegerLiteral
+	:	DecimalNumeral IntegerTypeSuffix?
+	;
+
+HexIntegerLiteral
+	:	HexNumeral IntegerTypeSuffix?
+	;
+
+OctalIntegerLiteral
+	:	OctalNumeral IntegerTypeSuffix?
+	;
+
+BinaryIntegerLiteral
+	:	BinaryNumeral IntegerTypeSuffix?
+	;
+
+IntegerTypeSuffix
+	:	[lL]
+	;
+
+DecimalNumeral
+	:	'0'
+	|	NonZeroDigit (Digits? | Underscores Digits)
+	;
+
+Digits
+	:	Digit (DigitsAndUnderscores? Digit)?
+	;
+
+Digit
+	:	'0'
+	|	NonZeroDigit
+	;
+
+NonZeroDigit
+	:	[1-9]
+	;
+
+DigitsAndUnderscores
+	:	DigitOrUnderscore+
+	;
+
+DigitOrUnderscore
+	:	Digit
+	|	'_'
+	;
+
+Underscores
+	:	'_'+
+	;
+
+HexNumeral
+	:	'0' [xX] HexDigits
+	;
+
+HexDigits
+	:	HexDigit (HexDigitsAndUnderscores? HexDigit)?
+	;
+
+HexDigit
+	:	[0-9a-fA-F]
+	;
+
+HexDigitsAndUnderscores
+	:	HexDigitOrUnderscore+
+	;
+
+HexDigitOrUnderscore
+	:	HexDigit
+	|	'_'
+	;
+
+OctalNumeral
+	:	'0' Underscores? OctalDigits
+	;
+
+OctalDigits
+	:	OctalDigit (OctalDigitsAndUnderscores? OctalDigit)?
+	;
+
+OctalDigit
+	:	[0-7]
+	;
+
+OctalDigitsAndUnderscores
+	:	OctalDigitOrUnderscore+
+	;
+
+OctalDigitOrUnderscore
+	:	OctalDigit
+	|	'_'
+	;
+
+BinaryNumeral
+	:	'0' [bB] BinaryDigits
+	;
+
+BinaryDigits
+	:	BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)?
+	;
+
+BinaryDigit
+	:	[01]
+	;
+
+BinaryDigitsAndUnderscores
+	:	BinaryDigitOrUnderscore+
+	;
+
+BinaryDigitOrUnderscore
+	:	BinaryDigit
+	|	'_'
+	;
+
+DecimalFloatingPointLiteral
+	:	Digits '.' Digits? ExponentPart? FloatTypeSuffix?
+	|	'.' Digits ExponentPart? FloatTypeSuffix?
+	|	Digits ExponentPart FloatTypeSuffix?
+	|	Digits FloatTypeSuffix
+	;
+
+ExponentPart
+	:	ExponentIndicator SignedInteger
+	;
+
+ExponentIndicator
+	:	[eE]
+	;
+
+SignedInteger
+	:	Sign? Digits
+	;
+
+Sign
+	:	[\+\-]
+	;
+
+FloatTypeSuffix
+	:	[fFdD]
+	;
+
+HexadecimalFloatingPointLiteral
+	:	HexSignificand BinaryExponent FloatTypeSuffix?
+	;
+
+HexSignificand
+	:	HexNumeral '.'?
+	|	'0' [xX] HexDigits? '.' HexDigits
+	;
+
+BinaryExponent
+	:	BinaryExponentIndicator SignedInteger
+	;
+
+BinaryExponentIndicator
+	:	[pP]
+	;
+
+SingleCharacter
+	:	~['\\\r\n]
+	;
+
+StringCharacters
+	:	StringCharacter+
+	;
+
+StringCharacter
+	:	~["\\\r\n]
+	|	EscapeSequence
+	;
+
+// §3.10.6 Escape Sequences for Character and String Literals
+
+EscapeSequence
+	:	'\\' 'u005c'? [btnfr"'\\]
+	|	OctalEscape
+    |   UnicodeEscape // This is not in the spec but prevents having to preprocess the input
+	;
+
+OctalEscape
+	:	'\\' 'u005c'? OctalDigit
+	|	'\\' 'u005c'? OctalDigit OctalDigit
+	|	'\\' 'u005c'? ZeroToThree OctalDigit OctalDigit
+	;
+
+ZeroToThree
+	:	[0-3]
+	;
+
+// This is not in the spec but prevents having to preprocess the input
+UnicodeEscape
+    :   '\\' 'u'+  HexDigit HexDigit HexDigit HexDigit
+    ;
+
+
+/*
+fragment
+JavaLetter
+	:	[a-zA-Z$_] // these are the "java letters" below 0x7F
+	|	// covers all characters above 0x7F which are not a surrogate
+		~[\u0000-\u007F\uD800-\uDBFF] {this.wasJavaIdentiferStart()}?
+	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+		[\uD800-\uDBFF] [\uDC00-\uDFFF] {this.wasJavaIdentiferStartUTF16()}?
+	;
+
+fragment
+JavaLetterOrDigit
+	:	[a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
+	|	// covers all characters above 0x7F which are not a surrogate
+		~[\u0000-\u007F\uD800-\uDBFF] {this.wasJavaIdentiferPart()}?
+	|	// covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
+		[\uD800-\uDBFF] [\uDC00-\uDFFF] {this.wasJavaIdentiferPartUTF16()}?
+    ;
+*/
+
+// Dropped SMP support as ANTLR has no native support for it
+
+IdentifierStart
+	:  [\x24]            // $ [\u0024]
+	| [\x41-\x5A]   // A-Z [\u0041-\u005A]
+	| [\x5F]          // _ [\u005F]
+	| [\x61-\x7A]  // a-z [\u0061-\u007A]
+	;
+
+IdentifierPart
+	: IdentifierStart
+	| [\x30-\x39] // [0-9] [\u0030-\u0039]
+	;
+
+@TerminalFragmentGrammar end ;
+
+@KeyWord  RootKeyWord(Identifier) begin ;
+
+ABSTRACT : 'abstract' ;
+ASSERT : 'assert' ;
+BOOLEAN : 'boolean' ;
+BREAK : 'break' ;
+BYTE : 'byte' ;
+CASE : 'case' ;
+CATCH : 'catch' ;
+CHAR : 'char' ;
+CLASS : 'class' ;
+CONST : 'const' ;
+CONTINUE : 'continue' ;
+DEFAULT : 'default' ;
+DO : 'do' ;
+DOUBLE : 'double' ;
+ELSE : 'else' ;
+ENUM : 'enum' ;
+EXTENDS : 'extends' ;
+FINAL : 'final' ;
+FINALLY : 'finally' ;
+FLOAT : 'float' ;
+FOR : 'for' ;
+IF : 'if' ;
+GOTO : 'goto' ;
+IMPLEMENTS : 'implements' ;
+IMPORT : 'import' ;
+INSTANCEOF : 'instanceof' ;
+INT : 'int' ;
+INTERFACE : 'interface' ;
+LONG : 'long' ;
+NATIVE : 'native' ;
+NEW : 'new' ;
+PACKAGE : 'package' ;
+PRIVATE : 'private' ;
+PROTECTED : 'protected' ;
+PUBLIC : 'public' ;
+RETURN : 'return' ;
+SHORT : 'short' ;
+STATIC : 'static' ;
+STRICTFP : 'strictfp' ;
+SUPER : 'super' ;
+SWITCH : 'switch' ;
+SYNCHRONIZED : 'synchronized' ;
+THIS : 'this' ;
+THROW : 'throw' ;
+THROWS : 'throws' ;
+TRANSIENT : 'transient' ;
+TRY : 'try' ;
+VOID : 'void' ;
+VOLATILE : 'volatile' ;
+WHILE : 'while' ;
+
+@KeyWord end ;

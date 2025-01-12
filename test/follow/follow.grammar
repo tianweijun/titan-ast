@@ -1,0 +1,30 @@
+
+@StartGrammar E ;
+
+@NonterminalGrammar begin ;
+
+E : T E1 ;
+E1 : '+' T E1 | ;
+T : F T1 ;
+T1 : '*' F T1 | ;
+F : '(' E ')' | 'i' ;
+
+@NonterminalGrammar end ;
+
+@TerminalGrammar begin ;
+
+i : 'i' ;
+add : '+' ;
+mul : '*' ;
+openBracket : '(' ;
+closingBracket : ')' ;
+
+
+ WS
+    : [\s\t\n\r]+ -> skip
+    ;
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+
+@TerminalFragmentGrammar end ;

@@ -1,0 +1,37 @@
+
+import {ScrollView} from "std-widgets.slint";
+
+import { LineTreeData,TextTreeData,TreeData,GlobalTreeData } from "DataType.slint";
+
+export component TreeViewer inherits ScrollView {
+    viewport-width: GlobalTreeData.tree-data.width * 1px;
+    viewport-height: GlobalTreeData.tree-data.height * 1px;
+    
+    for to_y[index] in GlobalTreeData.tree_data.lines.to-y: Path {
+        width: GlobalTreeData.tree_data.lines.width[index] * 1px;
+        height: GlobalTreeData.tree_data.lines.height[index] * 1px;
+        stroke: black;
+        stroke-width: 1px;
+        x: GlobalTreeData.tree_data.lines.x[index] * 1px;
+        y: GlobalTreeData.tree_data.lines.y[index] * 1px;
+        MoveTo {
+            x: GlobalTreeData.tree_data.lines.from_x[index];
+            y: GlobalTreeData.tree_data.lines.from_y[index];
+        }
+
+        LineTo {
+            x: GlobalTreeData.tree_data.lines.to_x[index];
+            y: GlobalTreeData.tree_data.lines.to_y[index];
+        }
+    }
+    for text[index] in GlobalTreeData.tree_data.texts.text: Text {
+        x: GlobalTreeData.tree_data.texts.x[index] * 1px;
+        y: GlobalTreeData.tree_data.texts.y[index] * 1px;
+        //width: GlobalTreeData.tree_data.texts.width[index] * 1px;
+        //height: GlobalTreeData.tree_data.texts.height[index] * 1px;
+        text: GlobalTreeData.tree_data.texts.text[index];
+        font-size: GlobalTreeData.tree_data.font-size * 1px;
+        horizontal-alignment: left;
+        vertical-alignment: top;
+    }
+}

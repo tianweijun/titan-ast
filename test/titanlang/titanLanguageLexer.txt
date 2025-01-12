@@ -1,0 +1,253 @@
+/*
+*
+* titan language lexer ,源代码及其其他形式等价文件都是utf-8.
+*
+*/
+
+@TerminalGrammar begin ;
+BlockComment
+    nfa(start,end)
+     :
+               start'/\*'prefix2
+               prefix2[\*]suffix1 prefix2~[\*]prefix2
+               suffix1[/]end suffix1[\*]suffix1 suffix1~[/\*]prefix2
+     -> skip
+;
+
+LineComment
+    nfa(start,end)
+     :
+      start'//'prefix2
+      prefix2[]end prefix2[\n]end prefix2~[\n]prefix2
+    -> skip
+;
+
+WordSpace
+    :  [\s\t\r\n]+ -> skip
+    ;
+
+LeftBrace : '{' ;
+RightBrace : '}' ;
+LeftParen : '(' ;
+RightParen : ')' ;
+
+Semi : ';' ;
+Comma : ',' ;
+Colon : ':' ;
+Dot : '.' ;
+
+Plus    : '+' ;
+Minus   : '-' ;
+Star    : '*' ;
+Slash   : '/' ;
+Mod     : '%' ;
+
+BitAnd : '&' ;
+BitOr : '|' ;
+BitXor : '^' ;
+BitNot : '~' ;
+
+Gt : '>' ;
+Lt : '<' ;
+
+Assign : '=' ;
+
+Or : '|' ;
+Not : '!' ;
+
+Question : '?' ;
+At : '@' ;
+
+UnsignedIntegerLiteral :
+  UnsignedDecimalLiteral
+  | UnsignedHexadecimalLiteral
+  | UnsignedOctalLiteral
+  | UnsignedBinaryLiteral
+;
+
+UnsignedFloatingPointNumberLiteral :
+   UnsignedDecimalFloatingPointNumberLiteral
+;
+
+// char=4byte=dword
+CharLiteral :
+  '\'' Utf8CharForCharLiteral '\''
+	|	'\'' EscapeSequence '\''
+;
+
+StringLiteral :
+  '"' StringLiteralCharSequence? '"'
+;
+
+Identifier
+	:	IdentifierStart IdentifierPart*
+	;
+
+
+@TerminalGrammar end ;
+
+
+@TerminalFragmentGrammar begin ;
+
+AnyOne : [\x00-\xFF] ;
+
+OctalDigit : [0-7] ;
+
+DecimalDigit
+  :  [0-9]
+  ;
+
+HexadecimalDigit
+    :   [0-9a-fA-F]
+    ;
+
+DecimalDigits :
+  DecimalDigit (DecimalDigit | '_')*
+;
+
+UnsignedDecimalLiteral :
+  DecimalDigits IntegerSuffix?
+;
+
+UnsignedHexadecimalLiteral :
+   '0' [xX] '_'* HexadecimalDigit (HexadecimalDigit | '_')* IntegerSuffix?
+;
+
+UnsignedOctalLiteral :
+   '0' [oO] '_'* OctalDigit (OctalDigit | '_')* IntegerSuffix?
+;
+
+UnsignedBinaryLiteral :
+   '0b' '_'* [01] [01_]* IntegerSuffix?
+;
+
+IntegerSuffix :
+    'u8'
+    | 'u16'
+    | 'u32'
+    | 'u64'
+    | 'u128'
+    | 'usize'
+    | 'i8'
+    | 'i16'
+    | 'i32'
+    | 'i64'
+    | 'i128'
+    | 'isize'
+;
+
+UnsignedDecimalFloatingPointNumberLiteral :
+  DecimalDigits '.' DecimalDigits FloatingPointNumberExponent? FloatingPointNumberSuffix?
+	|	DecimalDigits FloatingPointNumberExponent FloatingPointNumberSuffix?
+	|	DecimalDigits FloatingPointNumberSuffix
+;
+
+FloatingPointNumberExponent :
+  [eE] [\+\-]? DecimalDigits
+;
+
+FloatingPointNumberSuffix :
+   'f32' | 'f64'
+;
+
+StringLiteralCharSequence :
+    StringLiteralChar+
+;
+
+StringLiteralChar :
+  Utf8CharForStringLiteral
+  | EscapeSequence
+ ;
+
+// ('\n','\xFF','\u{FFFF}',...)
+EscapeSequence :
+    AsciiEscapeSequence
+    | UnicodeEscapeSequence
+;
+
+AsciiEscapeSequence :
+  '\\' [0'"?\\abfnrtv]
+  | '\\x' OctalDigit? HexadecimalDigit
+;
+
+UnicodeEscapeSequence : '\\u' '{' HexadecimalDigit{1,6} '}' ;
+
+// '\\'=x5C,没有转义标志。
+Utf8CharForCharLiteral :
+    [\x00-\x5B\x5D-\x7F]        // 1字节 0xxx_xxxx                   [00-7F]
+    | [\xC0-\xDF] [\x80-\xBF]{1}    // 2字节 110x_xxxx 10xx_xxxx{1}      [0080-07FF]
+    | [\xE0-\xEF] [\x80-\xBF]{2}    // 3字节 1110_xxxx 10xx_xxxx{2}      [0800-FFFF]
+    | [\xF0-\xF7] [\x80-\xBF]{3}    // 4字节 1111_0xxx 10xx_xxxx{3}      [01_0000-1F_FFFF]
+    | [\xF8-\xFB] [\x80-\xBF]{4}    // 5字节 1111_10xx 10xx_xxxx{4}      [20_0000-3FF_FFFF]
+    | [\xFC-\xFD] [\x80-\xBF]{5}    // 6字节 1111_110x 10xx_xxxx{5}      [400_0000-7FFF_FFFF]
+;
+
+// (1):'\"'=x22,没有字符串边界标志.
+// (2):'\\'=x5C,没有转义标志.
+Utf8CharForStringLiteral :
+    [\x00-\x21\x23-\x5B\x5D-\x7F]   // 1字节 0xxx_xxxx              [00-7F]
+    | [\xC0-\xDF] [\x80-\xBF]{1}    // 2字节 110x_xxxx 10xx_xxxx{1}      [0080-07FF]
+    | [\xE0-\xEF] [\x80-\xBF]{2}    // 3字节 1110_xxxx 10xx_xxxx{2}      [0800-FFFF]
+    | [\xF0-\xF7] [\x80-\xBF]{3}    // 4字节 1111_0xxx 10xx_xxxx{3}      [01_0000-1F_FFFF]
+    | [\xF8-\xFB] [\x80-\xBF]{4}    // 5字节 1111_10xx 10xx_xxxx{4}      [20_0000-3FF_FFFF]
+    | [\xFC-\xFD] [\x80-\xBF]{5}    // 6字节 1111_110x 10xx_xxxx{5}      [400_0000-7FFF_FFFF]
+;
+
+/*
+Utf8Char :
+    [\x00-\x7F]                     // 1字节 0xxx_xxxx                   [00-7F]
+    | [\xC0-\xDF] [\x80-\xBF]{1}    // 2字节 110x_xxxx 10xx_xxxx{1}      [0080-07FF]
+    | [\xE0-\xEF] [\x80-\xBF]{2}    // 3字节 1110_xxxx 10xx_xxxx{2}      [0800-FFFF]
+    | [\xF0-\xF7] [\x80-\xBF]{3}    // 4字节 1111_0xxx 10xx_xxxx{3}      [01_0000-1F_FFFF]
+    | [\xF8-\xFB] [\x80-\xBF]{4}    // 5字节 1111_10xx 10xx_xxxx{4}      [20_0000-3FF_FFFF]
+    | [\xFC-\xFD] [\x80-\xBF]{5}    // 6字节 1111_110x 10xx_xxxx{5}      [400_0000-7FFF_FFFF]
+;
+*/
+
+IdentifierStart :
+    [\x41-\x5A]   // A-Z
+	  | [\x5F]          // _
+	  | [\x61-\x7A]  // a-z
+	  ;
+
+IdentifierPart
+  	: IdentifierStart
+  	| [\x30-\x39] // 0-9
+  	;
+
+@TerminalFragmentGrammar end ;
+
+@KeyWord RootKeyWord(Identifier) begin ;
+
+Crate : 'crate' ;
+Super : 'super' ;
+SelfValue : 'self' ;
+Module : 'module' ;
+Use : 'use' ;
+Type : 'type' ;
+Var : 'var' ;
+Struct : 'struct' ;
+Annotation : 'annotation' ;
+Enum : 'enum' ;
+Class : 'class' ;
+Function : 'function' ;
+Trait : 'trait' ;
+SelfType : 'Self' ;
+Public : 'public' ;
+Const : 'const' ;
+Implement : 'implement' ;
+Extends : 'extends' ;
+Let : 'let' ;
+As : 'as' ;
+Loop : 'loop' ;
+While : 'while' ;
+For : 'for' ;
+In : 'in' ;
+Continue : 'continue' ;
+Break : 'break' ;
+Match : 'match' ;
+If : 'if' ;
+Else : 'else' ;
+Return : 'return' ;
+
+@KeyWord end ;
