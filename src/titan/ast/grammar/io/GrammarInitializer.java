@@ -132,7 +132,7 @@ public class GrammarInitializer {
       // 去掉()
       String rootKeyWord =
           midTokenText.substring(KW_ROOT_KEY_WORD.length() + 1, midTokenText.length() - 1);
-      rootKeyWord = GrammarCharset.formatEscapeChar2Char(rootKeyWord);
+      rootKeyWord = GrammarCharset.formatEscapeChar2Char(rootKeyWord, KW_ROOT_KEY_WORD);
       KeyWordAutomataDetail keyWordAutomataDetail =
           languageGrammar.getKeyWordAutomataDetail(rootKeyWord);
       if (null == keyWordAutomataDetail) {
@@ -293,7 +293,7 @@ public class GrammarInitializer {
     Iterator<GrammarToken> statementContentTokensIt = statementContentTokens.iterator();
     // grammar name
     GrammarToken token = statementContentTokensIt.next();
-    grammar.name = GrammarCharset.formatEscapeChar2Char(token.text);
+    grammar.name = GrammarCharset.formatEscapeChar2Char(token.text, "init grammar name");
     // Grammar attributes or :
     token = statementContentTokensIt.next(); // GrammarDescriptor or :
     // Grammar attributes

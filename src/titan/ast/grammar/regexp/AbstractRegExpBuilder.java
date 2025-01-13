@@ -363,7 +363,7 @@ public abstract class AbstractRegExpBuilder {
     RegExp.RegExpCharSet aliasRegExpSet = new RegExp.RegExpCharSet();
     aliasRegExpSet.type = RegExp.RegExpCharSetType.HELPER_ALIAS;
     aliasRegExpSet.chars =
-        GrammarCharset.formatEscapeChar2Char(stringBuilder.toString()).toCharArray();
+        GrammarCharset.formatEscapeChar2Char(stringBuilder.toString(), grammar.name).toCharArray();
     aliasRegExp.sets.add(aliasRegExpSet);
     if (isSplitCharByTextOfRegExp) {
       // 分隔符不算text部分，减去1
@@ -406,7 +406,7 @@ public abstract class AbstractRegExpBuilder {
               "%s:grammarName is empty,error near %s",
               grammar.name, new String(text, startIndexOfText, text.length - startIndexOfText)));
     }
-    grammarName = GrammarCharset.formatEscapeChar2Char(grammarName);
+    grammarName = GrammarCharset.formatEscapeChar2Char(grammarName, grammar.name);
     Grammar grammar = sources.get(grammarName);
     if (null == grammar) {
       throw new AstRuntimeException(

@@ -2,6 +2,7 @@ package titan.ast.grammar.io;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import titan.ast.AstRuntimeException;
 
 /**
  * 语法解析器相关的字符集.
@@ -320,17 +321,20 @@ public class GrammarCharset {
    * @param str str
    * @return return null if parse error
    */
-  public static String formatEscapeChar2Char(String str) {
+  public static String formatEscapeChar2Char(String str, String errorTipMsgPrefix) {
     StringBuilder stringBuilder = new StringBuilder();
     char[] text = str.toCharArray();
     int indexOfText = 0;
     while (indexOfText < text.length) {
       char tchar = text[indexOfText];
-      if ('\\' == tchar) { // 转义字符 基本单元正则内容中\后面必须跟一个能正确表示转义的字符
+      if (GrammarCharset.BACK_SLASH == tchar) { // 转义字符 基本单元正则内容中\后面必须跟一个能正确表示转义的字符
         ++indexOfText;
         int newIndexByEscapeChar = formatEscapeChar2CharAndSet(text, indexOfText, stringBuilder);
         if (newIndexByEscapeChar <= indexOfText) {
-          return null;
+          throw new AstRuntimeException(
+              String.format(
+                  "%s:format escape char error,error near '%s' in %s",
+                  errorTipMsgPrefix, new String(text, 0, indexOfText), str));
         }
         indexOfText = newIndexByEscapeChar;
       } else { // 常规字符

@@ -103,7 +103,8 @@ public class KeyWordAutomataBuilder {
               "%s: expect keyword text like 'xxx', but is empty,error near %s",
               grammar.name, new String(text)));
     }
-    textOfKeyWords.add(GrammarCharset.formatEscapeChar2Char(textOfKeyWordBuilder.toString()));
+    textOfKeyWords.add(
+        GrammarCharset.formatEscapeChar2Char(textOfKeyWordBuilder.toString(), grammar.name));
     // skip'
     ++indexOfText;
     return indexOfText;

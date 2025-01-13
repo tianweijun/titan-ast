@@ -161,7 +161,7 @@ public class NfaReg2TokenNfaConverter {
       throw new AstRuntimeException(
           String.format("%s:nfa(start,end) is error near %s", grammar.name, token.text));
     }
-    this.strStart = GrammarCharset.formatEscapeChar2Char(stringBuilder.toString());
+    this.strStart = GrammarCharset.formatEscapeChar2Char(stringBuilder.toString(), grammar.name);
     // end
     ++indexOfChar; // skip,
     isEndCharRight = false;
@@ -178,7 +178,7 @@ public class NfaReg2TokenNfaConverter {
       throw new AstRuntimeException(
           String.format("%s:nfa(start,end) is error near %s", grammar.name, token.text));
     }
-    this.strEnd = GrammarCharset.formatEscapeChar2Char(stringBuilder.toString());
+    this.strEnd = GrammarCharset.formatEscapeChar2Char(stringBuilder.toString(), grammar.name);
     ++indexOfChar; // skip)
   }
 
@@ -314,7 +314,8 @@ public class NfaReg2TokenNfaConverter {
             String.format("%s: edge is wrong in %s", parent.grammar.name, token.text));
       }
 
-      this.from = GrammarCharset.formatEscapeChar2Char(charsBuilder.toString());
+      this.from =
+          GrammarCharset.formatEscapeChar2Char(charsBuilder.toString(), parent.grammar.name);
       // edge chars
       // skip \'
       ++indexOfChar;
@@ -351,7 +352,7 @@ public class NfaReg2TokenNfaConverter {
         throw new AstRuntimeException(
             String.format("%s: edge is wrong in %s", parent.grammar.name, token.text));
       }
-      this.to = GrammarCharset.formatEscapeChar2Char(charsBuilder.toString());
+      this.to = GrammarCharset.formatEscapeChar2Char(charsBuilder.toString(), parent.grammar.name);
     }
 
     public char[] getCharsOfEdge() {
@@ -413,7 +414,8 @@ public class NfaReg2TokenNfaConverter {
         throw new AstRuntimeException(
             String.format("%s: edge is wrong in %s", parent.grammar.name, token.text));
       }
-      this.from = GrammarCharset.formatEscapeChar2Char(charsBuilder.toString());
+      this.from =
+          GrammarCharset.formatEscapeChar2Char(charsBuilder.toString(), parent.grammar.name);
       // edge chars
       if (charsOfText[indexOfChar] == GrammarCharset.TILDE) {
         this.notChars = true;
@@ -458,7 +460,7 @@ public class NfaReg2TokenNfaConverter {
         throw new AstRuntimeException(
             String.format("%s: edge is wrong in %s", parent.grammar.name, token.text));
       }
-      this.to = GrammarCharset.formatEscapeChar2Char(charsBuilder.toString());
+      this.to = GrammarCharset.formatEscapeChar2Char(charsBuilder.toString(), parent.grammar.name);
     }
 
     private char[] getCharsOfEdge() {
