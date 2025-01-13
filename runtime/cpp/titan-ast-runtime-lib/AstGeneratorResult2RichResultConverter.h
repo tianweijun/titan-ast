@@ -22,14 +22,12 @@ class DLL_PUBLIC AstGeneratorResult2RichResultConverter {
 
  private:
   RichTokensResult *convert2RichTokensResult(TokensResult *tokensResult);
+  LineNumberDetail *buildLineNumberDetail(std::vector<Token *> *tokens);
+  RichAstResult *convert2RichAstResult(AstGeneratorResult *astGeneratorResult);
   RichTokenParseErrorData *
   convert2RichTokenGeneratorErrorData(TokenParseErrorData *tokenParseErrorData);
-  LineNumberDetail *buildLineNumberDetail(std::list<Token *> *tokens);
-  RichAstResult *convert2RichAstResult(AstResult *astResult,
-                                       LineNumberDetail *lineNumberDetail);
   RichAstParseErrorData *
-  convert2RichAstParseErrorData(AstParseErrorData *astParseErrorData,
-                                LineNumberDetail *lineNumberDetail);
+  convert2RichAstParseErrorData(AstParseErrorData *astParseErrorData,std::vector<Token *> * tokens);
 };
 
 #endif// AST_RUNTIME_RUNTIME_ASTGENERATORRESULT2RICHRESULTCONVERTER_H_

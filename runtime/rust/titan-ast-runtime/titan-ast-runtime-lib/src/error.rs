@@ -11,13 +11,13 @@ pub enum AstAppError {
         finished_tokens: Vec<Token>,
         start: usize,
         end: usize,
-        error_text: String,
+        error_text: Vec<u8>
     },
     TokensError,
     AstParseError {
         start: usize,
         end: usize,
-        error_text: String,
+        error_text: Vec<u8>,
     },
     RichTokenParseError {
         finished_tokens: Vec<Token>,
@@ -27,7 +27,7 @@ pub enum AstAppError {
         start_offset_in_line: usize,
         end_line_number: usize,
         end_offset_in_line: usize,
-        error_text: String,
+        error_text: Vec<u8>,
     },
     RichAstParseError {
         start: usize,
@@ -36,7 +36,7 @@ pub enum AstAppError {
         start_offset_in_line: usize,
         end_line_number: usize,
         end_offset_in_line: usize,
-        error_text: String,
+        error_text: Vec<u8>,
     },
 }
 
@@ -54,7 +54,7 @@ impl fmt::Display for AstAppError {
                 write!(
                     f,
                     "generate ast failed,error near [{},{}):{}",
-                    start, end, error_text,
+                    start, end, String::from_utf8_lossy(error_text),
                 )
             }
             AstAppError::TokenParseError {
@@ -66,7 +66,7 @@ impl fmt::Display for AstAppError {
                 write!(
                     f,
                     "[{},{}):'{}' does not match any token",
-                    start, end, error_text,
+                    start, end, String::from_utf8_lossy(error_text),
                 )
             }
             AstAppError::TokensError => {
@@ -89,7 +89,7 @@ impl fmt::Display for AstAppError {
                     start_offset_in_line,
                     end_line_number,
                     end_offset_in_line,
-                    error_text
+                    String::from_utf8_lossy(error_text)
                 )
             }
             AstAppError::RichAstParseError {
@@ -108,7 +108,7 @@ impl fmt::Display for AstAppError {
                     start_offset_in_line,
                     end_line_number,
                     end_offset_in_line,
-                    error_text
+                    String::from_utf8_lossy(error_text)
                 )
             }
         }

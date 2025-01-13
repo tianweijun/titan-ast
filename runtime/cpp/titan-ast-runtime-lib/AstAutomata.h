@@ -15,6 +15,6 @@ class AstAutomata {
 
   virtual AstAutomataType getType() = 0;
 
-  virtual AstResult *buildAst(std::list<Token *> *sourceTokens) = 0;
+  virtual AstResult *buildAst(std::vector<Token *> *sourceTokens) = 0;
 };
 #endif// AST_RUNTIME_RUNTIME_ASTAUTOMATA_H_

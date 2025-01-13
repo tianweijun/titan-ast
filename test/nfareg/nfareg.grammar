@@ -1,53 +1,42 @@
-@TerminalGrammar begin ;
-BlockComment nfa(start,end) :
-// SlashCn :  \xEF\xBC\x8F' | '\xE3\x80\x81' ;
-// AsteriskCn :  '\xEF\xBC\x8A' | '\xC3\x97' ;
-start'/'prefix1
-start'\xEF\xBC\x8F'prefix1
-start'\xE3\x80\x81'prefix1
-
-prefix1'*'prefix2
-prefix1'\xEF\xBC\x8A'prefix2
-prefix1'\xC3\x97'prefix2
-
-prefix2'\*'suffix1
-prefix2'\xEF'_01_suffix1 _01_suffix1'\xBC'_02_suffix1 _02_suffix1'\x8A'suffix1
-                         _01_suffix1~[\xBC]prefix2    _02_suffix1~[\x8A]prefix2
-prefix2'\xC3'_11_suffix1 _11_suffix1'\x97'suffix1
-                         _11_suffix1~[\x97]prefix2
-prefix2~[\*\xEF\xC3]prefix2
-
-suffix1'/'end
-suffix1'\xEF'_01_suffix2 _01_suffix2'\xBC'_02_suffix2  _02_suffix2'\x8F'end
-                         _01_suffix2~[\xBC]prefix2
-_02_suffix2'\x8A'suffix1 _02_suffix2~[\x8F\x8A]prefix1
-suffix1'\xE3'_11_suffix2 _11_suffix2'\x80'_12_suffix2  _12_suffix2'\x81'end
-                         _11_suffix2~[\x80]prefix2     _12_suffix2~[\x81]prefix2
-
-suffix1'\*'suffix1
-suffix1'\xC3'_11_loop_n1 _11_loop_n1'\x97'suffix1
-                         _11_loop_n1~[\x97]prefix2
-suffix1~[/\xEF\xE3\*\xC3]prefix2
-
-;
-
-WordSpace
-    :  [\s\t\r\n]+ -> skip
-    ;
-
-@TerminalGrammar end ;
-
 @StartGrammar compilationUnit ;
 
 @NonterminalGrammar begin ;
-compilationUnit
-  :
-    BlockComment+
-  ;
-
+compilationUnit : StringLiteral+ ;
 @NonterminalGrammar end ;
 
+@TerminalGrammar begin ;
+StringLiteral : DoubleQuoteFragment StringLiteralChar* DoubleQuoteFragment ;
+@TerminalGrammar end ;
 
 @TerminalFragmentGrammar begin ;
+DoubleQuoteFragment : '\"' | DoubleQuoteCn ;
+DoubleQuoteCn :      '\xE2\x80\x9C' | '\xE2\x80\x9D' ;
+StringLiteralChar : Utf8CharForStringLiteral  ;
+// (1):'\"'=x22,DoubleQuoteCn:'\xE2\x80\x9C'|'\xE2\x80\x9D';
+// (2):'\\'=x5C,BackslashCn:'\xEF\xBC\xBC'|'\xE3\x80\x81';
+Utf8CharForStringLiteral :
+    [\x00-\x21\x23-\x5B\x5D-\x7F]        // 1 0xxx_xxxx              [00-7F]
+    | [\xC0-\xDF] [\x80-\xBF]{1}         // 2 110x_xxxx 10xx_xxxx{1}      [0080-07FF]
+    // | [\xE0-\xEF] [\x80-\xBF]{2}      // 3 1110_xxxx 10xx_xxxx{2}      [0800-FFFF]
+    | Utf83CharForStringLiteral
+    | [\xF0-\xF7] [\x80-\xBF]{3}         // 4 1111_0xxx 10xx_xxxx{3}      [01_0000-1F_FFFF]
+    | [\xF8-\xFB] [\x80-\xBF]{4}         // 5 1111_10xx 10xx_xxxx{4}      [20_0000-3FF_FFFF]
+    | [\xFC-\xFD] [\x80-\xBF]{5}         // 6 1111_110x 10xx_xxxx{5}      [400_0000-7FFF_FFFF]
+;
+// no '\xE2\x80\x9C' '\xE2\x80\x9D' '\xE3\x80\x81' '\xEF\xBC\xBC'
+Utf83CharForStringLiteral :
+    // #########['\xE0\x80\x80','\xE2\x80\x9C')#########
+    [\xE0-\xE1] [\x80-\xBF]{2} | '\xE2\x80' [\x80-\x9B]
+
+    // #########('\xE2\x80\x9D','\xE3\x80\x81')#########
+    | '\xE2\x80' [\x9E-\xBF] | '\xE2' [\x81-\xBF] [\x80-\xBF] | '\xE3\x80\x80'
+
+    // #########('\xE3\x80\x81','\xEF\xBC\xBC')#########
+    | '\xE3\x80' [\x82-\xBF] | '\xE3' [\x81-\xBF] [\x80-\xBF] | [\xE4-\xEE] [\x80-\xBF]{2}
+    | '\xEF' [\x80-\xBB] [\x80-\xBF] | '\xEF\xBC' [\x80-\xBB]
+
+    // #########('\xEF\xBC\xBC','\xEF\xBF\xBF']#########
+    | '\xEF\xBC' [\xBD-\xBF] | '\xEF' [\xBD-\xBF] [\x80-\xBF]
+;
 
 @TerminalFragmentGrammar end ;

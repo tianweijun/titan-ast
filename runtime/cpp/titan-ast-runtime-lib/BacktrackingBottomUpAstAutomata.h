@@ -35,7 +35,7 @@ class BacktrackingBottomUpAstAutomata : public AstAutomata {
 
   AstAutomataType getType() override;
 
-  AstResult *buildAst(std::list<Token *> *sourceTokens) override;
+  AstResult *buildAst(std::vector<Token *> *sourceTokens) override;
 
  protected:
   virtual void reduceBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
@@ -46,10 +46,11 @@ class BacktrackingBottomUpAstAutomata : public AstAutomata {
   TokenReducingSymbolInputStream tokenReducingSymbolInputStream;
 
  private:
-  void init(std::list<Token *> *sourceTokens);
+  void init(std::vector<Token *> *sourceTokens);
   ReducingSymbol *getConnectedSignOfStartGrammarReducingSymbol();
   bool addNewBacktrackingBottomUpBranch(
       BacktrackingBottomUpBranch *newBacktrackingBottomUpBranch);
+  void removeRedundantTriedBottomUpBranchs(int minEndIndexOfToken);
   void consumeBottomUpBranch();
   bool isAcceptedBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);
   void shiftBottomUpBranch(BacktrackingBottomUpBranch *bottomUpBranch);

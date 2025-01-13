@@ -32,7 +32,12 @@ TokensResult *DfaTokenAutomata::buildToken(const std::string *sourceFilePath) {
       continue;
     }
     if (buildOneTokenMethodResult->type == BuildOneTokenMethodResultType::ALL_TEXT_HAS_BEEN_BUILT) {
-      tokensResult = TokensResult::generateOkResult(tokens);
+      auto arrayTokens = new std::vector<Token *> (tokens->size(), nullptr);
+      int indexOfToken = 0;
+      for(auto token : *tokens){
+        (*arrayTokens)[indexOfToken++] = token;
+      }
+      tokensResult = TokensResult::generateOkResult(arrayTokens);
       delete buildOneTokenMethodResult;
       break;
     }
@@ -40,8 +45,13 @@ TokensResult *DfaTokenAutomata::buildToken(const std::string *sourceFilePath) {
       BuildOneTokenMethodTokenGeneratorErrorData *tokenGeneratorErrorData =
           buildOneTokenMethodResult
               ->getBuildOneTokenMethodTokenGeneratorErrorData();
-      tokensResult = TokensResult::generateTokenParseErrorResult(
-          new TokenParseErrorData(tokens, tokenGeneratorErrorData->start,
+          auto arrayTokens = new std::vector<Token *> (tokens->size(), nullptr);
+          int indexOfToken = 0;
+          for(auto token : *tokens){
+            (*arrayTokens)[indexOfToken++] = token;
+          }
+          tokensResult = TokensResult::generateTokenParseErrorResult(
+          new TokenParseErrorData(arrayTokens, tokenGeneratorErrorData->start,
                                   tokenGeneratorErrorData->end,
                                   tokenGeneratorErrorData->errorText));
       delete buildOneTokenMethodResult;

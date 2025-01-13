@@ -23,14 +23,14 @@ enum class TokensResultType : int {
 
 class DLL_PUBLIC TokenParseErrorData {
 public:
-  TokenParseErrorData(std::list<Token *> *finishedTokens, int start, int end,
+  TokenParseErrorData(std::vector<Token *> *finishedTokens, int start, int end,
                       std::string errorText);
   ~TokenParseErrorData();
 
   std::string toString();
 
 public:
-  std::list<Token *> *finishedTokens;
+  std::vector<Token *> *finishedTokens;
   int start;
   int end;
   std::string errorText;
@@ -43,8 +43,8 @@ public:
 
   bool isOk() const;
 
-  static TokensResult *generateOkResult(std::list<Token *> *data);
-  std::list<Token *> *getOkData() const;
+  static TokensResult *generateOkResult(std::vector<Token *> *data);
+  std::vector<Token *> *getOkData() const;
 
   static TokensResult *generateSourceIoErrorResult(std::string *data);
   std::string *getSourceIoErrorData() const;
@@ -103,7 +103,7 @@ public:
 
   bool isOk() const;
 
-  std::list<Token *> *getOkTokens() const;
+  std::vector<Token *> *getOkTokens() const;
   Ast *getOkAst() const;
   std::string getErrorMsg() const;
 
@@ -120,7 +120,7 @@ enum class RichTokensResultType : int {
 
 class DLL_PUBLIC RichTokenParseErrorData {
 public:
-  RichTokenParseErrorData(std::list<Token *> *finishedTokens, int start,
+  RichTokenParseErrorData(std::vector<Token *> *finishedTokens, int start,
                           int end, int startLineNumber, int startOffsetInLine,
                           int endLineNumber, int endOffsetInLine,
                           std::string errorText);
@@ -129,7 +129,7 @@ public:
   std::string toString();
 
 public:
-  std::list<Token *> *finishedTokens;
+  std::vector<Token *> *finishedTokens;
   int start;
   int end;
   int startLineNumber;
@@ -146,8 +146,8 @@ public:
 
   bool isOk() const;
 
-  static RichTokensResult *generateOkResult(std::list<Token *> *data);
-  std::list<Token *> *getOkData() const;
+  static RichTokensResult *generateOkResult(std::vector<Token *> *data);
+  std::vector<Token *> *getOkData() const;
 
   static RichTokensResult *generateSourceIoErrorResult(std::string *data);
   std::string *getSourceIoErrorData() const;
@@ -243,19 +243,17 @@ public:
 class DLL_PUBLIC RichAstGeneratorResult {
 public:
   RichAstGeneratorResult(const RichTokensResult *richTokensResult,
-                         const LineNumberDetail *richAstResult,
                          const RichAstResult *astResult);
   ~RichAstGeneratorResult();
 
   bool isOk() const;
 
-  std::list<Token *> *getOkTokens() const;
+  std::vector<Token *> *getOkTokens() const;
   Ast *getOkAst() const;
   std::string getErrorMsg() const;
 
 public:
   const RichTokensResult *richTokensResult;
-  const LineNumberDetail *lineNumberDetail;
   const RichAstResult *richAstResult;
 };
 #endif // AST_RUNTIME_RUNTIME_RESULT_H_

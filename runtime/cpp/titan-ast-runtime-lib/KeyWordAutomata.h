@@ -5,7 +5,7 @@
 #ifndef AST_RUNTIME_RUNTIME_KEYWORDAUTOMATA_H_
 #define AST_RUNTIME_RUNTIME_KEYWORDAUTOMATA_H_
 
-#include <list>
+#include <vector>
 #include <string>
 #include <unordered_map>
 
@@ -39,7 +39,7 @@ class KeyWordAutomata {
   KeyWordAutomata();
   ~KeyWordAutomata();
   KeyWordAutomata(int isEmpty, const Grammar *rootKeyWord);
-  std::list<Token *> *buildToken(std::list<Token *> *tokens) const;
+  std::vector<Token *> *buildToken(std::vector<Token *> *tokens) const;
 
  public:
   int emptyOrNot;

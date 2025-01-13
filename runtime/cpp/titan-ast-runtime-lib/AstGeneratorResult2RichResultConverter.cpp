@@ -15,19 +15,11 @@ byte AstGeneratorResult2RichResultConverter::getNewline() { return newline; }
 
 RichAstGeneratorResult *AstGeneratorResult2RichResultConverter::convert(
     AstGeneratorResult *astGeneratorResult) {
+  RichAstResult *richAstResult = convert2RichAstResult(astGeneratorResult);
   RichTokensResult *richTokensResult =
       convert2RichTokensResult(astGeneratorResult->tokensResult);
-  LineNumberDetail *lineNumberDetail;
-  if (richTokensResult->isOk()) {
-    lineNumberDetail = buildLineNumberDetail(richTokensResult->getOkData());
-  } else {
-    lineNumberDetail = new LineNumberDetail(nullptr, 0);
-  }
-  RichAstResult *richAstResult =
-      convert2RichAstResult(astGeneratorResult->astResult, lineNumberDetail);
   delete astGeneratorResult;
-  return new RichAstGeneratorResult(richTokensResult, lineNumberDetail,
-                                    richAstResult);
+  return new RichAstGeneratorResult(richTokensResult, richAstResult);
 }
 
 RichTokensResult *
@@ -60,57 +52,9 @@ AstGeneratorResult2RichResultConverter::convert2RichTokensResult(
   tokensResult->data = nullptr;
   return richTokensResult;
 }
-RichTokenParseErrorData *
-AstGeneratorResult2RichResultConverter::convert2RichTokenGeneratorErrorData(
-    TokenParseErrorData *tokenParseErrorData) {
-  char charNewline = (char)newline;
-  // set startLineNumber,lineNumberStartIndex
-  int startLineNumber = 1;
-  int indexOfBytes = -1;
-  int startLineNumberIndex = 0;
-  for (Token *token : *tokenParseErrorData->finishedTokens) {
-    auto text = token->text.data();
-    auto lenOfText = token->text.length();
-    for (int indexOfText = 0; indexOfText < lenOfText; indexOfText++) {
-      char ch = text[indexOfText];
-      ++indexOfBytes;
-      if (ch == charNewline) {
-        ++startLineNumber;
-        startLineNumberIndex = indexOfBytes + 1;
-      }
-    }
-  }
-  // set endLineNumber,lineNumberEndIndex
-  int endLineNumber = startLineNumber;
-  int endLineNumberIndex = startLineNumberIndex;
-  {
-    auto stringText = tokenParseErrorData->errorText;
-    auto text = stringText.data();
-    auto lenOfText = stringText.length();
-    for (int indexOfText = 0; indexOfText < lenOfText; indexOfText++) {
-      char ch = text[indexOfText];
-      ++indexOfBytes;
-      if (ch == charNewline) {
-        ++endLineNumber;
-        endLineNumberIndex = indexOfBytes + 1;
-      }
-    }
-  }
-  auto richTokenParseErrorData = new RichTokenParseErrorData(
-      tokenParseErrorData->finishedTokens, tokenParseErrorData->start,
-      tokenParseErrorData->end, startLineNumber,
-      tokenParseErrorData->start - startLineNumberIndex +
-          1, // 用户角度下标从1开始
-      endLineNumber,
-      tokenParseErrorData->end - endLineNumberIndex + 1, // 用户角度下标从1开始
-      tokenParseErrorData->errorText);
-  // take token in finishedTokens
-  tokenParseErrorData->finishedTokens = nullptr;
-  return richTokenParseErrorData;
-}
 
 LineNumberDetail *AstGeneratorResult2RichResultConverter::buildLineNumberDetail(
-    std::list<Token *> *tokens) {
+    std::vector<Token *> *tokens) {
   char charNewline = (char)newline;
   std::list<LineNumberRange> lineNumberRanges;
   int nextStart = 0;
@@ -145,19 +89,22 @@ LineNumberDetail *AstGeneratorResult2RichResultConverter::buildLineNumberDetail(
   return new LineNumberDetail(lineNumberRangeArray, lineNumberRanges.size());
 }
 RichAstResult *AstGeneratorResult2RichResultConverter::convert2RichAstResult(
-    AstResult *astResult, LineNumberDetail *lineNumberDetail) {
+    AstGeneratorResult *astGeneratorResult) {
   RichAstResult *richAstResult = nullptr;
-  switch (astResult->type) {
+  switch (astGeneratorResult->astResult->type) {
   case AstResultType::OK: {
-    richAstResult = RichAstResult::generateOkResult(astResult->getOkData());
+    richAstResult = RichAstResult::generateOkResult(
+        astGeneratorResult->astResult->getOkData());
     // data move
     break;
   }
   case AstResultType::AST_PARSE_ERROR: {
-    auto astParseErrorData = astResult->getAstParseErrorData();
+    auto astParseErrorData =
+        astGeneratorResult->astResult->getAstParseErrorData();
     richAstResult = RichAstResult::generateRichAstParseErrorResult(
-        convert2RichAstParseErrorData(astResult->getAstParseErrorData(),
-                                      lineNumberDetail));
+        convert2RichAstParseErrorData(
+            astGeneratorResult->astResult->getAstParseErrorData(),
+            astGeneratorResult->tokensResult->getOkData()));
     // delete data
     delete astParseErrorData;
     break;
@@ -168,18 +115,54 @@ RichAstResult *AstGeneratorResult2RichResultConverter::convert2RichAstResult(
     break;
   }
   }
-  // data is invalid
-  astResult->data = nullptr;
+  // data is invalid,been moved
+  astGeneratorResult->astResult->data = nullptr;
   return richAstResult;
+}
+
+RichTokenParseErrorData *
+AstGeneratorResult2RichResultConverter::convert2RichTokenGeneratorErrorData(
+    TokenParseErrorData *tokenParseErrorData) {
+  std::vector<Token *> tokens(tokenParseErrorData->finishedTokens->size() + 1,
+                              nullptr);
+  int indexOfToken = 0;
+  for (auto token : *tokenParseErrorData->finishedTokens) {
+    tokens[indexOfToken++] = token;
+  }
+  Token errorToken;
+  errorToken.start = tokenParseErrorData->start;
+  errorToken.text = tokenParseErrorData->errorText;
+  tokens[indexOfToken++] = &errorToken;
+
+  LineNumberDetail *lineNumberDetail = buildLineNumberDetail(&tokens);
+  LineNumberRangeDto startLineNumberRange =
+      lineNumberDetail->getLineNumberRangeDto(tokenParseErrorData->start);
+  LineNumberRangeDto endLineNumberRange =
+      lineNumberDetail->getLineNumberRangeDto(tokenParseErrorData->end - 1);
+  delete lineNumberDetail;
+  auto richTokenParseErrorData = new RichTokenParseErrorData(
+      tokenParseErrorData->finishedTokens, tokenParseErrorData->start,
+      tokenParseErrorData->end, startLineNumberRange.lineNumber,
+      tokenParseErrorData->start - startLineNumberRange.start +
+          1, // 用户角度下标从1开始
+      endLineNumberRange.lineNumber,
+      tokenParseErrorData->end - endLineNumberRange.start +
+          1, // 用户角度下标从1开始
+      tokenParseErrorData->errorText);
+  // take token in finishedTokens
+  tokenParseErrorData->finishedTokens = nullptr;
+  return richTokenParseErrorData;
 }
 
 RichAstParseErrorData *
 AstGeneratorResult2RichResultConverter::convert2RichAstParseErrorData(
-    AstParseErrorData *astParseErrorData, LineNumberDetail *lineNumberDetail) {
+    AstParseErrorData *astParseErrorData, std::vector<Token *> *tokens) {
+  LineNumberDetail *lineNumberDetail = buildLineNumberDetail(tokens);
   LineNumberRangeDto startLineNumberRange =
       lineNumberDetail->getLineNumberRangeDto(astParseErrorData->start);
   LineNumberRangeDto endLineNumberRange =
-      lineNumberDetail->getLineNumberRangeDto(astParseErrorData->end-1);
+      lineNumberDetail->getLineNumberRangeDto(astParseErrorData->end - 1);
+  delete lineNumberDetail;
   return new RichAstParseErrorData(
       astParseErrorData->start, astParseErrorData->end,
       startLineNumberRange.lineNumber,

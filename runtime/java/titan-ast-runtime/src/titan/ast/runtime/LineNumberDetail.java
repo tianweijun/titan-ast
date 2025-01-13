@@ -8,11 +8,15 @@ package titan.ast.runtime;
 public class LineNumberDetail {
   public final LineNumberRange[] lineNumberRanges;
 
+  public LineNumberDetail() {
+    lineNumberRanges = new LineNumberRange[0];
+  }
+
   public LineNumberDetail(LineNumberRange[] lineNumberRanges) {
     this.lineNumberRanges = lineNumberRanges;
   }
 
-  public LineNumberRangeDto getLineNumberRangeDto(int bytePosition) {
+  public LineNumberRange getLineNumberRangeDto(int bytePosition) {
     int left = 0;
     int right = lineNumberRanges.length - 1;
 
@@ -20,8 +24,7 @@ public class LineNumberDetail {
       int mid = left + (right - left) / 2; // 计算中间元素的索引
       LineNumberRange midLineNumberRange = lineNumberRanges[mid];
       if (bytePosition >= midLineNumberRange.start && bytePosition < midLineNumberRange.end) {
-        // 找到目标值，返回行号lineNumber=index+1
-        return new LineNumberRangeDto(mid + 1, midLineNumberRange.start, midLineNumberRange.end);
+        return midLineNumberRange;
       } else if (bytePosition < midLineNumberRange.start) {
         right = mid - 1; // 目标值在左半部分
       } else {
@@ -32,24 +35,19 @@ public class LineNumberDetail {
   }
 
   public static class LineNumberRange {
-    public int start;
-    public int end;
+    public final int start;
+    public final int end; // indexOfNewlineByte+1
+    public final int lineNumber;
+    public final int indexOfStartToken;
+    public final int indexOfEndToken;
 
-    public LineNumberRange(int start, int end) {
+    public LineNumberRange(
+        int start, int end, int lineNumber, int indexOfStartToken, int indexOfEndToken) {
       this.start = start;
       this.end = end;
-    }
-  }
-
-  public static class LineNumberRangeDto {
-    public int lineNumber;
-    public int start;
-    public int end;
-
-    public LineNumberRangeDto(int lineNumber, int start, int end) {
       this.lineNumber = lineNumber;
-      this.start = start;
-      this.end = end;
+      this.indexOfStartToken = indexOfStartToken;
+      this.indexOfEndToken = indexOfEndToken;
     }
   }
 }

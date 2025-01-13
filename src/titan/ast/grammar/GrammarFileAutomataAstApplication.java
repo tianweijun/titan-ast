@@ -147,12 +147,15 @@ public class GrammarFileAutomataAstApplication {
     runtimeAutomataRichAstApplication.displayGraphicalViewOfAst(ast);
   }
 
-  public void displayGraphicalViewOfAst(Ast ast, String charsetName) {
-    runtimeAutomataRichAstApplication.displayGraphicalViewOfAst(ast, charsetName);
-  }
-
   private void setRuntimeAutomataRichAstApplication() {
     this.runtimeAutomataRichAstApplication = buildRuntimeAutomataRichAstApplication();
+  }
+
+  public void setRuntimeAstApplicationCharset(String charsetName) {
+    if (null == runtimeAutomataRichAstApplication) {
+      setRuntimeAutomataRichAstApplication();
+    }
+    runtimeAutomataRichAstApplication.setCharset(charsetName);
   }
 
   public RuntimeAutomataAstApplication buildRuntimeAutomataAstApplication() {

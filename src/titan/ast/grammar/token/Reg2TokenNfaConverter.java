@@ -291,7 +291,9 @@ public class Reg2TokenNfaConverter {
       }
     }
     if (start.edges.isEmpty()) {
-      throw new AstRuntimeException(String.format("%s:[ab]{m,n},[ab] is empty", taskGrammar.name));
+      throw new AstRuntimeException(
+          String.format(
+              "%s:[ab]{m,n},[ab] is empty,error near %s", taskGrammar.name, unitRegExp.toString()));
     }
     buildRegExpNfaByNfa(unitRegExp, rnfa);
   }

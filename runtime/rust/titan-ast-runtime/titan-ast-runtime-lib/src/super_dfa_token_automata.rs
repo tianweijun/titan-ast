@@ -16,7 +16,7 @@ pub(crate) enum BuildOneTokenMethodResult {
     TokenParseError {
         start: usize,
         end: usize,
-        error_text: String,
+        error_text: Vec<u8>,
     },
 }
 
@@ -116,7 +116,7 @@ impl SuperDfaTokenAutomata {
             return BuildOneTokenMethodResult::TokenParseError {
                 start: start_index_of_token,
                 end: start_index_of_token + self.one_token_string_builder.len(),
-                error_text: self.one_token_string_builder.to_string(),
+                error_text: self.one_token_string_builder.get_data(),
             };
         }
         // 重复嗅探更高优先级或贪婪

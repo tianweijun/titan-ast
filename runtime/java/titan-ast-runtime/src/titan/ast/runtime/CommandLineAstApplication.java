@@ -25,6 +25,7 @@ public class CommandLineAstApplication {
       String automataFilePath, String sourceCodeFilePath, String charsetName) {
     RuntimeAutomataRichAstApplication runtimeAstApplication =
         new RuntimeAutomataRichAstApplication();
+    runtimeAstApplication.setCharset(charsetName);
     try {
       runtimeAstApplication.setContext(automataFilePath);
     } catch (AutomataDataIoException e) {
@@ -34,7 +35,7 @@ public class CommandLineAstApplication {
     RichAstGeneratorResult astGeneratorResult =
         runtimeAstApplication.buildRichAst(sourceCodeFilePath);
     if (astGeneratorResult.isOk()) {
-      runtimeAstApplication.displayGraphicalViewOfAst(astGeneratorResult.getOkAst(), charsetName);
+      runtimeAstApplication.displayGraphicalViewOfAst(astGeneratorResult.getOkAst());
     } else {
       Logger.info(astGeneratorResult.getErrorMsg());
     }

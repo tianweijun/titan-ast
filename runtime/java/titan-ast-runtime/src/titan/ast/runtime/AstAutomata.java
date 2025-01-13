@@ -1,6 +1,6 @@
 package titan.ast.runtime;
 
-import java.util.List;
+import java.util.ArrayList;
 import titan.ast.runtime.AstGeneratorResult.AstResult;
 
 /**
@@ -11,5 +11,5 @@ import titan.ast.runtime.AstGeneratorResult.AstResult;
 public interface AstAutomata {
   AstAutomataType getType();
 
-  AstResult buildAst(List<Token> sourceTokens);
+  AstResult buildAst(ArrayList<Token> sourceTokens);
 }

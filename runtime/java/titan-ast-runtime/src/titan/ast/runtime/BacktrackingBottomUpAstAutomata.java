@@ -2,7 +2,6 @@ package titan.ast.runtime;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.TreeSet;
 import titan.ast.runtime.AstGeneratorResult.AstParseErrorData;
@@ -41,7 +40,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
    * @return
    */
   @Override
-  public AstResult buildAst(List<Token> sourceTokens) {
+  public AstResult buildAst(ArrayList<Token> sourceTokens) {
     init(sourceTokens);
     while (result == null && !bottomUpBranchs.isEmpty()) {
       consumeBottomUpBranch();
@@ -211,20 +210,24 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       return;
     }
     if (bottomUpBranchs.add(newBacktrackingBottomUpBranch)) {
+      removeRedundantTriedBottomUpBranchs(
+          bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken);
+    }
+  }
+
+  private void removeRedundantTriedBottomUpBranchs(int minEndIndexOfToken) {
+    if (triedBottomUpBranchs.isEmpty()) {
+      return;
+    }
+    int minEndIndexOfTriedBranch =
+        triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
+    while (minEndIndexOfTriedBranch < minEndIndexOfToken) {
+      triedBottomUpBranchs.pollFirst();
       if (triedBottomUpBranchs.isEmpty()) {
-        return;
+        break;
       }
-      int minEndIndexOfTask = bottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
-      int minEndIndexOfTriedBranch =
+      minEndIndexOfTriedBranch =
           triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
-      while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
-        triedBottomUpBranchs.pollFirst();
-        if (triedBottomUpBranchs.isEmpty()) {
-          break;
-        }
-        minEndIndexOfTriedBranch =
-            triedBottomUpBranchs.first().reducingSymbols.getLast().endIndexOfToken;
-      }
     }
   }
 
@@ -235,7 +238,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     result = null;
   }
 
-  private void init(List<Token> sourceTokens) {
+  private void init(ArrayList<Token> sourceTokens) {
     clear();
     tokenReducingSymbolInputStream = new TokenReducingSymbolInputStream(sourceTokens);
 
@@ -258,9 +261,13 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     if (tokenReducingSymbols.isEmpty()) {
       return new AstParseErrorData(0, 0, "");
     }
+    if (!triedBottomUpBranchs.isEmpty()) {
+      // 更加精确的错误范围，错误位置是已解析最长的token附近
+      removeRedundantTriedBottomUpBranchs(
+          triedBottomUpBranchs.last().reducingSymbols.getLast().endIndexOfToken);
+    }
 
     int indexOfLastToken = tokenReducingSymbols.size() - 1;
-
     int startIndexOfToken = indexOfLastToken;
     int endIndexOfToken = 0;
     for (BacktrackingBottomUpBranch branch : triedBottomUpBranchs) {
@@ -278,22 +285,8 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     if (endIndexOfToken + 1 <= indexOfLastToken) { // 如果还有下一个token，将他加入过来，错误信息必须涵盖可能的位置。
       endIndexOfToken += 1;
     }
-    int startIndexByte = 0;
-    int endIndexByte = 0;
 
-    Token startToken = tokenReducingSymbols.get(startIndexOfToken);
-    Token endToken = tokenReducingSymbols.get(endIndexOfToken);
-    startIndexByte = startToken.start;
-    endIndexByte = endToken.start + endToken.text.length();
-
-    StringBuilder tokenInfo = new StringBuilder();
-    for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken; indexOfToken++) {
-      Token token = tokenReducingSymbols.get(indexOfToken);
-      tokenInfo.append(token.text).append(" ");
-    }
-    tokenInfo.delete(tokenInfo.length() - 1, tokenInfo.length());
-
-    return new AstParseErrorData(startIndexByte, endIndexByte, tokenInfo.toString());
+    return tokenReducingSymbolInputStream.getAstParseErrorData(startIndexOfToken, endIndexOfToken);
   }
 
   public static class BacktrackingBottomUpBranchComparator

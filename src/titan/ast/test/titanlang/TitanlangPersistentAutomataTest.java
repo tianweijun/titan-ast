@@ -10,18 +10,19 @@ import titan.ast.CommandLineAstApplication;
 public class TitanlangPersistentAutomataTest {
 
   public static void main(String[] args) {
-    String fileDirectory = "D:\\github-pro\\titan\\titan-language-compiler\\src\\resources\\grammar\\";
+    String fileDirectory =
+        "D:\\github-pro\\titan\\titan-language-compiler\\src\\resources\\grammar\\";
     String[] testArgs = {
       "-grammarFilePaths",
-        fileDirectory+"titanLanguageNotTextTokenLexer.txt",
-        fileDirectory+"titanLanguagePunctuationLexer.txt",
-        fileDirectory+"titanLanguageNumberLiteralLexer.txt",
-        fileDirectory+"titanLanguageCharsLiteralLexer.txt",
-        fileDirectory+"titanLanguageIdentifierLexer.txt",
-        fileDirectory+"titanLanguageKeyWordLexer.txt",
-        fileDirectory+"titanLanguageParser.txt",
+      fileDirectory + "titanLanguageNotTextTokenLexer.txt",
+      fileDirectory + "titanLanguageNumberLiteralLexer.txt",
+      fileDirectory + "titanLanguageCharsLiteralLexer.txt",
+      fileDirectory + "titanLanguagePunctuationLexer.txt",
+      fileDirectory + "titanLanguageIdentifierLexer.txt",
+      fileDirectory + "titanLanguageKeyWordLexer.txt",
+      fileDirectory + "titanLanguageParser.txt",
       "-persistentAutomataFilePath",
-        fileDirectory+"titanLanguageGrammar.automata"
+      fileDirectory + "titanLanguageGrammar.automata"
     };
 
     new CommandLineAstApplication().run(testArgs);

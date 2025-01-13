@@ -2,6 +2,7 @@ package titan.ast.input;
 
 import java.util.LinkedList;
 import java.util.List;
+import titan.ast.runtime.AstGeneratorResult;
 import titan.ast.util.StringUtils;
 
 /**
@@ -17,7 +18,7 @@ public class CommandLineParameters {
   public String automataFilePath = "";
 
   public boolean graphicalViewOfAst = false;
-  public String graphicalViewOfAstCharSet = "";
+  public String graphicalViewOfAstCharSet = AstGeneratorResult.DEFAULT_CHARSET.name();
   public boolean isAmbiguous = false;
 
   public boolean isRight() {

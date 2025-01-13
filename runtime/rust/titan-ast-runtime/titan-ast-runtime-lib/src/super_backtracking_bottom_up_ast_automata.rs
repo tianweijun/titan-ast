@@ -381,10 +381,6 @@ impl SuperBacktrackingBottomUpAstAutomata {
             .bottom_up_branchs
             .insert(new_backtracking_bottom_up_branch)
         {
-            if self.tried_bottom_up_branchs.is_empty() {
-                return;
-            }
-
             let min_end_index_of_task = self
                 .bottom_up_branchs
                 .first()
@@ -393,7 +389,28 @@ impl SuperBacktrackingBottomUpAstAutomata {
                 .last()
                 .unwrap()
                 .end_index_of_token;
-            let mut min_end_index_of_tried_branch = self
+            self.remove_redundant_tried_bottom_up_branchs(min_end_index_of_task);
+        }
+    }
+
+    fn remove_redundant_tried_bottom_up_branchs(&mut self, min_end_index_of_token: i32) {
+        if self.tried_bottom_up_branchs.is_empty() {
+            return;
+        }
+        let mut min_end_index_of_tried_branch = self
+            .tried_bottom_up_branchs
+            .first()
+            .unwrap()
+            .reducing_symbols
+            .last()
+            .unwrap()
+            .end_index_of_token;
+        while min_end_index_of_tried_branch < min_end_index_of_token {
+            self.tried_bottom_up_branchs.pop_first();
+            if self.tried_bottom_up_branchs.is_empty() {
+                break;
+            }
+            min_end_index_of_tried_branch = self
                 .tried_bottom_up_branchs
                 .first()
                 .unwrap()
@@ -401,20 +418,6 @@ impl SuperBacktrackingBottomUpAstAutomata {
                 .last()
                 .unwrap()
                 .end_index_of_token;
-            while min_end_index_of_tried_branch < min_end_index_of_task {
-                self.tried_bottom_up_branchs.pop_first();
-                if self.tried_bottom_up_branchs.is_empty() {
-                    break;
-                }
-                min_end_index_of_tried_branch = self
-                    .tried_bottom_up_branchs
-                    .first()
-                    .unwrap()
-                    .reducing_symbols
-                    .last()
-                    .unwrap()
-                    .end_index_of_token;
-            }
         }
     }
 
@@ -447,13 +450,28 @@ impl SuperBacktrackingBottomUpAstAutomata {
             return AstAppError::AstParseError {
                 start: 0,
                 end: 0,
-                error_text: "".to_string(),
+                error_text: Default::default(),
             };
         }
 
-        let index_of_last_token = (token_reducing_symbols.len() - 1) as i32;
+        if !self.tried_bottom_up_branchs.is_empty() {
+            let min_end_index_of_token = self
+                .tried_bottom_up_branchs
+                .last()
+                .unwrap()
+                .reducing_symbols
+                .last()
+                .unwrap()
+                .end_index_of_token;
+            self.remove_redundant_tried_bottom_up_branchs(min_end_index_of_token);
+        }
 
-        let mut start_index_of_token: i32 = index_of_last_token as i32;
+        let token_reducing_symbols = &self
+            .token_reducing_symbol_input_stream
+            .token_reducing_symbols;
+
+        let index_of_last_token = (token_reducing_symbols.len() - 1) as i32;
+        let mut start_index_of_token: i32 = index_of_last_token;
         let mut end_index_of_token: i32 = 0;
         for branch in self.tried_bottom_up_branchs.iter() {
             let mut last_index_of_branch =
@@ -475,24 +493,9 @@ impl SuperBacktrackingBottomUpAstAutomata {
             end_index_of_token += 1;
         }
 
-        let start_index_byte = token_reducing_symbols[start_index_of_token as usize].start;
-
-        let end_token = &token_reducing_symbols[end_index_of_token as usize];
-        let end_index_byte = end_token.start + end_token.text.len();
-
-        let mut token_info: Vec<u8> = Vec::with_capacity(end_index_byte - start_index_byte + 1);
-        for index_of_token in start_index_of_token as usize..=end_index_of_token as usize {
-            let token = &token_reducing_symbols[index_of_token];
-            token_info.append(&mut token.text.clone());
-            token_info.push(' ' as u8);
-        }
-        token_info.pop();
-
-        return AstAppError::AstParseError {
-            start: start_index_byte,
-            end: end_index_byte,
-            error_text: String::from_utf8_lossy(&token_info).to_string(),
-        };
+        return self
+            .token_reducing_symbol_input_stream
+            .get_ast_parse_error_data(start_index_of_token, end_index_of_token);
     }
 }
 

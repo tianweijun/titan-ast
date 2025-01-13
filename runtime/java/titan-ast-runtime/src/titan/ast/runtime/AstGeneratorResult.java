@@ -1,5 +1,8 @@
 package titan.ast.runtime;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,6 +11,7 @@ import java.util.List;
  * @author tian wei jun
  */
 public class AstGeneratorResult {
+  public static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
   public final TokensResult tokensResult;
   public final AstResult astResult;
 
@@ -68,12 +72,12 @@ public class AstGeneratorResult {
       return type == TokensResultType.OK;
     }
 
-    public static TokensResult generateOkResult(List<Token> data) {
+    public static TokensResult generateOkResult(ArrayList<Token> data) {
       return new TokensResult(TokensResultType.OK, data);
     }
 
-    public List<Token> getOkData() {
-      return (List<Token>) data;
+    public ArrayList<Token> getOkData() {
+      return (ArrayList<Token>) data;
     }
 
     public static TokensResult generateSourceIoErrorResult(String data) {
@@ -100,12 +104,13 @@ public class AstGeneratorResult {
   }
 
   public static class TokenParseErrorData {
-    public final List<Token> finishedTokens;
+    public final ArrayList<Token> finishedTokens;
     public final int start;
     public final int end;
     public final String errorText;
 
-    public TokenParseErrorData(List<Token> finishedTokens, int start, int end, String errorText) {
+    public TokenParseErrorData(
+        ArrayList<Token> finishedTokens, int start, int end, String errorText) {
       this.finishedTokens = finishedTokens;
       this.start = start;
       this.end = end;

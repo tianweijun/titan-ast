@@ -29,7 +29,7 @@ Identifier :
 
 IdentifierChar : [a-zA-Z_0-9] ;
 
-Test :   (~[a] | ~[)  ;
+Test :   (~[a] )  ;
 
 @TerminalFragmentGrammar end ;
 

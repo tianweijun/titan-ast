@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, vec};
 
 pub(crate) type Byte = u8;
 
@@ -29,6 +29,17 @@ impl ByteBuffer {
 
     pub(crate) fn set_position(&mut self, position: usize) {
         self.position = position;
+    }
+
+    pub(crate) fn get_data(&self) -> Vec<u8> {
+        let mut data = Vec::with_capacity(self.len());
+        for (index, b) in self.buffer.iter().enumerate() {
+            if index >= self.len() {
+                break;
+            }
+            data.push(*b);
+        }
+        return data;
     }
 
     pub(crate) fn get_i32(&self) -> i32 {

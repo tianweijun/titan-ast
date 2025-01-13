@@ -25,7 +25,6 @@ pub struct LineNumberDetail {
 
 pub struct RichAstGeneratorResult {
     pub tokens_result: Result<Vec<Token>, AstAppError>,
-    pub line_number_detail: LineNumberDetail,
     pub ast_result: Result<Ast, AstAppError>,
 }
 

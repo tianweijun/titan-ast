@@ -1,8 +1,6 @@
 package titan.ast.test.diy;
 
-import titan.ast.grammar.GrammarFileAutomataAstApplication;
-import titan.ast.logger.Logger;
-import titan.ast.runtime.RichAstGeneratorResult;
+import titan.ast.CommandLineAstApplication;
 
 public class DiyShowGraphicalViewOfAstByGrammarFileTest {
 
@@ -12,11 +10,13 @@ public class DiyShowGraphicalViewOfAstByGrammarFileTest {
       "D://github-pro/titan/titan-ast/test/diy/diy.grammar",
       "-sourceFilePath",
       "D://github-pro/titan/titan-ast/test/diy/diy.txt",
-      "-graphicalViewOfAst"
+      "-graphicalViewOfAst",
+      "utf-8"
     };
 
-    // new CommandLineAstApplication().run(testArgs);
+    new CommandLineAstApplication().run(testArgs);
 
+    /*
     GrammarFileAutomataAstApplication grammarFileAutomataAstApplication =
         new GrammarFileAutomataAstApplication();
     grammarFileAutomataAstApplication.setAstAutomataContext(testArgs[1]);
@@ -29,6 +29,6 @@ public class DiyShowGraphicalViewOfAstByGrammarFileTest {
           richAstGeneratorResult.getOkAst());
     } else {
       Logger.info(richAstGeneratorResult.getErrorMsg());
-    }
+    }*/
   }
 }

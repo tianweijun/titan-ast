@@ -7,7 +7,8 @@
 
 #include "AutomataTmpToken.h"
 #include "Token.h"
-#include <list>
+#include "Result.h"
+#include <vector>
 #include <set>
 
 class TokenReducingSymbolInputStream {
@@ -16,17 +17,21 @@ class TokenReducingSymbolInputStream {
                                  int countOfInnerGrammars);
   ~TokenReducingSymbolInputStream();
 
-  int sizeOfTokenReducingSymbols;
+  unsigned int sizeOfTokenReducingSymbols;
   int nextReadIndex;
   AutomataTmpToken *tokenReducingSymbols;
+  std::vector<Token *> *sourceTokens;
 
   AutomataTmpToken *read();
   bool hasNext() const;
   bool hasReadAll() const;
   void clear();
-  void init(std::list<Token *> *sourceTokens);
+  void init(std::vector<Token *> *sourceTokens);
 
- private:
+  AstParseErrorData *getAstParseErrorData(int startIndexOfTokenReducingSymbols,
+                                          int endIndexOfTokenReducingSymbols);
+
+private:
   std::set<Grammar *, PtrGrammarContentCompare> innerGrammars;
 };
 

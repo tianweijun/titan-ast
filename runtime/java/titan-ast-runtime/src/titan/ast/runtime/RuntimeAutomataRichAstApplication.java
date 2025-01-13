@@ -1,6 +1,7 @@
 package titan.ast.runtime;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * RuntimeAutomataAstApplication.
@@ -16,6 +17,14 @@ public class RuntimeAutomataRichAstApplication extends RuntimeAutomataAstApplica
     richResultConverter.setNewline(newline);
   }
 
+  public void setCharset(Charset charset) {
+    richResultConverter.setCharset(charset);
+  }
+
+  public void setCharset(String charsetName) {
+    richResultConverter.setCharset(charsetName);
+  }
+
   public RichAstGeneratorResult buildRichAst(String sourceFilePath) {
     return richResultConverter.convert(buildAst(sourceFilePath));
   }
@@ -28,8 +37,9 @@ public class RuntimeAutomataRichAstApplication extends RuntimeAutomataAstApplica
     RuntimeAutomataRichAstApplication app = null;
     app = (RuntimeAutomataRichAstApplication) super.clone();
     app.setContext(this.automataData);
-    // set newline
+    // set newline ,setCharset
     app.setNewline(this.richResultConverter.getNewline());
+    app.setCharset(this.richResultConverter.getCharset());
     return app;
   }
 }

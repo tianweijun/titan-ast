@@ -52,7 +52,7 @@ void BacktrackingBottomUpAstAutomata::clear() {
 }
 
 AstResult *
-BacktrackingBottomUpAstAutomata::buildAst(std::list<Token *> *sourceTokens) {
+BacktrackingBottomUpAstAutomata::buildAst(std::vector<Token *> *sourceTokens) {
   init(sourceTokens);
   while (result == nullptr && !bottomUpBranchs.empty()) {
     consumeBottomUpBranch();
@@ -258,7 +258,7 @@ bool BacktrackingBottomUpAstAutomata::isAcceptedBottomUpBranch(
   return tokenReducingSymbolInputStream.hasReadAll() && bottomUpBranch->reducingSymbols.size() == 2 && startGrammar == topReducingSymbol->astOfCurrentDfaState->grammar;
 }
 
-void BacktrackingBottomUpAstAutomata::init(std::list<Token *> *sourceTokens) {
+void BacktrackingBottomUpAstAutomata::init(std::vector<Token *> *sourceTokens) {
   clear();
   tokenReducingSymbolInputStream.init(sourceTokens);
 
@@ -293,31 +293,31 @@ bool BacktrackingBottomUpAstAutomata::addNewBacktrackingBottomUpBranch(
     return false;
   }
 
-  bool hasInsert = bottomUpBranchs.insert(newBacktrackingBottomUpBranch).second;
-  if (hasInsert) {
-    if (triedBottomUpBranchs.empty()) {
-      return hasInsert;
-    }
-    int minEndIndexOfTask =
-        (*bottomUpBranchs.begin())->reducingSymbols.back()->endIndexOfToken;
-
-    auto firstTriedBranch = *triedBottomUpBranchs.begin();
-    int minEndIndexOfTriedBranch =
-        firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
-    while (minEndIndexOfTriedBranch < minEndIndexOfTask) {
-      triedBottomUpBranchs.erase(firstTriedBranch);
-      delete firstTriedBranch;
-      if (triedBottomUpBranchs.empty()) {
-        break;
-      }
-      firstTriedBranch = *triedBottomUpBranchs.begin();
-      minEndIndexOfTriedBranch =
-          firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
-    }
-    // std::cout<<minEndIndexOfTask<<":"<<bottomUpBranchs.size()<<"
-    // "<<triedBottomUpBranchs.size()<<std::endl;
+  bool hasInserted = bottomUpBranchs.insert(newBacktrackingBottomUpBranch).second;
+  if (hasInserted) {
+    removeRedundantTriedBottomUpBranchs( (*bottomUpBranchs.begin())->reducingSymbols.back()->endIndexOfToken);
   }
-  return hasInsert;
+  return hasInserted;
+}
+
+void BacktrackingBottomUpAstAutomata::removeRedundantTriedBottomUpBranchs(int minEndIndexOfToken){
+  if (triedBottomUpBranchs.empty()) {
+    return ;
+  }
+
+  auto firstTriedBranch = *triedBottomUpBranchs.begin();
+  int minEndIndexOfTriedBranch =
+      firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
+  while (minEndIndexOfTriedBranch < minEndIndexOfToken) {
+    triedBottomUpBranchs.erase(firstTriedBranch);
+    delete firstTriedBranch;
+    if (triedBottomUpBranchs.empty()) {
+      break;
+    }
+    firstTriedBranch = *triedBottomUpBranchs.begin();
+    minEndIndexOfTriedBranch =
+        firstTriedBranch->reducingSymbols.back()->endIndexOfToken;
+  }
 }
 
 /**
@@ -329,8 +329,15 @@ AstParseErrorData *BacktrackingBottomUpAstAutomata::getAstParseErrorData() {
   if (sizeOfTokens <= 0) {
     return new AstParseErrorData(0, 0, "");
   }
-  int indexOfLastToken = sizeOfTokens - 1;
 
+  if (!triedBottomUpBranchs.empty()) {
+    // 更加精确的错误范围，错误位置是已解析最长的token附近
+    auto lastTriedBottomUpBranch = *triedBottomUpBranchs.rbegin();
+    removeRedundantTriedBottomUpBranchs(
+        lastTriedBottomUpBranch->reducingSymbols.back()->endIndexOfToken);
+  }
+
+  int indexOfLastToken = sizeOfTokens - 1;
   int startIndexOfToken = indexOfLastToken;
   int endIndexOfToken = 0;
   for (auto branch : triedBottomUpBranchs) {
@@ -345,31 +352,11 @@ AstParseErrorData *BacktrackingBottomUpAstAutomata::getAstParseErrorData() {
       endIndexOfToken = lastIndexOfBranch;
     }
   }
-
   if (endIndexOfToken + 1 <= indexOfLastToken) {// 如果还有下一个token，将他加入过来，错误信息必须涵盖可能的位置。
     endIndexOfToken += 1;
   }
 
-  int startIndexByte = 0;
-  int endIndexByte = 0;
-
-  std::stringstream tokenInfo;
-  auto tokenReducingSymbols =
-      tokenReducingSymbolInputStream.tokenReducingSymbols;
-  AutomataTmpToken *startToken = &tokenReducingSymbols[startIndexOfToken];
-  AutomataTmpToken *endToken = &tokenReducingSymbols[endIndexOfToken];
-  startIndexByte = startToken->start;
-  endIndexByte = endToken->start + (int) endToken->text->length();
-
-  for (int indexOfToken = startIndexOfToken; indexOfToken <= endIndexOfToken;
-       indexOfToken++) {
-    AutomataTmpToken *token = &tokenReducingSymbols[indexOfToken];
-    tokenInfo << *(token->text) << " ";
-  }
-  auto strTokenInfo = tokenInfo.str();
-  strTokenInfo.pop_back();
-
-  return new AstParseErrorData(startIndexByte, endIndexByte, strTokenInfo);
+  return tokenReducingSymbolInputStream.getAstParseErrorData(startIndexOfToken, endIndexOfToken);
 }
 
 AstAutomataType BacktrackingBottomUpAstAutomata::getType() {

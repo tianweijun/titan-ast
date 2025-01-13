@@ -18,8 +18,8 @@ KeyWordAutomata::KeyWordAutomata(int isEmpty, const Grammar *rootKeyWord)
 
 KeyWordAutomata::~KeyWordAutomata() = default;
 
-std::list<Token *> *
-KeyWordAutomata::buildToken(std::list<Token *> *tokens) const {
+std::vector<Token *> *
+KeyWordAutomata::buildToken(std::vector<Token *> *tokens) const {
   for (auto token : *tokens) {
     if (rootKeyWord->index == token->terminal.index) {
       auto findIt = textTerminalMap.find(&token->text);

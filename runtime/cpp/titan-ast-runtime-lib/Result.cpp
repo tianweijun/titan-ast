@@ -35,11 +35,11 @@ TokensResult::~TokensResult() {
 
 bool TokensResult::isOk() const { return type == TokensResultType::OK; }
 
-TokensResult *TokensResult::generateOkResult(std::list<Token *> *data) {
+TokensResult *TokensResult::generateOkResult(std::vector<Token *> *data) {
   return new TokensResult(TokensResultType::OK, data);
 }
-std::list<Token *> *TokensResult::getOkData() const {
-  return static_cast<std::list<Token *> *>(data);
+std::vector<Token *> *TokensResult::getOkData() const {
+  return static_cast<std::vector<Token *> *>(data);
 }
 
 TokensResult *TokensResult::generateSourceIoErrorResult(std::string *data) {
@@ -56,7 +56,7 @@ TokenParseErrorData *TokensResult::getTokenParseErrorData() const {
   return static_cast<TokenParseErrorData *>(data);
 }
 
-TokenParseErrorData::TokenParseErrorData(std::list<Token *> *finishedTokens,
+TokenParseErrorData::TokenParseErrorData(std::vector<Token *> *finishedTokens,
                                          int start, int end,
                                          std::string errorText)
     : finishedTokens(finishedTokens), start(start), end(end),
@@ -138,7 +138,7 @@ AstGeneratorResult::~AstGeneratorResult() {
 bool AstGeneratorResult::isOk() const {
   return tokensResult->isOk() && astResult->isOk();
 }
-std::list<Token *> *AstGeneratorResult::getOkTokens() const {
+std::vector<Token *> *AstGeneratorResult::getOkTokens() const {
   return tokensResult->getOkData();
 }
 Ast *AstGeneratorResult::getOkAst() const { return astResult->getOkData(); }
@@ -169,7 +169,7 @@ std::string AstGeneratorResult::getErrorMsg() const {
 }
 
 RichTokenParseErrorData::RichTokenParseErrorData(
-    std::list<Token *> *finishedTokens, int start, int end, int startLineNumber,
+    std::vector<Token *> *finishedTokens, int start, int end, int startLineNumber,
     int startOffsetInLine, int endLineNumber, int endOffsetInLine,
     std::string errorText)
     : finishedTokens(finishedTokens), start(start), end(end),
@@ -216,11 +216,11 @@ RichTokensResult::~RichTokensResult() {
 
 bool RichTokensResult::isOk() const { return type == RichTokensResultType::OK; }
 
-RichTokensResult *RichTokensResult::generateOkResult(std::list<Token *> *data) {
+RichTokensResult *RichTokensResult::generateOkResult(std::vector<Token *> *data) {
   return new RichTokensResult(RichTokensResultType::OK, data);
 }
-std::list<Token *> *RichTokensResult::getOkData() const {
-  return static_cast<std::list<Token *> *>(data);
+std::vector<Token *> *RichTokensResult::getOkData() const {
+  return static_cast<std::vector<Token *> *>(data);
 }
 
 RichTokensResult *
@@ -324,20 +324,18 @@ RichAstResult *RichAstResult::generateRichTokensErrorResult() {
 // RichAstGeneratorResult
 RichAstGeneratorResult::RichAstGeneratorResult(
     const RichTokensResult *richTokensResult,
-    const LineNumberDetail *lineNumberDetail,
     const RichAstResult *richAstResult)
-    : richTokensResult(richTokensResult), lineNumberDetail(lineNumberDetail),
+    : richTokensResult(richTokensResult),
       richAstResult(richAstResult) {}
 RichAstGeneratorResult::~RichAstGeneratorResult() {
   delete richTokensResult;
-  delete lineNumberDetail;
   delete richAstResult;
 }
 
 bool RichAstGeneratorResult::isOk() const {
   return richTokensResult->isOk() && richAstResult->isOk();
 }
-std::list<Token *> *RichAstGeneratorResult::getOkTokens() const {
+std::vector<Token *> *RichAstGeneratorResult::getOkTokens() const {
   return richTokensResult->getOkData();
 }
 Ast *RichAstGeneratorResult::getOkAst() const {

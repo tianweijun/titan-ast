@@ -31,10 +31,10 @@ impl RuntimeAutomataRichAstApplication {
     }
 
     pub fn build_rich_ast(&mut self, source_code_file_path: &String) -> RichAstGeneratorResult {
-        let ast_generator_result = self
+        let mut ast_generator_result = self
             .runtime_automata_ast_app
             .build_ast(source_code_file_path);
-        return self.rich_result_converter.convert(ast_generator_result);
+        return self.rich_result_converter.convert(&mut ast_generator_result);
     }
 
     pub fn get_grammars(&self) -> Vec<AstGrammar> {

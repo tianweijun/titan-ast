@@ -1,7 +1,5 @@
 package titan.ast.runtime;
 
-import java.nio.charset.StandardCharsets;
-
 /**
  * .
  *
@@ -77,6 +75,6 @@ public class ByteBuffer {
 
   @Override
   public String toString() {
-    return new String(buffer, 0, position, StandardCharsets.ISO_8859_1);
+    return new String(buffer, 0, position, AstGeneratorResult.DEFAULT_CHARSET);
   }
 }

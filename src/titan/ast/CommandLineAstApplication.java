@@ -95,14 +95,15 @@ public class CommandLineAstApplication {
       GrammarFileAutomataAstApplication grammarFileAutomataAstApplication,
       CommandLineParameters commandLineParameters) {
     if (commandLineParameters.isBuildingAstByGrammarFile()) {
+      grammarFileAutomataAstApplication.setRuntimeAstApplicationCharset(
+          commandLineParameters.graphicalViewOfAstCharSet);
       RichAstGeneratorResult astGeneratorResult =
           grammarFileAutomataAstApplication.buildAst(commandLineParameters.sourceFilePath);
       if (!astGeneratorResult.isOk()) {
         Logger.info(astGeneratorResult.getErrorMsg());
       }
       if (commandLineParameters.graphicalViewOfAst && astGeneratorResult.isOk()) {
-        grammarFileAutomataAstApplication.displayGraphicalViewOfAst(
-            astGeneratorResult.getOkAst(), commandLineParameters.graphicalViewOfAstCharSet);
+        grammarFileAutomataAstApplication.displayGraphicalViewOfAst(astGeneratorResult.getOkAst());
       }
     }
   }
@@ -113,6 +114,7 @@ public class CommandLineAstApplication {
           new RuntimeAutomataRichAstApplication();
       try {
         runtimeAutomataAstApplication.setContext(commandLineParameters.automataFilePath);
+        runtimeAutomataAstApplication.setCharset(commandLineParameters.graphicalViewOfAstCharSet);
       } catch (AutomataDataIoException e) {
         throw new AstRuntimeException(e);
       }
@@ -122,8 +124,7 @@ public class CommandLineAstApplication {
         Logger.info(astGeneratorResult.getErrorMsg());
       }
       if (commandLineParameters.graphicalViewOfAst && astGeneratorResult.isOk()) {
-        runtimeAutomataAstApplication.displayGraphicalViewOfAst(
-            astGeneratorResult.getOkAst(), commandLineParameters.graphicalViewOfAstCharSet);
+        runtimeAutomataAstApplication.displayGraphicalViewOfAst(astGeneratorResult.getOkAst());
       }
     }
   }

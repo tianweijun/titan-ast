@@ -1,6 +1,6 @@
 package titan.ast.runtime;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * .
@@ -10,14 +10,9 @@ import java.util.List;
 public class RichAstGeneratorResult {
   public final RichTokensResult richTokensResult;
   public final RichAstResult richAstResult;
-  private final LineNumberDetail lineNumberDetail;
 
-  public RichAstGeneratorResult(
-      RichTokensResult richTokensResult,
-      LineNumberDetail lineNumberDetail,
-      RichAstResult richAstResult) {
+  public RichAstGeneratorResult(RichTokensResult richTokensResult, RichAstResult richAstResult) {
     this.richTokensResult = richTokensResult;
-    this.lineNumberDetail = lineNumberDetail;
     this.richAstResult = richAstResult;
   }
 
@@ -25,16 +20,12 @@ public class RichAstGeneratorResult {
     return richTokensResult.isOk() && richAstResult.isOk();
   }
 
-  public List<Token> getOkTokens() {
+  public ArrayList<Token> getOkTokens() {
     return richTokensResult.getOkData();
   }
 
   public Ast getOkAst() {
     return richAstResult.getOkData();
-  }
-
-  public LineNumberDetail getOkLineNumberDetail() {
-    return lineNumberDetail;
   }
 
   public String getErrorMsg() {
@@ -81,7 +72,7 @@ public class RichAstGeneratorResult {
       this.data = data;
     }
 
-    public static RichTokensResult generateOkResult(List<Token> data) {
+    public static RichTokensResult generateOkResult(ArrayList<Token> data) {
       return new RichTokensResult(RichTokensResultType.OK, data);
     }
 
@@ -101,8 +92,8 @@ public class RichAstGeneratorResult {
       return type == RichTokensResultType.OK;
     }
 
-    public List<Token> getOkData() {
-      return (List<Token>) data;
+    public ArrayList<Token> getOkData() {
+      return (ArrayList<Token>) data;
     }
 
     public String getSourceIoErrorData() {
@@ -115,7 +106,7 @@ public class RichAstGeneratorResult {
   }
 
   public static class RichTokenParseErrorData {
-    public final List<Token> finishedTokens;
+    public final ArrayList<Token> finishedTokens;
     public final int start;
     public final int end;
     public final int startLineNumber;
@@ -125,7 +116,7 @@ public class RichAstGeneratorResult {
     public final String errorText;
 
     public RichTokenParseErrorData(
-        List<Token> finishedTokens,
+        ArrayList<Token> finishedTokens,
         int start,
         int end,
         int startLineNumber,

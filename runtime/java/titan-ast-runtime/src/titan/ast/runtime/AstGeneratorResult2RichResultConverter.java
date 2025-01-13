@@ -1,13 +1,12 @@
 package titan.ast.runtime;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import titan.ast.runtime.AstGeneratorResult.AstParseErrorData;
-import titan.ast.runtime.AstGeneratorResult.AstResult;
 import titan.ast.runtime.AstGeneratorResult.TokenParseErrorData;
 import titan.ast.runtime.AstGeneratorResult.TokensResult;
 import titan.ast.runtime.LineNumberDetail.LineNumberRange;
-import titan.ast.runtime.LineNumberDetail.LineNumberRangeDto;
 import titan.ast.runtime.RichAstGeneratorResult.RichAstParseErrorData;
 import titan.ast.runtime.RichAstGeneratorResult.RichAstResult;
 import titan.ast.runtime.RichAstGeneratorResult.RichTokenParseErrorData;
@@ -20,6 +19,7 @@ import titan.ast.runtime.RichAstGeneratorResult.RichTokensResult;
  */
 public class AstGeneratorResult2RichResultConverter {
   private byte newline = '\n';
+  RichAstGeneratorResultStringEncoder stringEncoder = new RichAstGeneratorResultStringEncoder();
 
   public byte getNewline() {
     return newline;
@@ -29,30 +29,39 @@ public class AstGeneratorResult2RichResultConverter {
     this.newline = newline;
   }
 
-  public RichAstGeneratorResult convert(AstGeneratorResult astGeneratorResult) {
-    RichTokensResult richTokensResult = convert2RichTokensResult(astGeneratorResult.tokensResult);
-    LineNumberDetail lineNumberDetail;
-    if (richTokensResult.isOk()) {
-      lineNumberDetail = buildLineNumberDetail(richTokensResult.getOkData());
-    } else {
-      lineNumberDetail = new LineNumberDetail(new LineNumberRange[0]);
-    }
-    RichAstResult richAstResult =
-        convert2RichAstResult(astGeneratorResult.astResult, lineNumberDetail);
-    return new RichAstGeneratorResult(richTokensResult, lineNumberDetail, richAstResult);
+  public void setCharset(String charsetName) {
+    stringEncoder.setCharset(charsetName);
   }
 
-  private RichAstResult convert2RichAstResult(
-      AstResult astResult, LineNumberDetail lineNumberDetail) {
+  public void setCharset(Charset charset) {
+    stringEncoder.setCharset(charset);
+  }
+
+  public Charset getCharset() {
+    return stringEncoder.getCharset();
+  }
+
+  public RichAstGeneratorResult convert(AstGeneratorResult astGeneratorResult) {
+    RichAstResult richAstResult = convert2RichAstResult(astGeneratorResult);
+    return new RichAstGeneratorResult(
+        convert2RichTokensResult(astGeneratorResult.tokensResult), richAstResult);
+  }
+
+  public RichAstResult convert2RichAstResult(AstGeneratorResult astGeneratorResult) {
     RichAstResult richAstResult = null;
-    switch (astResult.getType()) {
+
+    switch (astGeneratorResult.astResult.getType()) {
       case OK -> {
-        richAstResult = RichAstResult.generateOkResult(astResult.getOkData());
+        richAstResult =
+            RichAstResult.generateOkResult(
+                stringEncoder.encodeAst(astGeneratorResult.astResult.getOkData()));
       }
       case AST_PARSE_ERROR -> {
         richAstResult =
             RichAstResult.generateRichAstParseErrorResult(
-                convert2RichAstParseErrorData(astResult.getAstParseErrorData(), lineNumberDetail));
+                convert2RichAstParseErrorData(
+                    astGeneratorResult.astResult.getAstParseErrorData(),
+                    astGeneratorResult.tokensResult.getOkData()));
       }
       case TOKENS_ERROR -> {
         richAstResult = RichAstResult.generateRichTokensErrorResult();
@@ -62,26 +71,61 @@ public class AstGeneratorResult2RichResultConverter {
   }
 
   private RichAstParseErrorData convert2RichAstParseErrorData(
-      AstParseErrorData astParseErrorData, LineNumberDetail lineNumberDetail) {
-    LineNumberRangeDto startLineNumberRange =
+      AstParseErrorData astParseErrorData, ArrayList<Token> tokens) {
+    LineNumberDetail lineNumberDetail = buildLineNumberDetail(tokens);
+    LineNumberRange startLineNumberRange =
         lineNumberDetail.getLineNumberRangeDto(astParseErrorData.start);
-    LineNumberRangeDto endLineNumberRange =
+    LineNumberRange endLineNumberRange =
         lineNumberDetail.getLineNumberRangeDto(astParseErrorData.end - 1);
+    int startOffsetInLine =
+        stringEncoder.getOffsetInLine(tokens, startLineNumberRange, astParseErrorData.start);
+    int endOffsetInLine =
+        stringEncoder.getOffsetInLine(tokens, endLineNumberRange, astParseErrorData.end);
     return new RichAstParseErrorData(
         astParseErrorData.start,
         astParseErrorData.end,
         startLineNumberRange.lineNumber,
-        astParseErrorData.start - startLineNumberRange.start + 1, // 用户角度下标从1开始
+        startOffsetInLine + 1, // 从1开始计数，所以+1
         endLineNumberRange.lineNumber,
-        astParseErrorData.end - endLineNumberRange.start + 1, // 用户角度下标从1开始
-        astParseErrorData.errorText);
+        endOffsetInLine + 1, // 从1开始计数，所以+1
+        stringEncoder.encodeString(astParseErrorData.errorText));
   }
 
-  private RichTokensResult convert2RichTokensResult(TokensResult tokensResult) {
+  private RichTokenParseErrorData convert2RichTokenGeneratorErrorData(
+      TokenParseErrorData tokenParseErrorData) {
+    ArrayList<Token> tokens = new ArrayList<>(tokenParseErrorData.finishedTokens.size() + 1);
+    tokens.addAll(tokenParseErrorData.finishedTokens);
+    Token token = new Token(tokenParseErrorData.start);
+    token.text = tokenParseErrorData.errorText;
+    tokens.add(token);
+
+    LineNumberDetail lineNumberDetail = buildLineNumberDetail(tokens);
+
+    LineNumberRange startLineNumberRange =
+        lineNumberDetail.getLineNumberRangeDto(tokenParseErrorData.start);
+    LineNumberRange endLineNumberRange =
+        lineNumberDetail.getLineNumberRangeDto(tokenParseErrorData.end - 1);
+    int startOffsetInLine =
+        stringEncoder.getOffsetInLine(tokens, startLineNumberRange, tokenParseErrorData.start);
+    int endOffsetInLine =
+        stringEncoder.getOffsetInLine(tokens, endLineNumberRange, tokenParseErrorData.end);
+    return new RichTokenParseErrorData(
+        stringEncoder.encodeTokens(tokenParseErrorData.finishedTokens),
+        tokenParseErrorData.start,
+        tokenParseErrorData.end,
+        startLineNumberRange.lineNumber,
+        startOffsetInLine + 1, // 从1开始计数，所以+1
+        endLineNumberRange.lineNumber,
+        endOffsetInLine + 1, // 从1开始计数，所以+1
+        stringEncoder.encodeString(tokenParseErrorData.errorText));
+  }
+
+  public RichTokensResult convert2RichTokensResult(TokensResult tokensResult) {
     RichTokensResult richTokensResult = null;
     switch (tokensResult.getType()) {
       case OK -> {
-        richTokensResult = RichTokensResult.generateOkResult(tokensResult.getOkData());
+        richTokensResult =
+            RichTokensResult.generateOkResult(stringEncoder.encodeTokens(tokensResult.getOkData()));
       }
       case TOKEN_PARSE_ERROR -> {
         richTokensResult =
@@ -96,65 +140,41 @@ public class AstGeneratorResult2RichResultConverter {
     return richTokensResult;
   }
 
-  private RichTokenParseErrorData convert2RichTokenGeneratorErrorData(
-      TokenParseErrorData tokenParseErrorData) {
-    char charNewline = (char) newline;
-    // set startLineNumber,lineNumberStartIndex
-    int startLineNumber = 1;
-    int indexOfBytes = -1;
-    int startLineNumberIndex = 0;
-    for (Token token : tokenParseErrorData.finishedTokens) {
-      for (char ch : token.text.toCharArray()) {
-        ++indexOfBytes;
-        if (ch == charNewline) {
-          ++startLineNumber;
-          startLineNumberIndex = indexOfBytes + 1;
-        }
-      }
-    }
-    // set endLineNumber,lineNumberEndIndex
-    int endLineNumber = startLineNumber;
-    int endLineNumberIndex = startLineNumberIndex;
-    for (char ch : tokenParseErrorData.errorText.toCharArray()) {
-      ++indexOfBytes;
-      if (ch == charNewline) {
-        ++endLineNumber;
-        endLineNumberIndex = indexOfBytes + 1;
-      }
-    }
-    return new RichTokenParseErrorData(
-        tokenParseErrorData.finishedTokens,
-        tokenParseErrorData.start,
-        tokenParseErrorData.end,
-        startLineNumber,
-        tokenParseErrorData.start - startLineNumberIndex + 1, // 用户角度下标从1开始
-        endLineNumber,
-        tokenParseErrorData.end - endLineNumberIndex + 1, // 用户角度下标从1开始
-        tokenParseErrorData.errorText);
-  }
-
   public LineNumberDetail buildLineNumberDetail(List<Token> tokens) {
-    char charNewline = (char) newline;
     ArrayList<LineNumberRange> lineNumberRanges = new ArrayList<LineNumberRange>();
-    int nextStart = 0;
+    int indexOfStartToken = 0;
+    int start = 0;
     int indexOfBytes = -1;
-    for (Token token : tokens) {
-      for (char ch : token.text.toCharArray()) {
+    int indexOfToken = 0;
+    for (; indexOfToken < tokens.size(); indexOfToken++) {
+      Token token = tokens.get(indexOfToken);
+      byte[] bytes = token.text.getBytes(AstGeneratorResult.DEFAULT_CHARSET);
+      for (int indexOfTokenBytes = 0; indexOfTokenBytes < bytes.length; indexOfTokenBytes++) {
         ++indexOfBytes;
-        if (ch == charNewline) {
-          int nextEnd = indexOfBytes + 1;
-          lineNumberRanges.add(new LineNumberRange(nextStart, nextEnd));
+        if (bytes[indexOfTokenBytes] == newline) {
+          int end = indexOfBytes + 1;
+          int indexOfEndToken = indexOfToken;
+          lineNumberRanges.add(
+              new LineNumberRange(
+                  start, end, lineNumberRanges.size() + 1, indexOfStartToken, indexOfEndToken));
           // 更新下一行
-          nextStart = nextEnd;
+          start = end;
+          if (indexOfTokenBytes + 1 < bytes.length) {
+            indexOfStartToken = indexOfEndToken;
+          } else {
+            indexOfStartToken = indexOfEndToken + 1;
+          }
         }
       }
     }
     // 最后一行可以没有换行符，设置这个特殊行
-    if (indexOfBytes >= nextStart) {
-      int nextEnd = indexOfBytes + 1;
-      lineNumberRanges.add(new LineNumberRange(nextStart, nextEnd));
+    if (indexOfBytes >= start) {
+      int end = indexOfBytes + 1;
+      lineNumberRanges.add(
+          new LineNumberRange(
+              start, end, lineNumberRanges.size() + 1, indexOfStartToken, indexOfToken));
       // 更新下一行
-      nextStart = nextEnd;
+      start = end;
     }
     // lineNumberRanges move to array
     LineNumberRange[] lineNumberRangeArray = new LineNumberRange[lineNumberRanges.size()];

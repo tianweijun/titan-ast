@@ -3,6 +3,7 @@ package titan.ast.runtime;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import titan.ast.runtime.AstGeneratorResult.TokenParseErrorData;
@@ -68,16 +69,20 @@ public class DfaTokenAutomata implements TokenAutomata {
       }
 
       if (buildOneTokenMethodResultType == BuildOneTokenMethodResultType.ALL_TEXT_HAS_BEEN_BUILT) {
-        tokensResult = TokensResult.generateOkResult(tokens);
+        ArrayList<Token> tokensArrayList = new ArrayList<Token>(tokens.size());
+        tokensArrayList.addAll(tokens);
+        tokensResult = TokensResult.generateOkResult(tokensArrayList);
         break;
       }
       if (buildOneTokenMethodResultType == BuildOneTokenMethodResultType.TOKEN_PARSE_ERROR) {
         BuildOneTokenMethodTokenGeneratorErrorData tokenGeneratorErrorData =
             buildOneTokenMethodResult.getBuildOneTokenMethodTokenGeneratorErrorData();
+        ArrayList<Token> tokensArrayList = new ArrayList<Token>(tokens.size());
+        tokensArrayList.addAll(tokens);
         tokensResult =
             TokensResult.generateTokenParseErrorResult(
                 new TokenParseErrorData(
-                    tokens,
+                    tokensArrayList,
                     tokenGeneratorErrorData.start,
                     tokenGeneratorErrorData.end,
                     tokenGeneratorErrorData.errorText));

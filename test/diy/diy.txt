@@ -1,4 +1,2 @@
-
-
 set sum Equal age end
-set sum1 equal age1 end
+set sum1     equal age1 end

@@ -59,18 +59,14 @@ public class RuntimeAutomataAstApplication implements Cloneable {
   }
 
   public AstGeneratorResult buildAst(String sourceFilePath) {
-    TokensResult tokensResult = tokenAutomata.buildToken(sourceFilePath);
-    AstResult astResult;
-    if (tokensResult.isOk()) {
-      astResult = astAutomata.buildAst(tokensResult.getOkData());
-    } else {
-      astResult = AstResult.generateTokensErrorResult();
-    }
-    return new AstGeneratorResult(tokensResult, astResult);
+    return buildAst(tokenAutomata.buildToken(sourceFilePath));
   }
 
   public AstGeneratorResult buildAst(InputStream sourceByteInputStream) {
-    TokensResult tokensResult = tokenAutomata.buildToken(sourceByteInputStream);
+    return buildAst(tokenAutomata.buildToken(sourceByteInputStream));
+  }
+
+  public AstGeneratorResult buildAst(TokensResult tokensResult) {
     AstResult astResult;
     if (tokensResult.isOk()) {
       astResult = astAutomata.buildAst(tokensResult.getOkData());
@@ -82,10 +78,6 @@ public class RuntimeAutomataAstApplication implements Cloneable {
 
   public void displayGraphicalViewOfAst(Ast ast) {
     new titan.ast.runtime.AstGuiOutputer(ast).output();
-  }
-
-  public void displayGraphicalViewOfAst(Ast ast, String charsetName) {
-    new titan.ast.runtime.AstGuiOutputer(ast, charsetName).output();
   }
 
   @Override
