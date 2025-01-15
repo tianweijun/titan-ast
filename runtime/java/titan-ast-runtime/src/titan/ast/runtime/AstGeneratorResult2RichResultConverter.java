@@ -2,6 +2,7 @@ package titan.ast.runtime;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import titan.ast.runtime.AstGeneratorResult.AstParseErrorData;
 import titan.ast.runtime.AstGeneratorResult.TokenParseErrorData;
@@ -42,19 +43,33 @@ public class AstGeneratorResult2RichResultConverter {
   }
 
   public RichAstGeneratorResult convert(AstGeneratorResult astGeneratorResult) {
-    RichAstResult richAstResult = convert2RichAstResult(astGeneratorResult);
-    return new RichAstGeneratorResult(
-        convert2RichTokensResult(astGeneratorResult.tokensResult), richAstResult);
+    RichAstResult richAstResult = convert2RichAstResultNoEncodingAst(astGeneratorResult);
+    RichTokensResult richTokensResult = convert2RichTokensResult(astGeneratorResult.tokensResult);
+    if (richAstResult.isOk()) {
+      encodeAstByEncodedTokens(richAstResult.getOkData(), richTokensResult.getOkData().iterator());
+    }
+    return new RichAstGeneratorResult(richTokensResult, richAstResult);
   }
 
-  public RichAstResult convert2RichAstResult(AstGeneratorResult astGeneratorResult) {
+  private void encodeAstByEncodedTokens(Ast ast, Iterator<Token> encodedTokensIt) {
+    for (Ast child : ast.children) {
+      encodeAstByEncodedTokens(child, encodedTokensIt);
+    }
+    if (ast instanceof TerminalAst terminalAst) {
+      Token encodedToken = encodedTokensIt.next();
+      while (encodedToken.type != TokenType.TEXT) {
+        encodedToken = encodedTokensIt.next();
+      }
+      terminalAst.token.text = encodedToken.text;
+    }
+  }
+
+  private RichAstResult convert2RichAstResultNoEncodingAst(AstGeneratorResult astGeneratorResult) {
     RichAstResult richAstResult = null;
 
     switch (astGeneratorResult.astResult.getType()) {
       case OK -> {
-        richAstResult =
-            RichAstResult.generateOkResult(
-                stringEncoder.encodeAst(astGeneratorResult.astResult.getOkData()));
+        richAstResult = RichAstResult.generateOkResult(astGeneratorResult.astResult.getOkData());
       }
       case AST_PARSE_ERROR -> {
         richAstResult =
@@ -120,7 +135,7 @@ public class AstGeneratorResult2RichResultConverter {
         stringEncoder.encodeString(tokenParseErrorData.errorText));
   }
 
-  public RichTokensResult convert2RichTokensResult(TokensResult tokensResult) {
+  private RichTokensResult convert2RichTokensResult(TokensResult tokensResult) {
     RichTokensResult richTokensResult = null;
     switch (tokensResult.getType()) {
       case OK -> {
@@ -140,7 +155,7 @@ public class AstGeneratorResult2RichResultConverter {
     return richTokensResult;
   }
 
-  public LineNumberDetail buildLineNumberDetail(List<Token> tokens) {
+  private LineNumberDetail buildLineNumberDetail(List<Token> tokens) {
     ArrayList<LineNumberRange> lineNumberRanges = new ArrayList<LineNumberRange>();
     int indexOfStartToken = 0;
     int start = 0;

@@ -80,21 +80,4 @@ public class RichAstGeneratorResultStringEncoder {
     }
     return getCharCount(byteBuffer.buffer, 0, byteBuffer.length());
   }
-
-  public Ast encodeAst(Ast ast) {
-    if (isNeedToEncoding()) {
-      doEncodeAst(ast);
-    }
-    return ast;
-  }
-
-  private void doEncodeAst(Ast ast) {
-    if (ast instanceof TerminalAst terminalAst) {
-      terminalAst.token.text = doEncodeString(terminalAst.token.text);
-      return;
-    }
-    for (Ast child : ast.children) {
-      doEncodeAst(child);
-    }
-  }
 }

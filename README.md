@@ -101,6 +101,7 @@ import titan-ast-runtime.jar and using it like this:
         new RuntimeAutomataRichAstApplication();
     try {
       runtimeAstApplication.setContext(automataFilePath);
+      runtimeAstApplication.setCharset(charsetName);
     } catch (AutomataDataIoException e) {
       Logger.info(e.getMessage());
       return;
