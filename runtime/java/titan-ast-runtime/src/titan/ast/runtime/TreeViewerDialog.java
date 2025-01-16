@@ -3,12 +3,7 @@ package titan.ast.runtime;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 /**
@@ -45,37 +40,5 @@ public class TreeViewerDialog {
     dialog.pack();
     dialog.setVisible(true);
     return dialog;
-  }
-
-  /**
-   * 新建线程异步打开窗口.
-   *
-   * @return 异步运算结果是窗口
-   */
-  public Future<JFrame> open() {
-    Callable<JFrame> callable =
-        new Callable<JFrame>() {
-          JFrame result;
-
-          @Override
-          public JFrame call() throws Exception {
-            SwingUtilities.invokeAndWait(
-                new Runnable() {
-                  @Override
-                  public void run() {
-                    result = TreeViewerDialog.this.show();
-                  }
-                });
-
-            return result;
-          }
-        };
-
-    ExecutorService executor = Executors.newSingleThreadExecutor();
-    try {
-      return executor.submit(callable);
-    } finally {
-      executor.shutdown();
-    }
   }
 }
