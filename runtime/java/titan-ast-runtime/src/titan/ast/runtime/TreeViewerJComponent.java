@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -39,13 +41,20 @@ public class TreeViewerJComponent extends JComponent {
   private final StringTree stringTree;
   private JSlider scaleSlider;
   private JButton exportAsPngBtn;
+  private Map desktopHints;
 
   public TreeViewerJComponent(StringTree tree) {
     super();
     setLayout(null);
     setScaleSlider();
     setExportAsPngBtn();
+    setFontHints();
     this.stringTree = tree;
+  }
+
+  private void setFontHints() {
+    Toolkit tk = Toolkit.getDefaultToolkit();
+    desktopHints = (Map) (tk.getDesktopProperty("awt.font.desktophints"));
   }
 
   public Container getContainer() {
@@ -114,13 +123,14 @@ public class TreeViewerJComponent extends JComponent {
 
   private void drawBoxTree(Graphics2D g2d) {
     BoxTreeContext boxTreeContext = createDrawTreeContext(stringTree);
-    // 消除文字锯齿
+    g2d.setFont(boxTreeContext.font);
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.setRenderingHint(
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-    // 消除画图锯齿
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    if (desktopHints != null) {
+      g2d.addRenderingHints(desktopHints);
+    }
     g2d.setColor(Color.BLACK);
-    g2d.setFont(boxTreeContext.font);
     drawBoxTree(g2d, boxTreeContext.boxTree);
   }
 
