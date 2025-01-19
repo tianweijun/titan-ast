@@ -1,9 +1,9 @@
 package titan.ast.grammar.token;
 
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import titan.ast.AstRuntimeException;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
@@ -48,17 +48,25 @@ public class KeyWordAutomataBuilder {
   }
 
   private void setKeyWord() {
-    LinkedHashSet<Grammar> keyWords = languageGrammar.keyWordAutomataDetail.keyWords;
-    HashMap<String, Grammar> textGrammarMap = new HashMap<>(keyWords.size());
-    for (Grammar keyWord : keyWords) {
+    HashMap<Grammar, LinkedList<Grammar>> keyWords = languageGrammar.keyWordAutomataDetail.keyWords;
+    int countOfTexts = 0;
+    for (LinkedList<Grammar> sameNameKeyWords : keyWords.values()) {
+      countOfTexts += sameNameKeyWords.size();
+    }
+    HashMap<String, Grammar> textGrammarMap = new HashMap<>(countOfTexts);
+    for (Entry<Grammar, LinkedList<Grammar>> entry : keyWords.entrySet()) {
+      Grammar keyWord = entry.getKey();
       this.grammar = keyWord;
-      List<String> textOfKeyWords = getTextsOfKeyWord(keyWord);
-      for (String textOfKeyWord : textOfKeyWords) {
-        if (textGrammarMap.containsKey(textOfKeyWord)) {
-          throw new AstRuntimeException(
-              String.format("KeyWord must be unique ,error near '%s'.", textOfKeyWord));
+      for (Grammar sameNameKeyWord : entry.getValue()) {
+        List<String> textsOfKeyWord = getTextsOfKeyWord(sameNameKeyWord);
+        for (String textOfKeyWord : textsOfKeyWord) {
+          if (textGrammarMap.containsKey(textOfKeyWord)) {
+            throw new AstRuntimeException(
+                String.format(
+                    "%s:KeyWord must be unique ,error near '%s'.", keyWord.name, textOfKeyWord));
+          }
+          textGrammarMap.put(textOfKeyWord, keyWord);
         }
-        textGrammarMap.put(textOfKeyWord, keyWord);
       }
     }
     keyWordAutomata.textTerminalMap = textGrammarMap;

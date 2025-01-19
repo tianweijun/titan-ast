@@ -66,7 +66,7 @@ public class GrammarFileAutomataAstApplication {
   private void addKeyWord2Terminals() {
     LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
     // 将keyword 添加到 terminals
-    for (Grammar keyWord : languageGrammar.keyWordAutomataDetail.keyWords) {
+    for (Grammar keyWord : languageGrammar.keyWordAutomataDetail.keyWords.keySet()) {
       languageGrammar.addGrammar(keyWord);
     }
   }

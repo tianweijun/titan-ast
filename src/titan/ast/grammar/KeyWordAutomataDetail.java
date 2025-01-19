@@ -1,7 +1,7 @@
 package titan.ast.grammar;
 
-import java.util.LinkedHashSet;
-import titan.ast.AstRuntimeException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import titan.ast.grammar.token.KeyWordAutomata;
 import titan.ast.util.StringUtils;
 
@@ -12,7 +12,8 @@ import titan.ast.util.StringUtils;
  */
 public class KeyWordAutomataDetail {
   public String rootKeyWordGrammarName = null;
-  public LinkedHashSet<Grammar> keyWords = new LinkedHashSet<>();
+  public HashMap<Grammar, LinkedList<Grammar>> keyWords =
+      new HashMap<Grammar, LinkedList<Grammar>>();
   public KeyWordAutomata keyWordAutomata = null;
 
   public boolean isEmpty() {
@@ -24,10 +25,11 @@ public class KeyWordAutomataDetail {
   }
 
   public void addKeyWord(Grammar keyWord) {
-    if (keyWords.contains(keyWord)) {
-      throw new AstRuntimeException(
-          String.format("name of grammar '%s' is not unique.", keyWord.name));
+    LinkedList<Grammar> sameNameKeyWords = keyWords.get(keyWord);
+    if (sameNameKeyWords == null) {
+      sameNameKeyWords = new LinkedList<>();
+      keyWords.put(keyWord, sameNameKeyWords);
     }
-    keyWords.add(keyWord);
+    sameNameKeyWords.add(keyWord);
   }
 }
