@@ -1,19 +1,15 @@
 package titan.ast.runtime;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,35 +17,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.plaf.ComponentUI;
 
 /**
- * 显示树数据结构的组件，本组件在窗口中.
+ * .
  *
  * @author tian wei jun
  */
-public class TreeViewerJComponent extends JComponent {
-
-  private static final int FONT_SIZE = 16;
-  private final StringTree stringTree;
-  private JSlider scaleSlider;
-  private JButton exportAsPngBtn;
+public class TreeViewerUI extends ComponentUI {
+  private static final int FONT_SIZE = 12;
   private Map desktopHints;
 
-  public TreeViewerJComponent(StringTree tree) {
-    super();
-    setLayout(null);
-    setScaleSlider();
-    setExportAsPngBtn();
+  public TreeViewerUI() {
     setFontHints();
-    this.stringTree = tree;
+  }
+
+  public static ComponentUI createUI(JComponent c) {
+    return new TreeViewerUI();
   }
 
   private void setFontHints() {
@@ -57,80 +42,54 @@ public class TreeViewerJComponent extends JComponent {
     desktopHints = (Map) (tk.getDesktopProperty("awt.font.desktophints"));
   }
 
-  public Container getContainer() {
-    JPanel controlTreeViewPanel = new JPanel();
-    controlTreeViewPanel.setLayout(new BoxLayout(controlTreeViewPanel, BoxLayout.PAGE_AXIS));
-    controlTreeViewPanel.add(this.scaleSlider);
-    controlTreeViewPanel.add(this.exportAsPngBtn);
-
-    Container treePanel = new JPanel(new BorderLayout());
-    treePanel.setBackground(Color.white);
-    treePanel.add(new JScrollPane(this), BorderLayout.CENTER);
-    treePanel.add(controlTreeViewPanel, BorderLayout.PAGE_END);
-    return treePanel;
-  }
-
-  private void setExportAsPngBtn() {
-    exportAsPngBtn = new JButton("Export as PNG");
-    exportAsPngBtn.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            new JComponent2PicConverter().convert(TreeViewerJComponent.this, "tree");
-          }
-        });
-    exportAsPngBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-  }
-
-  private void setScaleSlider() {
-    scaleSlider = new JSlider(JSlider.HORIZONTAL, -1000, 1000, 0);
-    scaleSlider.addChangeListener(
-        new ChangeListener() {
-          @Override
-          public void stateChanged(ChangeEvent e) {
-            TreeViewerJComponent.this.invalidate();
-            TreeViewerJComponent.this.getParent().repaint();
-          }
-        });
-    scaleSlider.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-  }
-
-  public float getScale() {
-    return scaleSlider.getValue() / 1000.0f + 1.0f;
-  }
-
   @Override
-  public Dimension getPreferredSize() {
-    BoxTreeContext boxTreeContext = createDrawTreeContext(stringTree);
+  public Dimension getPreferredSize(JComponent c) {
+    TreeViewer treeViewer = (TreeViewer) c;
+    BoxTreeContext boxTreeContext =
+        createDrawTreeContext(treeViewer.getTreeViewerModel(), treeViewer.getGraphics());
     return new Dimension(boxTreeContext.width, boxTreeContext.height);
   }
 
   @Override
-  public Dimension getMinimumSize() {
-    return getPreferredSize();
+  public Dimension getMinimumSize(JComponent c) {
+    return getPreferredSize(c);
   }
 
   @Override
-  public Dimension getMaximumSize() {
-    return getPreferredSize();
+  public Dimension getMaximumSize(JComponent c) {
+    return getPreferredSize(c);
   }
 
   @Override
-  public void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    drawBoxTree((Graphics2D) g);
+  public void paint(Graphics g, JComponent c) {
+    Graphics2D g2d = (Graphics2D) g;
+    // set local env
+    Insets insets = c.getInsets();
+    g2d.translate(insets.left, insets.top);
+    int width = c.getWidth() - insets.left - insets.right;
+    int height = c.getHeight() - insets.top - insets.bottom;
+    // clear back
+    g2d.setColor(c.getBackground());
+    g2d.fillRect(0, 0, width, height);
+    // draw tree
+    drawBoxTree(g2d, (TreeViewer) c);
+    // recover original env
+    g2d.translate(-insets.left, -insets.top);
   }
 
-  private void drawBoxTree(Graphics2D g2d) {
-    BoxTreeContext boxTreeContext = createDrawTreeContext(stringTree);
-    g2d.setFont(boxTreeContext.font);
+  private void drawBoxTree(Graphics2D g2d, TreeViewer treeViewer) {
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.setRenderingHint(
         RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     if (desktopHints != null) {
       g2d.addRenderingHints(desktopHints);
     }
+    BoxTreeContext boxTreeContext = createDrawTreeContext(treeViewer.getTreeViewerModel(), g2d);
+    if (null == boxTreeContext) {
+      return;
+    }
     g2d.setColor(Color.BLACK);
+    g2d.setFont(boxTreeContext.font);
     drawBoxTree(g2d, boxTreeContext.boxTree);
   }
 
@@ -159,14 +118,17 @@ public class TreeViewerJComponent extends JComponent {
     }
   }
 
-  private BoxTreeContext createDrawTreeContext(StringTree strTree) {
-    Font font = getFont();
+  private BoxTreeContext createDrawTreeContext(TreeViewerModel treeViewerModel, Graphics g) {
+    if (treeViewerModel.getStringTree() == null) {
+      return null;
+    }
+    Font font = g.getFont();
     if (font == null) {
       font = new Font(null, Font.PLAIN, FONT_SIZE);
     }
-    font = font.deriveFont(FONT_SIZE * this.getScale());
-    FontMetrics fontMetrics = this.getFontMetrics(font);
-    return new BoxTreeContext(font, fontMetrics, strTree);
+    font = font.deriveFont(FONT_SIZE * treeViewerModel.getScale());
+    FontMetrics fontMetrics = g.getFontMetrics(font);
+    return new BoxTreeContext(font, fontMetrics, treeViewerModel.getStringTree());
   }
 
   private static class HierarchicalRow {
@@ -194,6 +156,35 @@ public class TreeViewerJComponent extends JComponent {
     @Override
     public int hashCode() {
       return Objects.hash(heightOfTree);
+    }
+  }
+
+  private static class Box {
+    HierarchicalRow row;
+    int horizontalAxis = 0;
+    int verticalAxis = 0;
+    int width = 0;
+    int height = 0;
+    String text = "";
+    LinkedList<Box> children = new LinkedList<>();
+
+    public Box(String text, HierarchicalRow row, int width, int height) {
+      this.text = text;
+      this.row = row;
+      this.width = width;
+      this.height = height;
+    }
+
+    public Point getTopCenterPoint() {
+      int x = horizontalAxis + width / 2;
+      int y = verticalAxis - height;
+      return new Point(x, y);
+    }
+
+    public Point getBottomCenterPoint() {
+      int x = horizontalAxis + width / 2;
+      int y = verticalAxis;
+      return new Point(x, y);
     }
   }
 
@@ -344,35 +335,6 @@ public class TreeViewerJComponent extends JComponent {
           height = currentHeight;
         }
       }
-    }
-  }
-
-  private static class Box {
-    HierarchicalRow row;
-    int horizontalAxis = 0;
-    int verticalAxis = 0;
-    int width = 0;
-    int height = 0;
-    String text = "";
-    LinkedList<Box> children = new LinkedList<>();
-
-    public Box(String text, HierarchicalRow row, int width, int height) {
-      this.text = text;
-      this.row = row;
-      this.width = width;
-      this.height = height;
-    }
-
-    public Point getTopCenterPoint() {
-      int x = horizontalAxis + width / 2;
-      int y = verticalAxis - height;
-      return new Point(x, y);
-    }
-
-    public Point getBottomCenterPoint() {
-      int x = horizontalAxis + width / 2;
-      int y = verticalAxis;
-      return new Point(x, y);
     }
   }
 }

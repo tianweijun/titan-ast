@@ -28,7 +28,7 @@ public class TreeViewerDialog {
   private void populateDialog(StringTree tree) {
     final Container mainPane = dialog.getContentPane();
     mainPane.setLayout(new GridLayout(1, 1));
-    mainPane.add(new TreeViewerJComponent(tree).getContainer());
+    mainPane.add(new VisualTree(tree));
   }
 
   /**
