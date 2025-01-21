@@ -27,7 +27,7 @@ import javax.swing.plaf.ComponentUI;
  */
 public class TreeViewerUI extends ComponentUI {
   private static final int FONT_SIZE = 12;
-  BoxTreeContext currentBoxTreeContext;
+  private transient BoxTreeContext boxTreeContextCache;
   private Map desktopHints;
 
   public TreeViewerUI() {
@@ -121,12 +121,11 @@ public class TreeViewerUI extends ComponentUI {
 
   private BoxTreeContext createDrawTreeContext(TreeViewerModel treeViewerModel, Graphics g) {
     if (treeViewerModel.getStringTree() == null) {
-      currentBoxTreeContext = null;
-      return currentBoxTreeContext;
+      return null;
     }
-    if (null != currentBoxTreeContext
-        && currentBoxTreeContext.treeViewerModel.equalsByProperties(treeViewerModel)) {
-      return currentBoxTreeContext;
+    if (null != boxTreeContextCache
+        && boxTreeContextCache.treeViewerModel.equalsByProperties(treeViewerModel)) {
+      return boxTreeContextCache;
     }
 
     Font font = g.getFont();
@@ -135,10 +134,11 @@ public class TreeViewerUI extends ComponentUI {
     }
     font = font.deriveFont(FONT_SIZE * treeViewerModel.getScale());
     FontMetrics fontMetrics = g.getFontMetrics(font);
-    currentBoxTreeContext =
+    BoxTreeContext boxTreeContext =
         new BoxTreeContext(
             font, fontMetrics, treeViewerModel.getStringTree(), treeViewerModel.copyProperties());
-    return currentBoxTreeContext;
+    boxTreeContextCache = boxTreeContext;
+    return boxTreeContext;
   }
 
   private static class HierarchicalRow {
