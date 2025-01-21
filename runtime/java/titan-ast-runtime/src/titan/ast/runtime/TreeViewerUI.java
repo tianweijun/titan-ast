@@ -27,6 +27,7 @@ import javax.swing.plaf.ComponentUI;
  */
 public class TreeViewerUI extends ComponentUI {
   private static final int FONT_SIZE = 12;
+  BoxTreeContext currentBoxTreeContext;
   private Map desktopHints;
 
   public TreeViewerUI() {
@@ -120,15 +121,24 @@ public class TreeViewerUI extends ComponentUI {
 
   private BoxTreeContext createDrawTreeContext(TreeViewerModel treeViewerModel, Graphics g) {
     if (treeViewerModel.getStringTree() == null) {
-      return null;
+      currentBoxTreeContext = null;
+      return currentBoxTreeContext;
     }
+    if (null != currentBoxTreeContext
+        && currentBoxTreeContext.treeViewerModel.equalsByProperties(treeViewerModel)) {
+      return currentBoxTreeContext;
+    }
+
     Font font = g.getFont();
     if (font == null) {
       font = new Font(null, Font.PLAIN, FONT_SIZE);
     }
     font = font.deriveFont(FONT_SIZE * treeViewerModel.getScale());
     FontMetrics fontMetrics = g.getFontMetrics(font);
-    return new BoxTreeContext(font, fontMetrics, treeViewerModel.getStringTree());
+    currentBoxTreeContext =
+        new BoxTreeContext(
+            font, fontMetrics, treeViewerModel.getStringTree(), treeViewerModel.copyProperties());
+    return currentBoxTreeContext;
   }
 
   private static class HierarchicalRow {
@@ -198,14 +208,20 @@ public class TreeViewerUI extends ComponentUI {
     public int height = 0;
     public Box boxTree;
     List<HierarchicalRow> rows;
+    TreeViewerModel treeViewerModel;
 
-    public BoxTreeContext(Font font, FontMetrics fontMetrics, StringTree stringTree) {
+    public BoxTreeContext(
+        Font font,
+        FontMetrics fontMetrics,
+        StringTree stringTree,
+        TreeViewerModel treeViewerModel) {
       this.font = font;
       this.fontMetrics = fontMetrics;
       int fontHeight = fontMetrics.getAscent();
       colLineHeight = fontHeight * 2;
       rowTextGap = fontHeight;
       padding = fontHeight;
+      this.treeViewerModel = treeViewerModel;
       build(stringTree);
     }
 

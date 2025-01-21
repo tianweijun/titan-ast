@@ -1,6 +1,7 @@
 package titan.ast.runtime;
 
 import java.util.EventListener;
+import java.util.Objects;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
@@ -68,5 +69,18 @@ public class TreeViewerModel {
 
   public <T extends EventListener> T[] getListeners(Class<T> listenerType) {
     return listenerList.getListeners(listenerType);
+  }
+
+  public boolean equalsByProperties(TreeViewerModel that) {
+    if (this == that) return true;
+    if (that == null) return false;
+    return Float.compare(scale, that.scale) == 0 && Objects.equals(stringTree, that.stringTree);
+  }
+
+  public TreeViewerModel copyProperties() {
+    TreeViewerModel treeViewerModel = new TreeViewerModel();
+    treeViewerModel.stringTree = stringTree;
+    treeViewerModel.scale = scale;
+    return treeViewerModel;
   }
 }
