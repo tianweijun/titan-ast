@@ -10,6 +10,8 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,7 +49,8 @@ public class TreeViewerUI extends ComponentUI {
   public Dimension getPreferredSize(JComponent c) {
     TreeViewer treeViewer = (TreeViewer) c;
     BoxTreeContext boxTreeContext =
-        createDrawTreeContext(treeViewer.getTreeViewerModel(), treeViewer.getGraphics());
+        createDrawTreeContext(
+            treeViewer.getTreeViewerModel(), (Graphics2D) treeViewer.getGraphics());
     return new Dimension(boxTreeContext.width, boxTreeContext.height);
   }
 
@@ -119,7 +122,7 @@ public class TreeViewerUI extends ComponentUI {
     }
   }
 
-  private BoxTreeContext createDrawTreeContext(TreeViewerModel treeViewerModel, Graphics g) {
+  private BoxTreeContext createDrawTreeContext(TreeViewerModel treeViewerModel, Graphics2D g) {
     if (treeViewerModel.getStringTree() == null) {
       return null;
     }
@@ -136,7 +139,11 @@ public class TreeViewerUI extends ComponentUI {
     FontMetrics fontMetrics = g.getFontMetrics(font);
     BoxTreeContext boxTreeContext =
         new BoxTreeContext(
-            font, fontMetrics, treeViewerModel.getStringTree(), treeViewerModel.copyProperties());
+            font,
+            g.getFontMetrics(font),
+            g.getFontRenderContext(),
+            treeViewerModel.getStringTree(),
+            treeViewerModel.copyProperties());
     boxTreeContextCache = boxTreeContext;
     return boxTreeContext;
   }
@@ -201,6 +208,7 @@ public class TreeViewerUI extends ComponentUI {
   private static class BoxTreeContext {
     public final Font font;
     public final FontMetrics fontMetrics;
+    public final FontRenderContext fontRenderContext;
     public final int colLineHeight;
     public final int rowTextGap;
     public final int padding;
@@ -213,10 +221,12 @@ public class TreeViewerUI extends ComponentUI {
     public BoxTreeContext(
         Font font,
         FontMetrics fontMetrics,
+        FontRenderContext fontRenderContext,
         StringTree stringTree,
         TreeViewerModel treeViewerModel) {
       this.font = font;
       this.fontMetrics = fontMetrics;
+      this.fontRenderContext = fontRenderContext;
       int fontHeight = fontMetrics.getAscent();
       colLineHeight = fontHeight * 2;
       rowTextGap = fontHeight;
@@ -333,11 +343,9 @@ public class TreeViewerUI extends ComponentUI {
     }
 
     private Box createBox(String text, HierarchicalRow hierarchicalRow) {
-      int width = fontMetrics.getAscent();
-      if (StringUtils.isNotEmpty(text)) {
-        width = fontMetrics.stringWidth(text);
-      }
-      return new Box(text, hierarchicalRow, width, fontMetrics.getAscent());
+      Rectangle2D stringBounds = font.getStringBounds(text, fontRenderContext);
+      return new Box(
+          text, hierarchicalRow, (int) stringBounds.getWidth(), (int) stringBounds.getHeight());
     }
 
     private void setWidthAndHeight() {
