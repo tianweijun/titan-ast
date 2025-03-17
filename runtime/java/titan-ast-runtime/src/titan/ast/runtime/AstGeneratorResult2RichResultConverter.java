@@ -18,37 +18,50 @@ import titan.ast.runtime.RichAstGeneratorResult.RichTokensResult;
  *
  * @author tian wei jun
  */
-public class AstGeneratorResult2RichResultConverter {
-  private byte newline = '\n';
+class AstGeneratorResult2RichResultConverter {
   RichAstGeneratorResultStringEncoder stringEncoder = new RichAstGeneratorResultStringEncoder();
+  private byte newline = '\n';
 
-  public byte getNewline() {
+  byte getNewline() {
     return newline;
   }
 
-  public void setNewline(byte newline) {
+  void setNewline(byte newline) {
     this.newline = newline;
   }
 
-  public void setCharset(String charsetName) {
-    stringEncoder.setCharset(charsetName);
-  }
-
-  public void setCharset(Charset charset) {
-    stringEncoder.setCharset(charset);
-  }
-
-  public Charset getCharset() {
+  Charset getCharset() {
     return stringEncoder.getCharset();
   }
 
-  public RichAstGeneratorResult convert(AstGeneratorResult astGeneratorResult) {
+  void setCharset(String charsetName) {
+    stringEncoder.setCharset(charsetName);
+  }
+
+  void setCharset(Charset charset) {
+    stringEncoder.setCharset(charset);
+  }
+
+  RichAstGeneratorResult convert(AstGeneratorResult astGeneratorResult) {
+    RichTokensResult richTokensResult =
+        convert2RichTokensResultNoEncodingTokens(astGeneratorResult.tokensResult);
     RichAstResult richAstResult = convert2RichAstResultNoEncodingAst(astGeneratorResult);
-    RichTokensResult richTokensResult = convert2RichTokensResult(astGeneratorResult.tokensResult);
-    if (richAstResult.isOk()) {
-      encodeAstByEncodedTokens(richAstResult.getOkData(), richTokensResult.getOkData().iterator());
-    }
+    encode(richTokensResult, richAstResult);
     return new RichAstGeneratorResult(richTokensResult, richAstResult);
+  }
+
+  private void encode(RichTokensResult richTokensResult, RichAstResult richAstResult) {
+    switch (richAstResult.getType()) {
+      case OK -> {
+        ArrayList<Token> tokens = richTokensResult.getOkData();
+        stringEncoder.encodeTokens(tokens);
+        encodeAstByEncodedTokens(richAstResult.getOkData(), tokens.iterator());
+      }
+      case AST_PARSE_ERROR -> {
+        stringEncoder.encodeTokens(richTokensResult.getOkData());
+      }
+      case TOKENS_ERROR -> {}
+    }
   }
 
   private void encodeAstByEncodedTokens(Ast ast, Iterator<Token> encodedTokensIt) {
@@ -61,6 +74,7 @@ public class AstGeneratorResult2RichResultConverter {
         encodedToken = encodedTokensIt.next();
       }
       terminalAst.token.text = encodedToken.text;
+      terminalAst.token.start = encodedToken.start;
     }
   }
 
@@ -97,8 +111,6 @@ public class AstGeneratorResult2RichResultConverter {
     int endOffsetInLine =
         stringEncoder.getOffsetInLine(tokens, endLineNumberRange, astParseErrorData.end);
     return new RichAstParseErrorData(
-        astParseErrorData.start,
-        astParseErrorData.end,
         startLineNumberRange.lineNumber,
         startOffsetInLine + 1, // 从1开始计数，所以+1
         endLineNumberRange.lineNumber,
@@ -110,9 +122,9 @@ public class AstGeneratorResult2RichResultConverter {
       TokenParseErrorData tokenParseErrorData) {
     ArrayList<Token> tokens = new ArrayList<>(tokenParseErrorData.finishedTokens.size() + 1);
     tokens.addAll(tokenParseErrorData.finishedTokens);
-    Token token = new Token(tokenParseErrorData.start);
-    token.text = tokenParseErrorData.errorText;
-    tokens.add(token);
+    Token errorToken = new Token(tokenParseErrorData.start);
+    errorToken.text = tokenParseErrorData.errorText;
+    tokens.add(errorToken);
 
     LineNumberDetail lineNumberDetail = buildLineNumberDetail(tokens);
 
@@ -124,23 +136,21 @@ public class AstGeneratorResult2RichResultConverter {
         stringEncoder.getOffsetInLine(tokens, startLineNumberRange, tokenParseErrorData.start);
     int endOffsetInLine =
         stringEncoder.getOffsetInLine(tokens, endLineNumberRange, tokenParseErrorData.end);
+
     return new RichTokenParseErrorData(
         stringEncoder.encodeTokens(tokenParseErrorData.finishedTokens),
-        tokenParseErrorData.start,
-        tokenParseErrorData.end,
         startLineNumberRange.lineNumber,
         startOffsetInLine + 1, // 从1开始计数，所以+1
         endLineNumberRange.lineNumber,
         endOffsetInLine + 1, // 从1开始计数，所以+1
-        stringEncoder.encodeString(tokenParseErrorData.errorText));
+        stringEncoder.encodeString(errorToken.text));
   }
 
-  private RichTokensResult convert2RichTokensResult(TokensResult tokensResult) {
+  private RichTokensResult convert2RichTokensResultNoEncodingTokens(TokensResult tokensResult) {
     RichTokensResult richTokensResult = null;
     switch (tokensResult.getType()) {
       case OK -> {
-        richTokensResult =
-            RichTokensResult.generateOkResult(stringEncoder.encodeTokens(tokensResult.getOkData()));
+        richTokensResult = RichTokensResult.generateOkResult(tokensResult.getOkData());
       }
       case TOKEN_PARSE_ERROR -> {
         richTokensResult =

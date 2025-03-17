@@ -107,8 +107,6 @@ public class RichAstGeneratorResult {
 
   public static class RichTokenParseErrorData {
     public final ArrayList<Token> finishedTokens;
-    public final int start;
-    public final int end;
     public final int startLineNumber;
     public final int startOffsetInLine;
     public final int endLineNumber;
@@ -117,16 +115,12 @@ public class RichAstGeneratorResult {
 
     public RichTokenParseErrorData(
         ArrayList<Token> finishedTokens,
-        int start,
-        int end,
         int startLineNumber,
         int startOffsetInLine,
         int endLineNumber,
         int endOffsetInLine,
         String errorText) {
       this.finishedTokens = finishedTokens;
-      this.start = start;
-      this.end = end;
       this.startLineNumber = startLineNumber;
       this.startOffsetInLine = startOffsetInLine;
       this.endLineNumber = endLineNumber;
@@ -181,8 +175,6 @@ public class RichAstGeneratorResult {
   }
 
   public static class RichAstParseErrorData {
-    public final int start;
-    public final int end;
     public final int startLineNumber;
     public final int startOffsetInLine;
     public final int endLineNumber;
@@ -190,15 +182,11 @@ public class RichAstGeneratorResult {
     public final String errorText;
 
     public RichAstParseErrorData(
-        int start,
-        int end,
         int startLineNumber,
         int startOffsetInLine,
         int endLineNumber,
         int endOffsetInLine,
         String errorText) {
-      this.start = start;
-      this.end = end;
       this.startLineNumber = startLineNumber;
       this.startOffsetInLine = startOffsetInLine;
       this.endLineNumber = endLineNumber;

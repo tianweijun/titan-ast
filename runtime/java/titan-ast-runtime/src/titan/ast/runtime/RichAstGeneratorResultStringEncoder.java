@@ -9,37 +9,41 @@ import titan.ast.runtime.LineNumberDetail.LineNumberRange;
  *
  * @author tian wei jun
  */
-public class RichAstGeneratorResultStringEncoder {
+class RichAstGeneratorResultStringEncoder {
   private Charset charset = AstGeneratorResult.DEFAULT_CHARSET;
 
-  public void setCharset(Charset charset) {
+  Charset getCharset() {
+    return charset;
+  }
+
+  void setCharset(Charset charset) {
     if (charset != null) {
       this.charset = charset;
     }
   }
 
-  public void setCharset(String charsetName) {
+  void setCharset(String charsetName) {
     setCharset(Charset.forName(charsetName));
   }
 
-  public Charset getCharset() {
-    return charset;
-  }
-
-  public boolean isNeedToEncoding() {
+  boolean isNeedToEncoding() {
     return !AstGeneratorResult.DEFAULT_CHARSET.equals(charset);
   }
 
-  public ArrayList<Token> encodeTokens(ArrayList<Token> tokens) {
+  ArrayList<Token> encodeTokens(ArrayList<Token> tokens) {
     if (isNeedToEncoding()) {
+      int indexOfChar = 0;
       for (Token token : tokens) {
-        token.text = doEncodeString(token.text);
+        token.start = indexOfChar;
+        String text = doEncodeString(token.text);
+        token.text = text;
+        indexOfChar = text.codePointCount(0, text.length());
       }
     }
     return tokens;
   }
 
-  public String encodeString(String str) {
+  String encodeString(String str) {
     if (isNeedToEncoding()) {
       return doEncodeString(str);
     }
@@ -63,8 +67,7 @@ public class RichAstGeneratorResultStringEncoder {
     return str.codePointCount(0, str.length());
   }
 
-  public int getOffsetInLine(
-      ArrayList<Token> tokens, LineNumberRange lineNumberRange, int bytePosition) {
+  int getOffsetInLine(ArrayList<Token> tokens, LineNumberRange lineNumberRange, int bytePosition) {
     ByteBuffer byteBuffer = new ByteBuffer(bytePosition - lineNumberRange.start + 1);
     int indexOfBytes = tokens.get(lineNumberRange.indexOfStartToken).start;
     for (int indexOfToken = lineNumberRange.indexOfStartToken;
