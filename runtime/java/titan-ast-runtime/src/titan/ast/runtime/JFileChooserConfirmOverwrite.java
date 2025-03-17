@@ -9,8 +9,8 @@ import javax.swing.JOptionPane;
  *
  * @author tian wei jun
  */
-public class JFileChooserConfirmOverwrite extends JFileChooser {
-  public JFileChooserConfirmOverwrite() {
+class JFileChooserConfirmOverwrite extends JFileChooser {
+  JFileChooserConfirmOverwrite() {
     this.setMultiSelectionEnabled(false);
   }
 

@@ -8,12 +8,11 @@ import java.util.ListIterator;
  *
  * @author tian wei jun
  */
-public class BacktrackingBottomUpBranch
-    implements Cloneable, Comparable<BacktrackingBottomUpBranch> {
+class BacktrackingBottomUpBranch implements Comparable<BacktrackingBottomUpBranch> {
 
   LinkedList<ReducingSymbol> reducingSymbols = new LinkedList<>();
 
-  public BacktrackingBottomUpBranch cloneForAstAutomata() {
+  BacktrackingBottomUpBranch cloneForAstAutomata() {
     BacktrackingBottomUpBranch cloner = new BacktrackingBottomUpBranch();
     cloner.reducingSymbols = new LinkedList<>();
     for (ReducingSymbol reducingSymbol : this.reducingSymbols) {

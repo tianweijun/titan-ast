@@ -7,9 +7,9 @@ import java.util.List;
  *
  * @author tian wei jun
  */
-public class StringTree {
-  public String text;
-  public List<StringTree> children;
+class StringTree {
+  String text;
+  List<StringTree> children;
 
   /**
    * 带参初始化.
@@ -17,12 +17,12 @@ public class StringTree {
    * @param text 当前节点内容
    * @param children 子节点
    */
-  public StringTree(String text, List<StringTree> children) {
+  StringTree(String text, List<StringTree> children) {
     this.text = text;
     this.children = children;
   }
 
-  public int getHeight() {
+  int getHeight() {
     return getMaxHeight(this, 1, 1);
   }
 

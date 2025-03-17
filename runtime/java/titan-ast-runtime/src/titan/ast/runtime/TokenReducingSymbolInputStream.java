@@ -8,12 +8,12 @@ import titan.ast.runtime.AstGeneratorResult.AstParseErrorData;
  *
  * @author tian wei jun
  */
-public class TokenReducingSymbolInputStream {
-  public int nextReadIndex = 0;
-  public ArrayList<Token> tokenReducingSymbols;
-  public ArrayList<Token> sourceTokens;
+class TokenReducingSymbolInputStream {
+  int nextReadIndex = 0;
+  ArrayList<Token> tokenReducingSymbols;
+  ArrayList<Token> sourceTokens;
 
-  public TokenReducingSymbolInputStream(ArrayList<Token> sourceTokens) {
+  TokenReducingSymbolInputStream(ArrayList<Token> sourceTokens) {
     this.sourceTokens = sourceTokens;
     setTokenReducingSymbols();
   }
@@ -29,19 +29,19 @@ public class TokenReducingSymbolInputStream {
     tokenReducingSymbols.addAll(textTokens);
   }
 
-  public Token read() {
+  Token read() {
     return tokenReducingSymbols.get(nextReadIndex++);
   }
 
-  public boolean hasNext() {
+  boolean hasNext() {
     return nextReadIndex >= 0 && nextReadIndex < tokenReducingSymbols.size();
   }
 
-  public boolean hasReadAll() {
+  boolean hasReadAll() {
     return nextReadIndex >= tokenReducingSymbols.size();
   }
 
-  public AstParseErrorData getAstParseErrorData(
+  AstParseErrorData getAstParseErrorData(
       int startIndexOfTokenReducingSymbols, int endIndexOfTokenReducingSymbols) {
     Token startToken = tokenReducingSymbols.get(startIndexOfTokenReducingSymbols);
     Token endToken = tokenReducingSymbols.get(endIndexOfTokenReducingSymbols);

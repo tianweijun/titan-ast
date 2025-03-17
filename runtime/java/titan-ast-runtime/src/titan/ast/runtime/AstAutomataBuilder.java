@@ -5,9 +5,9 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class AstAutomataBuilder {
+class AstAutomataBuilder {
 
-  public AstAutomata build(AutomataData automataData) {
+  AstAutomata build(AutomataData automataData) {
     AstAutomata astAutomata = null;
     switch (automataData.astAutomataType) {
       case BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:

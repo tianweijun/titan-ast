@@ -8,35 +8,31 @@ import java.io.InputStream;
  *
  * @author tian wei jun
  */
-public class ByteBufferedInputStream {
+class ByteBufferedInputStream {
   private static final int STANDARD_BUFFER_CAPACITY = 512;
   private static final int EOF = -1;
-
-  public int nextReadIndex = 0;
-  public int markNextReadIndex = 0;
-
+  private final InputStream byteInputStream;
+  int nextReadIndex = 0;
+  int markNextReadIndex = 0;
   private int nextPos = 0;
   private int limit = 0;
   private int limitOfInvalidData = 0;
   private int mark = -1;
-
   private boolean isReadAllFromFile = false;
-
   private byte[] buffer;
-  private final InputStream byteInputStream;
 
   /**
    * 带参构造.
    *
    * @param byteInputStream 所识别的文本输入流
    */
-  public ByteBufferedInputStream(InputStream byteInputStream) {
+  ByteBufferedInputStream(InputStream byteInputStream) {
     this.byteInputStream = byteInputStream;
     init();
   }
 
   /** 初始化. */
-  public void init() {
+  void init() {
     buffer = new byte[STANDARD_BUFFER_CAPACITY];
   }
 
@@ -45,7 +41,7 @@ public class ByteBufferedInputStream {
    *
    * @return 所读取的字符，若没有文本了，返回-1
    */
-  public int read() throws IOException {
+  int read() throws IOException {
     if (nextPos < limit) { // 从缓冲中正常读取
       int read = buffer[nextPos++] & (int) 0xFF;
       ++nextReadIndex;
@@ -100,7 +96,7 @@ public class ByteBufferedInputStream {
   }
 
   /** mark为空 */
-  public void reset() {
+  void reset() {
     if (mark < 0) {
       return;
     }
@@ -116,7 +112,7 @@ public class ByteBufferedInputStream {
     mark = EOF;
   }
 
-  public void mark() {
+  void mark() {
     this.mark = nextPos - 1;
     this.markNextReadIndex = nextReadIndex;
   }

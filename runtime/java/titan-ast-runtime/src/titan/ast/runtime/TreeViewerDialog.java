@@ -11,17 +11,17 @@ import javax.swing.WindowConstants;
  *
  * @author tian wei jun
  */
-public class TreeViewerDialog {
+class TreeViewerDialog {
 
   private final JFrame dialog = new JFrame();
 
-  public TreeViewerDialog(StringTree tree) {
+  TreeViewerDialog(StringTree tree) {
     dialog.setPreferredSize(new Dimension(900, 800));
     dialog.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     populateDialog(tree);
   }
 
-  public void setTitle(String title) {
+  void setTitle(String title) {
     dialog.setTitle(title);
   }
 
@@ -36,7 +36,7 @@ public class TreeViewerDialog {
    *
    * @return 窗口
    */
-  public JFrame show() {
+  JFrame show() {
     dialog.pack();
     dialog.setVisible(true);
     return dialog;

@@ -5,7 +5,7 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class Logger {
+class Logger {
 
   private static void print(String msg) {
     System.out.print(msg);
@@ -15,23 +15,23 @@ public class Logger {
     System.out.println(msg);
   }
 
-  public static void debug(String msg) {
+  static void debug(String msg) {
     println(msg);
   }
 
-  public static void info(String msg) {
+  static void info(String msg) {
     println(msg);
   }
 
-  public static void warn(String msg) {
+  static void warn(String msg) {
     println(msg);
   }
 
-  public static void error(String msg) {
+  static void error(String msg) {
     println(msg);
   }
 
-  public static void fatal(String msg) {
+  static void fatal(String msg) {
     println(msg);
   }
 }

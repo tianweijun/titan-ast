@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author tian wei jun
  */
-public class JComponent2PicConverter {
+class JComponent2PicConverter {
   private JComponent viewer;
   private String fileName;
 
@@ -26,7 +26,7 @@ public class JComponent2PicConverter {
    * @param viewer 图形化组件
    * @param fileName 保存的文件名
    */
-  public void convert(JComponent viewer, String fileName) {
+  void convert(JComponent viewer, String fileName) {
     this.viewer = viewer;
     this.fileName = fileName;
     generatePngFile();

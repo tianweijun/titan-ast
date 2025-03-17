@@ -5,6 +5,6 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class SyntaxDfa {
-  public SyntaxDfaState start = null;
+class SyntaxDfa {
+  SyntaxDfaState start = null;
 }

@@ -10,12 +10,12 @@ import java.util.ArrayList;
 class NonterminalAutomataTmpAst extends AutomataTmpAst {
   final String alias;
 
-  public NonterminalAutomataTmpAst(Grammar grammar, String alias) {
+  NonterminalAutomataTmpAst(Grammar grammar, String alias) {
     super(grammar);
     this.alias = alias;
   }
 
-  public NonterminalAutomataTmpAst cloneForAstAutomata() {
+  NonterminalAutomataTmpAst cloneForAstAutomata() {
     NonterminalAutomataTmpAst ast = new NonterminalAutomataTmpAst(grammar, alias);
     for (AutomataTmpAst thisChild : this.children) {
       ast.children.add(thisChild.cloneForAstAutomata());

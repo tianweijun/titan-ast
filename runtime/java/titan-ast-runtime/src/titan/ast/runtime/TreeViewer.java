@@ -12,29 +12,29 @@ import javax.swing.event.ChangeListener;
  * @author tian wei jun
  */
 public class TreeViewer extends JComponent implements ChangeListener {
-  public static final String UI_CLASS_ID = "TreeViewerUI";
+  static final String UI_CLASS_ID = "TreeViewerUI";
   private final TreeViewerModel treeViewerModel = new TreeViewerModel();
 
   static {
     UIManager.put(TreeViewer.UI_CLASS_ID, TreeViewerUI.class.getName());
   }
 
-  public TreeViewer(StringTree tree) {
+  TreeViewer(StringTree tree) {
     updateUI();
     treeViewerModel.addChangeListener(this);
     setBackground(Color.white);
     setStringTree(tree);
   }
 
-  public TreeViewerModel getTreeViewerModel() {
+  TreeViewerModel getTreeViewerModel() {
     return treeViewerModel;
   }
 
-  public void setStringTree(StringTree stringTree) {
+  void setStringTree(StringTree stringTree) {
     treeViewerModel.setStringTree(stringTree);
   }
 
-  public void setScale(float scale) {
+  void setScale(float scale) {
     treeViewerModel.setScale(scale);
   }
 

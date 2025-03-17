@@ -5,18 +5,18 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class LineNumberDetail {
-  public final LineNumberRange[] lineNumberRanges;
+class LineNumberDetail {
+  final LineNumberRange[] lineNumberRanges;
 
-  public LineNumberDetail() {
+  LineNumberDetail() {
     lineNumberRanges = new LineNumberRange[0];
   }
 
-  public LineNumberDetail(LineNumberRange[] lineNumberRanges) {
+  LineNumberDetail(LineNumberRange[] lineNumberRanges) {
     this.lineNumberRanges = lineNumberRanges;
   }
 
-  public LineNumberRange getLineNumberRangeDto(int bytePosition) {
+  LineNumberRange getLineNumberRangeDto(int bytePosition) {
     int left = 0;
     int right = lineNumberRanges.length - 1;
 
@@ -34,14 +34,14 @@ public class LineNumberDetail {
     return null;
   }
 
-  public static class LineNumberRange {
-    public final int start;
-    public final int end; // indexOfNewlineByte+1
-    public final int lineNumber;
-    public final int indexOfStartToken;
-    public final int indexOfEndToken;
+  static class LineNumberRange {
+    final int start;
+    final int end; // indexOfNewlineByte+1
+    final int lineNumber;
+    final int indexOfStartToken;
+    final int indexOfEndToken;
 
-    public LineNumberRange(
+    LineNumberRange(
         int start, int end, int lineNumber, int indexOfStartToken, int indexOfEndToken) {
       this.start = start;
       this.end = end;

@@ -14,7 +14,7 @@ import titan.ast.runtime.AstGeneratorResult.TokensResult;
  *
  * @author tian wei jun
  */
-public class DfaTokenAutomata implements TokenAutomata {
+class DfaTokenAutomata implements TokenAutomata {
 
   final TokenDfa dfa;
   static final int EOF = -1;
@@ -25,7 +25,7 @@ public class DfaTokenAutomata implements TokenAutomata {
    *
    * @param dfa 识别token的 确定有限状态自动机
    */
-  public DfaTokenAutomata(TokenDfa dfa) {
+  DfaTokenAutomata(TokenDfa dfa) {
     this.dfa = dfa;
   }
 
@@ -185,45 +185,44 @@ public class DfaTokenAutomata implements TokenAutomata {
     private final BuildOneTokenMethodResultType type;
     private final Object data;
 
-    public BuildOneTokenMethodResult(BuildOneTokenMethodResultType type, Object data) {
+    BuildOneTokenMethodResult(BuildOneTokenMethodResultType type, Object data) {
       this.type = type;
       this.data = data;
     }
 
-    public BuildOneTokenMethodResultType getType() {
+    BuildOneTokenMethodResultType getType() {
       return type;
     }
 
-    public static BuildOneTokenMethodResult generateTokenResult(Token data) {
+    static BuildOneTokenMethodResult generateTokenResult(Token data) {
       return new BuildOneTokenMethodResult(BuildOneTokenMethodResultType.TOKEN, data);
     }
 
-    public Token getTokenData() {
+    Token getTokenData() {
       return (Token) data;
     }
 
-    public static BuildOneTokenMethodResult generateAllTextHasBeenBuiltResult() {
+    static BuildOneTokenMethodResult generateAllTextHasBeenBuiltResult() {
       return new BuildOneTokenMethodResult(
           BuildOneTokenMethodResultType.ALL_TEXT_HAS_BEEN_BUILT, null);
     }
 
-    public static BuildOneTokenMethodResult generateTokenParseErrorResult(
+    static BuildOneTokenMethodResult generateTokenParseErrorResult(
         BuildOneTokenMethodTokenGeneratorErrorData data) {
       return new BuildOneTokenMethodResult(BuildOneTokenMethodResultType.TOKEN_PARSE_ERROR, data);
     }
 
-    public BuildOneTokenMethodTokenGeneratorErrorData
-        getBuildOneTokenMethodTokenGeneratorErrorData() {
+    BuildOneTokenMethodTokenGeneratorErrorData getBuildOneTokenMethodTokenGeneratorErrorData() {
       return (BuildOneTokenMethodTokenGeneratorErrorData) data;
     }
   }
 
-  public static class BuildOneTokenMethodTokenGeneratorErrorData {
-    public final int start;
-    public final int end;
-    public final String errorText;
+  static class BuildOneTokenMethodTokenGeneratorErrorData {
+    final int start;
+    final int end;
+    final String errorText;
 
-    public BuildOneTokenMethodTokenGeneratorErrorData(int start, int end, String errorText) {
+    BuildOneTokenMethodTokenGeneratorErrorData(int start, int end, String errorText) {
       this.start = start;
       this.end = end;
       this.errorText = errorText;

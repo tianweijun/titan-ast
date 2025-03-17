@@ -8,7 +8,7 @@ import titan.ast.runtime.AstGeneratorResult.AstResult;
  *
  * @author tian wei jun
  */
-public interface AstAutomata {
+interface AstAutomata {
   AstAutomataType getType();
 
   AstResult buildAst(ArrayList<Token> sourceTokens);

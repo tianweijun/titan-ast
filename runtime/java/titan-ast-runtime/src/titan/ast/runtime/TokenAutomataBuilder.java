@@ -5,9 +5,9 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class TokenAutomataBuilder {
+class TokenAutomataBuilder {
 
-  public TokenAutomata build(AutomataData automataData) {
+  TokenAutomata build(AutomataData automataData) {
     KeyWordAutomata keyWordAutomata = automataData.keyWordAutomata;
     TokenDfa tokenDfa = automataData.tokenDfa;
     TokenAutomata tokenAutomata = null;

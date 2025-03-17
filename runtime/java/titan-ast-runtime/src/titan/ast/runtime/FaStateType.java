@@ -5,7 +5,7 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public enum FaStateType {
+enum FaStateType {
   NONE(0),
   NORMAL(1),
   OPENING_TAG(2),
@@ -17,47 +17,47 @@ public enum FaStateType {
     this.v = v;
   }
 
-  public static int appendOpeningTag(int state) {
+  static int appendOpeningTag(int state) {
     return appendState(state, OPENING_TAG);
   }
 
-  public static int appendClosingTag(int state) {
+  static int appendClosingTag(int state) {
     return appendState(state, CLOSING_TAG);
   }
 
-  public static int appendState(int state, FaStateType appendState) {
+  static int appendState(int state, FaStateType appendState) {
     return state | appendState.v;
   }
 
-  public static int removeOpeningTag(int state) {
+  static int removeOpeningTag(int state) {
     return removeState(state, OPENING_TAG);
   }
 
-  public static int removeClosingTag(int state) {
+  static int removeClosingTag(int state) {
     return removeState(state, CLOSING_TAG);
   }
 
-  public static int removeState(int state, FaStateType removeState) {
+  static int removeState(int state, FaStateType removeState) {
     return state & (~removeState.v);
   }
 
-  public static boolean isNone(int state) {
+  static boolean isNone(int state) {
     return state == NONE.v;
   }
 
-  public static boolean isNormal(int state) {
+  static boolean isNormal(int state) {
     return (state & NORMAL.v) != 0;
   }
 
-  public static boolean isOpeningTag(int state) {
+  static boolean isOpeningTag(int state) {
     return (state & OPENING_TAG.v) != 0;
   }
 
-  public static boolean isClosingTag(int state) {
+  static boolean isClosingTag(int state) {
     return (state & CLOSING_TAG.v) != 0;
   }
 
-  public int getValue() {
+  int getValue() {
     return v;
   }
 }

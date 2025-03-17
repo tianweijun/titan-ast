@@ -8,7 +8,7 @@ import java.util.Set;
  *
  * @author tian wei jun
  */
-public class PersistentAutomataObject {
+class PersistentAutomataObject {
   // TokenAutomata
   KeyWordAutomata keyWordAutomata = null;
   TokenDfa tokenDfa = null;
@@ -23,11 +23,11 @@ public class PersistentAutomataObject {
   // meta data
   PersistentAutomataData persistentAutomataData;
 
-  public PersistentAutomataObject(PersistentAutomataData persistentAutomataData) {
+  PersistentAutomataObject(PersistentAutomataData persistentAutomataData) {
     this.persistentAutomataData = persistentAutomataData;
   }
 
-  public void init() throws AutomataDataIoException {
+  void init() throws AutomataDataIoException {
     initStringPool();
     initGrammars();
     initKeyWordAutomata();
@@ -82,7 +82,7 @@ public class PersistentAutomataObject {
     persistentAutomataData.getStringPoolByInputStream();
   }
 
-  public AutomataData toAutomataData() {
+  AutomataData toAutomataData() {
     AutomataData automataData = new AutomataData();
     // meta data
     automataData.stringPool = persistentAutomataData.stringPool;

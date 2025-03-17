@@ -5,12 +5,12 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class ByteBuffer {
+class ByteBuffer {
   boolean isBigEndian = true;
   int position = 0;
   byte[] buffer;
 
-  public ByteBuffer(int capacity) {
+  ByteBuffer(int capacity) {
     this.buffer = new byte[capacity];
   }
 

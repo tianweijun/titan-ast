@@ -16,7 +16,7 @@ import java.util.Set;
  *
  * @author tian wei jun
  */
-public class PersistentAutomataData {
+class PersistentAutomataData {
   InputStream byteInputStream;
   String[] stringPool;
   Grammar[] grammars;
@@ -24,7 +24,7 @@ public class PersistentAutomataData {
 
   ByteBuffer intByteBuffer = ByteBuffer.allocate(4);
 
-  public PersistentAutomataData(InputStream byteInputStream) {
+  PersistentAutomataData(InputStream byteInputStream) {
     intByteBuffer.order(ByteOrder.BIG_ENDIAN);
     this.byteInputStream = byteInputStream;
   }
@@ -34,7 +34,7 @@ public class PersistentAutomataData {
    *
    * @return
    */
-  public String[] getStringPoolByInputStream() throws AutomataDataIoException {
+  String[] getStringPoolByInputStream() throws AutomataDataIoException {
     int sizeOfStrings = readInt();
     String[] strings = new String[sizeOfStrings];
     for (int indexOfString = 0; indexOfString < sizeOfStrings; indexOfString++) {
@@ -51,7 +51,7 @@ public class PersistentAutomataData {
    *
    * @return
    */
-  public Grammar[] getGrammarsByInputStream() throws AutomataDataIoException {
+  Grammar[] getGrammarsByInputStream() throws AutomataDataIoException {
     int sizeOfGramamrs = readInt();
     Grammar[] grammars = new Grammar[sizeOfGramamrs];
 
@@ -94,7 +94,7 @@ public class PersistentAutomataData {
    *
    * @return
    */
-  public KeyWordAutomata getKeyWordAutomataByInputStream() throws AutomataDataIoException {
+  KeyWordAutomata getKeyWordAutomataByInputStream() throws AutomataDataIoException {
     KeyWordAutomata keyWordAutomata = new KeyWordAutomata();
 
     keyWordAutomata.emptyOrNot = readInt();
@@ -127,7 +127,7 @@ public class PersistentAutomataData {
    *
    * @return
    */
-  public TokenDfa getTokenDfaByInputStream() throws AutomataDataIoException {
+  TokenDfa getTokenDfaByInputStream() throws AutomataDataIoException {
     int sizeOfTokenDfaStates = readInt();
     TokenDfaState[] tokenDfaStates = new TokenDfaState[sizeOfTokenDfaStates];
     for (int indexOfTokenDfaState = 0;
@@ -159,7 +159,7 @@ public class PersistentAutomataData {
     return tokenDfa;
   }
 
-  public void getProductionRulesByInputStream() throws AutomataDataIoException {
+  void getProductionRulesByInputStream() throws AutomataDataIoException {
     int countOfProductionRules = readInt();
     ProductionRule[] productionRules = new ProductionRule[countOfProductionRules];
     for (int indexOfProductionRule = 0;
@@ -179,7 +179,7 @@ public class PersistentAutomataData {
     }
   }
 
-  public SyntaxDfa getSyntaxDfaByInputStream() throws AutomataDataIoException {
+  SyntaxDfa getSyntaxDfaByInputStream() throws AutomataDataIoException {
     int sizeOfSyntaxDfaStates = readInt();
     SyntaxDfaState[] syntaxDfaStates = new SyntaxDfaState[sizeOfSyntaxDfaStates];
     for (int indexOfSyntaxDfaState = 0;
@@ -237,13 +237,12 @@ public class PersistentAutomataData {
     }
   }
 
-  public AstAutomataType getAstAutomataTypeByInputStream() throws AutomataDataIoException {
+  AstAutomataType getAstAutomataTypeByInputStream() throws AutomataDataIoException {
     int original = readInt();
     return AstAutomataType.values()[original];
   }
 
-  public Map<Grammar, Set<Grammar>> getNonterminalFollowMapByInputStream()
-      throws AutomataDataIoException {
+  Map<Grammar, Set<Grammar>> getNonterminalFollowMapByInputStream() throws AutomataDataIoException {
     int size = readInt();
     Map<Grammar, Set<Grammar>> nonterminalFollowMap = new HashMap<>(size);
     for (int indexOfNonterminal = 0; indexOfNonterminal < size; indexOfNonterminal++) {
@@ -259,7 +258,7 @@ public class PersistentAutomataData {
     return nonterminalFollowMap;
   }
 
-  public Grammar getGrammarByInputStream() throws AutomataDataIoException {
+  Grammar getGrammarByInputStream() throws AutomataDataIoException {
     int indexOfGrammar = readInt();
     return grammars[indexOfGrammar];
   }

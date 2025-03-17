@@ -8,11 +8,11 @@ import java.util.Map;
  *
  * @author tian wei jun
  */
-public class TokenDfaState {
-  public int type = FaStateType.NONE.getValue();
-  public int weight = 0;
+class TokenDfaState {
+  int type = FaStateType.NONE.getValue();
+  int weight = 0;
   // token语法名字
-  public Grammar terminal = null;
+  Grammar terminal = null;
   // 转移
-  public Map<Integer, TokenDfaState> edges = new HashMap<>();
+  Map<Integer, TokenDfaState> edges = new HashMap<>();
 }

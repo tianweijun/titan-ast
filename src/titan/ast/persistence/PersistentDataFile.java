@@ -3,6 +3,7 @@ package titan.ast.persistence;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
@@ -28,7 +29,7 @@ import titan.ast.util.StringUtils;
  */
 public class PersistentDataFile {
   PersistentData persistentData;
-  FileOutputStream outputStream;
+  OutputStream outputStream;
 
   ByteBuffer intByteBuffer = ByteBuffer.allocate(4);
 
@@ -37,20 +38,22 @@ public class PersistentDataFile {
   }
 
   public void save(PersistentData persistentData, File outputFile) {
-    this.persistentData = persistentData;
     try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
-      this.outputStream = fileOutputStream;
-
-      writeStringPool();
-      writeGrammars();
-      writeKeyWordAutomata();
-      writeTokenDfa();
-      writeProductionRules();
-      writeAstAutomata();
-
+      save(persistentData, fileOutputStream);
     } catch (IOException e) {
       throw new AstRuntimeException(e);
     }
+  }
+
+  public void save(PersistentData persistentData, OutputStream outputStream) {
+    this.persistentData = persistentData;
+    this.outputStream = outputStream;
+    writeStringPool();
+    writeGrammars();
+    writeKeyWordAutomata();
+    writeTokenDfa();
+    writeProductionRules();
+    writeAstAutomata();
   }
 
   private void writeAstAutomata() {

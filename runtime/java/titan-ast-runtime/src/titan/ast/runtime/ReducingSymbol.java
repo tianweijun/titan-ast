@@ -5,18 +5,18 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
+class ReducingSymbol implements Cloneable, Comparable<ReducingSymbol> {
 
   // ast
-  public AutomataTmpAst astOfCurrentDfaState = null;
+  AutomataTmpAst astOfCurrentDfaState = null;
   // 状态
-  public SyntaxDfaState currentDfaState = null;
+  SyntaxDfaState currentDfaState = null;
   // token流中的位置
-  public int endIndexOfToken = -1;
+  int endIndexOfToken = -1;
 
-  public ReducingSymbol() {}
+  ReducingSymbol() {}
 
-  public ReducingSymbol cloneForAstAutomata() {
+  ReducingSymbol cloneForAstAutomata() {
     ReducingSymbol reducingSymbol = new ReducingSymbol();
     reducingSymbol.currentDfaState = this.currentDfaState;
     reducingSymbol.endIndexOfToken = this.endIndexOfToken;

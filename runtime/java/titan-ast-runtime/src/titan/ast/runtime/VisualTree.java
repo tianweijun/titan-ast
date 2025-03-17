@@ -18,11 +18,11 @@ import javax.swing.event.ChangeListener;
  *
  * @author tian wei jun
  */
-public class VisualTree extends JPanel {
+class VisualTree extends JPanel {
   TreeViewer treeViewer;
   ControlTreeViewerPanel controlTreeViewerPanel;
 
-  public VisualTree(StringTree tree) {
+  VisualTree(StringTree tree) {
     treeViewer = new TreeViewer(tree);
     controlTreeViewerPanel = new ControlTreeViewerPanel();
     layoutComponent();

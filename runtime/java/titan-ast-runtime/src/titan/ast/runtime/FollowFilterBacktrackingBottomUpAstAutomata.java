@@ -8,11 +8,11 @@ import java.util.Set;
  *
  * @author tian wei jun
  */
-public class FollowFilterBacktrackingBottomUpAstAutomata extends BacktrackingBottomUpAstAutomata {
-  public Map<Grammar, Set<Grammar>> nonterminalFollowMap;
+class FollowFilterBacktrackingBottomUpAstAutomata extends BacktrackingBottomUpAstAutomata {
+  Map<Grammar, Set<Grammar>> nonterminalFollowMap;
   Grammar eof;
 
-  public FollowFilterBacktrackingBottomUpAstAutomata(
+  FollowFilterBacktrackingBottomUpAstAutomata(
       SyntaxDfa astDfa,
       Grammar startGrammar,
       Map<Grammar, Set<Grammar>> nonterminalFollowMap,

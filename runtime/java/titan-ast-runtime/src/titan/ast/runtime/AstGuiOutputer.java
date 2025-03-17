@@ -8,21 +8,21 @@ import javax.swing.SwingUtilities;
  *
  * @author tian wei jun
  */
-public class AstGuiOutputer {
+class AstGuiOutputer {
   Ast tree;
 
-  public AstGuiOutputer(Ast tree) {
+  AstGuiOutputer(Ast tree) {
     this.tree = tree;
   }
 
-  public void output() {
+  void output() {
     SwingUtilities.invokeLater(new GuiRunnable(tree));
   }
 
   private static class GuiRunnable implements Runnable {
     StringTree strTree;
 
-    public GuiRunnable(Ast tree) {
+    GuiRunnable(Ast tree) {
       if (null != tree) {
         this.strTree = buildStringTree(tree);
       }

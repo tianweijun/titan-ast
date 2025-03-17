@@ -8,7 +8,7 @@ import titan.ast.runtime.AstGeneratorResult.TokensResult;
  *
  * @author tian wei jun
  */
-public interface TokenAutomata {
+interface TokenAutomata {
   TokensResult buildToken(String sourceFilePath);
 
   TokensResult buildToken(InputStream byteInputStream);

@@ -9,14 +9,14 @@ import java.util.Map;
  *
  * @author tian wei jun
  */
-public class SyntaxDfaState {
-  public int index = 0;
-  public int type = FaStateType.NONE.getValue();
+class SyntaxDfaState {
+  int index = 0;
+  int type = FaStateType.NONE.getValue();
   // 转移
-  public Map<Grammar, SyntaxDfaState> edges = new HashMap<>();
-  public ArrayList<ProductionRule> closingProductionRules = new ArrayList<>();
+  Map<Grammar, SyntaxDfaState> edges = new HashMap<>();
+  ArrayList<ProductionRule> closingProductionRules = new ArrayList<>();
 
-  public SyntaxDfaState(int index) {
+  SyntaxDfaState(int index) {
     this.index = index;
   }
 }

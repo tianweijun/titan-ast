@@ -8,12 +8,12 @@ package titan.ast.runtime;
 class TerminalAutomataTmpAst extends AutomataTmpAst {
   final Token token;
 
-  public TerminalAutomataTmpAst(Grammar grammar, Token token) {
+  TerminalAutomataTmpAst(Grammar grammar, Token token) {
     super(grammar);
     this.token = token;
   }
 
-  public TerminalAutomataTmpAst cloneForAstAutomata() {
+  TerminalAutomataTmpAst cloneForAstAutomata() {
     return new TerminalAutomataTmpAst(grammar, token);
   }
 

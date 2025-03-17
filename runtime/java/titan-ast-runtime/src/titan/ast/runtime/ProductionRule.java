@@ -5,10 +5,10 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class ProductionRule {
+class ProductionRule {
   // notNull
-  public Grammar grammar = null;
-  public String alias = "";
+  Grammar grammar = null;
+  String alias = "";
   // 用于收敛产生式
-  public SyntaxDfa reducingDfa = null;
+  SyntaxDfa reducingDfa = null;
 }

@@ -5,6 +5,6 @@ package titan.ast.runtime;
  *
  * @author tian wei jun
  */
-public class TokenDfa {
-  public TokenDfaState start;
+class TokenDfa {
+  TokenDfaState start;
 }

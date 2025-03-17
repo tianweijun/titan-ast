@@ -8,7 +8,7 @@ import titan.ast.runtime.AstGeneratorResult.TokensResult;
  *
  * @author tian wei jun
  */
-public class KeyWordDfaTokenAutomata extends DfaTokenAutomata {
+class KeyWordDfaTokenAutomata extends DfaTokenAutomata {
   KeyWordAutomata keyWordAutomata;
 
   /**
@@ -17,7 +17,7 @@ public class KeyWordDfaTokenAutomata extends DfaTokenAutomata {
    * @param keyWordAutomata 关键字有限自动机
    * @param dfa 识别token的 确定有限状态自动机
    */
-  public KeyWordDfaTokenAutomata(KeyWordAutomata keyWordAutomata, TokenDfa dfa) {
+  KeyWordDfaTokenAutomata(KeyWordAutomata keyWordAutomata, TokenDfa dfa) {
     super(dfa);
     this.keyWordAutomata = keyWordAutomata;
   }

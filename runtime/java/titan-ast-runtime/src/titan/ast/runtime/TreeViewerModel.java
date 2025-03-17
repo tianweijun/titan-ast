@@ -11,31 +11,31 @@ import javax.swing.event.EventListenerList;
  *
  * @author tian wei jun
  */
-public class TreeViewerModel {
-  protected EventListenerList listenerList = new EventListenerList();
-  protected transient ChangeEvent changeEvent = null;
+class TreeViewerModel {
+  EventListenerList listenerList = new EventListenerList();
+  transient ChangeEvent changeEvent = null;
   private StringTree stringTree;
   private float scale = 1.5f;
 
-  public TreeViewerModel() {}
+  TreeViewerModel() {}
 
-  public float getScale() {
+  float getScale() {
     return scale;
   }
 
-  public void setScale(float scale) {
+  void setScale(float scale) {
     setTreeViewerModelProperties(stringTree, scale);
   }
 
-  public StringTree getStringTree() {
+  StringTree getStringTree() {
     return stringTree;
   }
 
-  public void setStringTree(StringTree stringTree) {
+  void setStringTree(StringTree stringTree) {
     setTreeViewerModelProperties(stringTree, scale);
   }
 
-  public void setTreeViewerModelProperties(StringTree stringTree, float scale) {
+  void setTreeViewerModelProperties(StringTree stringTree, float scale) {
     if (this.stringTree != stringTree || this.scale != scale) {
       this.stringTree = stringTree;
       this.scale = scale;
@@ -43,15 +43,15 @@ public class TreeViewerModel {
     }
   }
 
-  public void addChangeListener(ChangeListener l) {
+  void addChangeListener(ChangeListener l) {
     listenerList.add(ChangeListener.class, l);
   }
 
-  public void removeChangeListener(ChangeListener l) {
+  void removeChangeListener(ChangeListener l) {
     listenerList.remove(ChangeListener.class, l);
   }
 
-  public ChangeListener[] getChangeListeners() {
+  ChangeListener[] getChangeListeners() {
     return listenerList.getListeners(ChangeListener.class);
   }
 
@@ -67,17 +67,17 @@ public class TreeViewerModel {
     }
   }
 
-  public <T extends EventListener> T[] getListeners(Class<T> listenerType) {
+  <T extends EventListener> T[] getListeners(Class<T> listenerType) {
     return listenerList.getListeners(listenerType);
   }
 
-  public boolean equalsByProperties(TreeViewerModel that) {
+  boolean equalsByProperties(TreeViewerModel that) {
     if (this == that) return true;
     if (that == null) return false;
     return Float.compare(scale, that.scale) == 0 && Objects.equals(stringTree, that.stringTree);
   }
 
-  public TreeViewerModel copyProperties() {
+  TreeViewerModel copyProperties() {
     TreeViewerModel treeViewerModel = new TreeViewerModel();
     treeViewerModel.stringTree = stringTree;
     treeViewerModel.scale = scale;

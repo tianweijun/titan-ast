@@ -12,7 +12,7 @@ import titan.ast.runtime.AstGeneratorResult.AstResult;
  *
  * @author tian wei jun
  */
-public class BacktrackingBottomUpAstAutomata implements AstAutomata {
+class BacktrackingBottomUpAstAutomata implements AstAutomata {
 
   final SyntaxDfa astDfa;
   final Grammar startGrammar;
@@ -23,7 +23,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
       new TreeSet<>(new BacktrackingBottomUpBranchComparator());
   AutomataTmpAst result = null;
 
-  public BacktrackingBottomUpAstAutomata(SyntaxDfa astDfa, Grammar startGrammar) {
+  BacktrackingBottomUpAstAutomata(SyntaxDfa astDfa, Grammar startGrammar) {
     this.astDfa = astDfa;
     this.startGrammar = startGrammar;
   }
@@ -289,7 +289,7 @@ public class BacktrackingBottomUpAstAutomata implements AstAutomata {
     return tokenReducingSymbolInputStream.getAstParseErrorData(startIndexOfToken, endIndexOfToken);
   }
 
-  public static class BacktrackingBottomUpBranchComparator
+  static class BacktrackingBottomUpBranchComparator
       implements Comparator<BacktrackingBottomUpBranch> {
 
     @Override

@@ -154,7 +154,7 @@ public class TreeViewerUI extends ComponentUI {
     public int height = 0;
     public List<Box> boxs = new LinkedList<>();
 
-    public HierarchicalRow(int heightOfTree) {
+    HierarchicalRow(int heightOfTree) {
       this.heightOfTree = heightOfTree;
     }
 
@@ -185,20 +185,20 @@ public class TreeViewerUI extends ComponentUI {
     String text = "";
     LinkedList<Box> children = new LinkedList<>();
 
-    public Box(String text, HierarchicalRow row, int width, int height) {
+    Box(String text, HierarchicalRow row, int width, int height) {
       this.text = text;
       this.row = row;
       this.width = width;
       this.height = height;
     }
 
-    public Point getTopCenterPoint() {
+    Point getTopCenterPoint() {
       int x = horizontalAxis + width / 2;
       int y = verticalAxis - height;
       return new Point(x, y);
     }
 
-    public Point getBottomCenterPoint() {
+    Point getBottomCenterPoint() {
       int x = horizontalAxis + width / 2;
       int y = verticalAxis;
       return new Point(x, y);
@@ -206,19 +206,19 @@ public class TreeViewerUI extends ComponentUI {
   }
 
   private static class BoxTreeContext {
-    public final Font font;
-    public final FontMetrics fontMetrics;
-    public final FontRenderContext fontRenderContext;
-    public final int colLineHeight;
-    public final int rowTextGap;
-    public final int padding;
-    public int width = 0;
-    public int height = 0;
-    public Box boxTree;
+    final Font font;
+    final FontMetrics fontMetrics;
+    final FontRenderContext fontRenderContext;
+    final int colLineHeight;
+    final int rowTextGap;
+    final int padding;
+    int width = 0;
+    int height = 0;
+    Box boxTree;
     List<HierarchicalRow> rows;
     TreeViewerModel treeViewerModel;
 
-    public BoxTreeContext(
+    BoxTreeContext(
         Font font,
         FontMetrics fontMetrics,
         FontRenderContext fontRenderContext,

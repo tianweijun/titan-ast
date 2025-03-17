@@ -1,9 +1,13 @@
 package titan.ast.grammar;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import titan.ast.AstContext;
+import titan.ast.AstRuntimeException;
 import titan.ast.grammar.ambiguity.GrammarAmbiguousJudge;
 import titan.ast.grammar.ambiguity.GrammarAmbiguousJudgeResult;
 import titan.ast.grammar.io.LanguageGrammarInitializer;
@@ -13,10 +17,9 @@ import titan.ast.grammar.syntax.ProductionRuleBuilder;
 import titan.ast.grammar.token.KeyWordAutomataBuilder;
 import titan.ast.grammar.token.TokenAutomataBuilder;
 import titan.ast.logger.Logger;
-import titan.ast.persistence.AutomataDataBuilder;
 import titan.ast.persistence.PersistentAutomataBuilder;
 import titan.ast.runtime.Ast;
-import titan.ast.runtime.AutomataData;
+import titan.ast.runtime.AutomataDataIoException;
 import titan.ast.runtime.RichAstGeneratorResult;
 import titan.ast.runtime.RuntimeAutomataAstApplication;
 import titan.ast.runtime.RuntimeAutomataRichAstApplication;
@@ -159,20 +162,36 @@ public class GrammarFileAutomataAstApplication {
   }
 
   public RuntimeAutomataAstApplication buildRuntimeAutomataAstApplication() {
-    AutomataDataBuilder automataDataBuilder = new AutomataDataBuilder(AstContext.get());
-    AutomataData automataData = automataDataBuilder.build();
+    PersistentAutomataBuilder persistentAutomataBuilder = new PersistentAutomataBuilder();
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    persistentAutomataBuilder.savePersistentDataToOutputStream(outputStream);
+
     RuntimeAutomataAstApplication runtimeAutomataAstApplication =
         new RuntimeAutomataAstApplication();
-    runtimeAutomataAstApplication.setContext(automataData);
+    try {
+      runtimeAutomataAstApplication.setContext(
+          new ByteArrayInputStream(outputStream.toByteArray()));
+      outputStream.close();
+    } catch (AutomataDataIoException | IOException e) {
+      throw new AstRuntimeException(e);
+    }
     return runtimeAutomataAstApplication;
   }
 
   public RuntimeAutomataRichAstApplication buildRuntimeAutomataRichAstApplication() {
-    AutomataDataBuilder automataDataBuilder = new AutomataDataBuilder(AstContext.get());
-    AutomataData automataData = automataDataBuilder.build();
+    PersistentAutomataBuilder persistentAutomataBuilder = new PersistentAutomataBuilder();
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    persistentAutomataBuilder.savePersistentDataToOutputStream(outputStream);
+
     RuntimeAutomataRichAstApplication runtimeAutomataRichAstApplication =
         new RuntimeAutomataRichAstApplication();
-    runtimeAutomataRichAstApplication.setContext(automataData);
+    try {
+      runtimeAutomataRichAstApplication.setContext(
+          new ByteArrayInputStream(outputStream.toByteArray()));
+      outputStream.close();
+    } catch (AutomataDataIoException | IOException e) {
+      throw new AstRuntimeException(e);
+    }
     return runtimeAutomataRichAstApplication;
   }
 
