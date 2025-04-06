@@ -8,16 +8,19 @@ package titan.ast.runtime;
 class TokenAutomataBuilder {
 
   TokenAutomata build(AutomataData automataData) {
-    KeyWordAutomata keyWordAutomata = automataData.keyWordAutomata;
+    DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData =
+        automataData.derivedTerminalGrammarAutomataData;
     TokenDfa tokenDfa = automataData.tokenDfa;
     TokenAutomata tokenAutomata = null;
-    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.EMPTY) {
+    if (derivedTerminalGrammarAutomataData.count == 0) {
       tokenAutomata = new DfaTokenAutomata(tokenDfa);
+    } else if (derivedTerminalGrammarAutomataData.count == 1) {
+      tokenAutomata =
+          new SingleDerivedTerminalGrammarAutomata(derivedTerminalGrammarAutomataData, tokenDfa);
+    } else {
+      tokenAutomata =
+          new DerivedTerminalGrammarAutomata(derivedTerminalGrammarAutomataData, tokenDfa);
     }
-    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.NOT_EMPTY) {
-      tokenAutomata = new KeyWordDfaTokenAutomata(keyWordAutomata, tokenDfa);
-    }
-
     return tokenAutomata;
   }
 }

@@ -6,7 +6,7 @@
 AutomataData::AutomataData()
     : stringPool(nullptr), sizeOfStringPool(0), grammars(nullptr),
       sizeOfGramamrs(0), productionRules(nullptr), sizeOfProductionRules(0),
-      keyWordAutomata(nullptr), tokenDfa(nullptr),
+      derivedTerminalGrammarAutomataData(nullptr), tokenDfa(nullptr),
       astAutomataType(AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA),
       astDfa(nullptr), startGrammar(nullptr), eofGrammar(nullptr),
       nonterminalFollowMap(nullptr) {}
@@ -28,8 +28,8 @@ AutomataData::~AutomataData() {
   delete tokenDfa;
   tokenDfa = nullptr;
 
-  delete keyWordAutomata;
-  keyWordAutomata = nullptr;
+  delete derivedTerminalGrammarAutomataData;
+  derivedTerminalGrammarAutomataData = nullptr;
 
   // startGrammar delete by persistentData.grammars
 

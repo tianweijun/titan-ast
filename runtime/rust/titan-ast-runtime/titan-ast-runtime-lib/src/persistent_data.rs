@@ -8,8 +8,10 @@ use crate::{
     ast::{Grammar, GrammarType, NonterminalGrammar, TerminalGrammar},
     ast_automata::AstAutomataType,
     byte_buffer::{Byte, ByteBuffer},
+    derived_terminal_grammar_automata_data::{
+        self, DerivedTerminalGrammarAutomataData, RootTerminalGrammarMap,
+    },
     error::AstAppError,
-    key_word_automata::{self, KeyWordAutomata},
     syntax_dfa::{ProductionRule, SyntaxDfa, SyntaxDfaState},
     token_dfa::{TokenDfa, TokenDfaState},
 };
@@ -161,36 +163,49 @@ impl PersistentData {
         return token_dfa;
     }
 
-    pub(crate) fn get_key_word_automata_by_input_stream(&mut self) -> KeyWordAutomata {
-        let mut key_word_automata = KeyWordAutomata::default();
+    pub(crate) fn get_derived_terminal_grammar_automata_data_by_input_stream(
+        &mut self,
+    ) -> DerivedTerminalGrammarAutomataData {
+        let mut derived_terminal_grammar_automata_data =
+            DerivedTerminalGrammarAutomataData::default();
 
-        key_word_automata.empty_or_not = self.read_i32();
-        if key_word_automata.empty_or_not == key_word_automata::EMPTY {
-            return key_word_automata;
+        let count = self.read_i32();
+        derived_terminal_grammar_automata_data.count = count;
+        if count == 0 {
+            return derived_terminal_grammar_automata_data;
         }
 
-        let index_of_root_key_word = self.read_i32() as usize;
-        key_word_automata.root_key_word = self.grammars[index_of_root_key_word].clone();
+        derived_terminal_grammar_automata_data.root_terminal_grammar_maps =
+            Vec::with_capacity(count as usize);
+        for _ in 0..derived_terminal_grammar_automata_data.count {
+            derived_terminal_grammar_automata_data
+                .root_terminal_grammar_maps
+                .push(self.get_root_terminal_grammar_map_by_input_stream());
+        }
+        return derived_terminal_grammar_automata_data;
+    }
 
-        let key_words_size = self.read_i32() as usize;
+    fn get_root_terminal_grammar_map_by_input_stream(&mut self) -> RootTerminalGrammarMap {
+        let index_of_root_terminal_grammar = self.read_i32() as usize;
+        let root_terminal_grammar = self.grammars[index_of_root_terminal_grammar].clone();
+
+        let text_terminal_map_size = self.read_i32() as usize;
 
         let mut text_terminal_map: HashMap<Vec<u8>, Grammar> =
-            HashMap::with_capacity(key_words_size);
-        for _ in 0..key_words_size {
-            let int_of_text = self.read_i32() as usize;
-            let text = self.string_pool[int_of_text].clone();
+            HashMap::with_capacity(text_terminal_map_size);
+        for _ in 0..text_terminal_map_size {
+            let index_of_text = self.read_i32() as usize;
+            let text = self.string_pool[index_of_text].clone();
 
-            let int_of_terminal = self.read_i32() as usize;
-            let terminal = self.grammars[int_of_terminal].clone();
+            let index_of_terminal = self.read_i32() as usize;
+            let terminal = self.grammars[index_of_terminal].clone();
 
-            text_terminal_map.insert(
-                text.into_bytes(),
-                terminal,
-            );
+            text_terminal_map.insert(text.into_bytes(), terminal);
         }
-        key_word_automata.text_terminal_map = text_terminal_map;
-
-        return key_word_automata;
+        return RootTerminalGrammarMap {
+            root_terminal_grammar,
+            text_terminal_map,
+        };
     }
 
     pub(crate) fn get_grammars_by_input_stream(&mut self) {

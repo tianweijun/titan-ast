@@ -6,7 +6,7 @@
 #define AST__DFATOKENAUTOMATA_H_
 #include "ByteBuffer.h"
 #include "ByteBufferedInputStream.h"
-#include "KeyWordAutomata.h"
+#include "DerivedTerminalGrammarAutomataData.h"
 #include "Token.h"
 #include "TokenAutomata.h"
 #include "TokenDfa.h"

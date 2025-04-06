@@ -8,8 +8,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import titan.ast.runtime.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
 
 /**
  * PersistentData对应在文件中的对象.
@@ -94,21 +96,33 @@ class PersistentAutomataData {
    *
    * @return
    */
-  KeyWordAutomata getKeyWordAutomataByInputStream() throws AutomataDataIoException {
-    KeyWordAutomata keyWordAutomata = new KeyWordAutomata();
+  DerivedTerminalGrammarAutomataData getDerivedTerminalGrammarAutomataDataByInputStream()
+      throws AutomataDataIoException {
+    DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData =
+        new DerivedTerminalGrammarAutomataData();
 
-    keyWordAutomata.emptyOrNot = readInt();
+    int count = readInt();
+    derivedTerminalGrammarAutomataData.count = count;
 
-    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.EMPTY) {
-      return keyWordAutomata;
+    if (count == 0) {
+      return derivedTerminalGrammarAutomataData;
     }
 
-    keyWordAutomata.rootKeyWord = grammars[readInt()];
+    List<RootTerminalGrammarMap> rootTerminalGrammarMaps = new ArrayList<>(count);
+    for (int i = 0; i < count; i++) {
+      rootTerminalGrammarMaps.add(getRootTerminalGrammarMapByInputStream());
+    }
+    derivedTerminalGrammarAutomataData.rootTerminalGrammarMaps = rootTerminalGrammarMaps;
 
-    int keyWordsSize = readInt();
+    return derivedTerminalGrammarAutomataData;
+  }
 
-    HashMap<String, Grammar> textTerminalMap = new HashMap<>(keyWordsSize);
-    for (int indexOfKeyWords = 0; indexOfKeyWords < keyWordsSize; indexOfKeyWords++) {
+  private RootTerminalGrammarMap getRootTerminalGrammarMapByInputStream()
+      throws AutomataDataIoException {
+    Grammar rootTerminalGrammar = grammars[readInt()];
+    int textTerminalMapSize = readInt();
+    HashMap<String, Grammar> textTerminalMap = new HashMap<>(textTerminalMapSize);
+    for (int indexOfKeyWords = 0; indexOfKeyWords < textTerminalMapSize; indexOfKeyWords++) {
       int intOfText = readInt();
       String text = stringPool[intOfText];
 
@@ -117,9 +131,7 @@ class PersistentAutomataData {
 
       textTerminalMap.put(text, terminal);
     }
-    keyWordAutomata.textTerminalMap = textTerminalMap;
-
-    return keyWordAutomata;
+    return new RootTerminalGrammarMap(rootTerminalGrammar, textTerminalMap);
   }
 
   /**

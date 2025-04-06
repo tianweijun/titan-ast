@@ -10,16 +10,16 @@ import titan.ast.grammar.LanguageGrammar;
 public class DfaTokenAutomataFactory {
 
   public static DfaTokenAutomata create(LanguageGrammar languageGrammar) {
-    KeyWordAutomata keyWordAutomata = languageGrammar.keyWordAutomataDetail.keyWordAutomata;
+    DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData =
+        languageGrammar.derivedTerminalGrammarAutomataDetail.derivedTerminalGrammarAutomataData;
     TokenDfa tokenDfa = languageGrammar.tokenDfa;
     DfaTokenAutomata dfaTokenAutomata = null;
-    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.EMPTY) {
+    if (derivedTerminalGrammarAutomataData.isEmpty()) {
       dfaTokenAutomata = new DfaTokenAutomata(tokenDfa);
+    } else {
+      dfaTokenAutomata =
+          new DerivedTerminalGrammarAutomata(derivedTerminalGrammarAutomataData, tokenDfa);
     }
-    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.NOT_EMPTY) {
-      dfaTokenAutomata = new KeyWordDfaTokenAutomata(keyWordAutomata, tokenDfa);
-    }
-
     return dfaTokenAutomata;
   }
 }

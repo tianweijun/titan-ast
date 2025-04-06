@@ -15,7 +15,7 @@ class AutomataData {
   ProductionRule[] productionRules;
 
   // TokenAutomata
-  KeyWordAutomata keyWordAutomata = null;
+  DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData = null;
   TokenDfa tokenDfa = null;
 
   // AstAutomata

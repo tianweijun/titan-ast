@@ -4,10 +4,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import titan.ast.AstRuntimeException;
+import titan.ast.grammar.DerivedTerminalGrammarAutomataDetail.RootTerminalGrammarMapDetail;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarAction;
 import titan.ast.grammar.GrammarAttribute;
-import titan.ast.grammar.KeyWordAutomataDetail;
 import titan.ast.grammar.LanguageGrammar;
 import titan.ast.grammar.NonterminalGrammar;
 import titan.ast.grammar.TerminalFragmentGrammar;
@@ -28,17 +28,17 @@ public class GrammarInitializer {
   private static final String KW_END = "end";
 
   private static final String KW_COLON = ":";
-  private static final String KW_RIGHT_RROW = "->";
+  private static final String KW_RIGHT_ARROW = "->";
   private static final String KW_SEMI = ";";
 
-  private static final String KW_ROOT_KEY_WORD = "RootKeyWord";
-  private static final String PREFIX_KEY_WORD_STATEMENT = "@KeyWord";
+  private static final String KW_DERIVE = "derive";
+  private static final String PREFIX_DERIVED_TERMINAL_GRAMMAR_STATEMENT = "@DerivedTerminalGrammar";
 
   private final LanguageGrammar languageGrammar;
   private final List<GrammarToken> grammarTokens;
 
   private State state = State.NORMAL;
-  private KeyWordAutomataDetail currentKeyWordAutomataDetail = null;
+  private RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail;
 
   /**
    * 带参初始化，自动初始化grammarCharset.
@@ -74,8 +74,8 @@ public class GrammarInitializer {
         ((TerminalGrammar) grammar).setLookaheadMatchingMode();
       }
       // add to languageGrammar
-      if (state == State.KEY_WORD) {
-        currentKeyWordAutomataDetail.addKeyWord(grammar);
+      if (state == State.DERIVED_TERMINAL) {
+        rootTerminalGrammarMapDetail.addTerminalGrammar(grammar);
       } else {
         languageGrammar.addGrammar(grammar);
       }
@@ -104,48 +104,48 @@ public class GrammarInitializer {
   }
 
   private void doSetStateFor3ContentTokens(LinkedList<GrammarToken> statementContentTokens) {
-    // KeyWord
-    // @KeyWord RootKeyWord(Identifier) begin ;
+    // @DerivedTerminalGrammar derive(Identifier) begin ;
     Iterator<GrammarToken> statementContentTokensIt = statementContentTokens.iterator();
     String firstTokenText = statementContentTokensIt.next().text;
     statementContentTokensIt.next();
     String lastTokenText = statementContentTokensIt.next().text;
 
-    if (firstTokenText.equals(PREFIX_KEY_WORD_STATEMENT) && lastTokenText.equals(KW_BEGIN)) {
-      setKeyWordBeginningState(statementContentTokens);
+    if (firstTokenText.equals(PREFIX_DERIVED_TERMINAL_GRAMMAR_STATEMENT)
+        && lastTokenText.equals(KW_BEGIN)) {
+      setDerivedTerminalGrammarBeginningState(statementContentTokens);
       return;
     }
     // 其他情况不合法
     String properGrammar =
         String.format(
             "%s %s(Identifier) %s %s",
-            PREFIX_KEY_WORD_STATEMENT, KW_ROOT_KEY_WORD, KW_BEGIN, KW_SEMI);
+            PREFIX_DERIVED_TERMINAL_GRAMMAR_STATEMENT, KW_DERIVE, KW_BEGIN, KW_SEMI);
     throwSetStateException(
         "special grammar statement is not legal, proper grammar like this : " + properGrammar,
         statementContentTokens);
   }
 
-  private void setKeyWordBeginningState(LinkedList<GrammarToken> statementContentTokens) {
+  private void setDerivedTerminalGrammarBeginningState(
+      LinkedList<GrammarToken> statementContentTokens) {
     String midTokenText = statementContentTokens.get(1).text;
-    if (midTokenText.startsWith(KW_ROOT_KEY_WORD)
-        && midTokenText.length() > KW_ROOT_KEY_WORD.length() + 2) {
+    if (midTokenText.startsWith(KW_DERIVE) && midTokenText.length() > KW_DERIVE.length() + 2) {
       // 去掉()
-      String rootKeyWord =
-          midTokenText.substring(KW_ROOT_KEY_WORD.length() + 1, midTokenText.length() - 1);
-      rootKeyWord = GrammarCharset.formatEscapeChar2Char(rootKeyWord, KW_ROOT_KEY_WORD);
-      KeyWordAutomataDetail keyWordAutomataDetail =
-          languageGrammar.getKeyWordAutomataDetail(rootKeyWord);
-      if (null == keyWordAutomataDetail) {
+      String rootTerminalGrammar =
+          midTokenText.substring(KW_DERIVE.length() + 1, midTokenText.length() - 1);
+      rootTerminalGrammar = GrammarCharset.formatEscapeChar2Char(rootTerminalGrammar, KW_DERIVE);
+      RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail =
+          languageGrammar.getRootTerminalGrammarMap(rootTerminalGrammar);
+      if (null == rootTerminalGrammarMapDetail) {
         throw new AstRuntimeException("the maximum of RootKeyWord grammar is one");
       }
-      currentKeyWordAutomataDetail = keyWordAutomataDetail;
-      state = State.KEY_WORD;
+      this.rootTerminalGrammarMapDetail = rootTerminalGrammarMapDetail;
+      state = State.DERIVED_TERMINAL;
       return;
     }
     String properGrammar =
         String.format(
             "%s %s(Identifier) %s %s",
-            PREFIX_KEY_WORD_STATEMENT, KW_ROOT_KEY_WORD, KW_BEGIN, KW_SEMI);
+            PREFIX_DERIVED_TERMINAL_GRAMMAR_STATEMENT, KW_DERIVE, KW_BEGIN, KW_SEMI);
     throwSetStateException(
         "special grammar statement is not legal, proper grammar like this : " + properGrammar,
         statementContentTokens);
@@ -178,7 +178,7 @@ public class GrammarInitializer {
         case PREFIX_FRAGMENT_GRAMMAR_STATEMENT:
           state = State.TERMINAL_FRAGMENT;
           break;
-        case PREFIX_KEY_WORD_STATEMENT:
+        case PREFIX_DERIVED_TERMINAL_GRAMMAR_STATEMENT:
           throwSetStateException(
               "setting keyword begining statement is at least 3 tokens ", statementContentTokens);
           break;
@@ -247,7 +247,7 @@ public class GrammarInitializer {
         || prefixText.equals(PREFIX_TERMINAL_GRAMMAR_STATEMENT)
         || prefixText.equals(PREFIX_NONTERMINAL_GRAMMAR_STATEMENT)
         || prefixText.equals(PREFIX_FRAGMENT_GRAMMAR_STATEMENT)
-        || prefixText.equals(PREFIX_KEY_WORD_STATEMENT);
+        || prefixText.equals(PREFIX_DERIVED_TERMINAL_GRAMMAR_STATEMENT);
   }
 
   /**
@@ -282,7 +282,7 @@ public class GrammarInitializer {
         grammar = new NonterminalGrammar(null);
         break;
       case TERMINAL:
-      case KEY_WORD:
+      case DERIVED_TERMINAL:
         grammar = new TerminalGrammar(null);
         break;
       case TERMINAL_FRAGMENT:
@@ -340,7 +340,7 @@ public class GrammarInitializer {
       Grammar grammar, Iterator<GrammarToken> statementContentTokensIt) {
     while (statementContentTokensIt.hasNext()) {
       GrammarToken token = statementContentTokensIt.next();
-      if (token.text.equals(KW_RIGHT_RROW)) {
+      if (token.text.equals(KW_RIGHT_ARROW)) {
         // action
         token = statementContentTokensIt.next();
         grammar.action = GrammarAction.getActionByString(token.text);
@@ -405,23 +405,11 @@ public class GrammarInitializer {
     return statementContentTokens;
   }
 
-  private GrammarToken nextUsefulToken(Iterator<GrammarToken> tokensIt) {
-    GrammarToken token = null;
-    while (tokensIt.hasNext()) {
-      GrammarToken tmp = tokensIt.next();
-      if (!GrammarTokenType.isSkip(tmp.type)) {
-        token = tmp;
-        break;
-      }
-    }
-    return token;
-  }
-
   public enum State {
     NORMAL,
     TERMINAL_FRAGMENT,
     TERMINAL,
     NONTERMINAL,
-    KEY_WORD
+    DERIVED_TERMINAL
   }
 }

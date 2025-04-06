@@ -1,7 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::{
-    ast::Grammar, ast_automata::AstAutomataType, key_word_automata::KeyWordAutomata,
+    ast::Grammar, ast_automata::AstAutomataType,
+    derived_terminal_grammar_automata_data::DerivedTerminalGrammarAutomataData,
     persistent_data::PersistentData, syntax_dfa::SyntaxDfa, token_dfa::TokenDfa,
 };
 
@@ -10,7 +11,7 @@ pub(crate) struct PersistentObject {
     //matadata
     pub(crate) persistent_data: PersistentData,
     //token dfa
-    pub(crate) key_word_automata: KeyWordAutomata,
+    pub(crate) derived_terminal_grammar_automata_data: DerivedTerminalGrammarAutomataData,
     pub(crate) token_dfa: TokenDfa,
     //ast dfa
     pub(crate) ast_automata_type: AstAutomataType,
@@ -25,7 +26,7 @@ impl PersistentObject {
         // 按文件组织顺序获得各个部分数据，每个部分获取一次
         self.init_string_pool();
         self.init_grammars();
-        self.init_key_word_automata();
+        self.init_derived_terminal_grammar_automata_data();
         self.init_token_dfa();
         self.init_production_rules();
         self.init_ast_automata();
@@ -77,8 +78,10 @@ impl PersistentObject {
         self.token_dfa.grammrs = self.persistent_data.grammars.clone();
     }
 
-    fn init_key_word_automata(&mut self) {
-        self.key_word_automata = self.persistent_data.get_key_word_automata_by_input_stream();
+    fn init_derived_terminal_grammar_automata_data(&mut self) {
+        self.derived_terminal_grammar_automata_data = self
+            .persistent_data
+            .get_derived_terminal_grammar_automata_data_by_input_stream();
     }
 
     fn init_grammars(&mut self) {
@@ -94,7 +97,7 @@ impl Default for PersistentObject {
     fn default() -> Self {
         Self {
             persistent_data: Default::default(),
-            key_word_automata: Default::default(),
+            derived_terminal_grammar_automata_data: Default::default(),
             token_dfa: Default::default(),
             ast_automata_type: AstAutomataType::BacktrackingBottomUpAstAutomata,
             start_grammar: 0,

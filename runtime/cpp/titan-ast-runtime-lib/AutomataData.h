@@ -7,7 +7,7 @@
 
 #include "AstAutomataType.h"
 #include "Grammar.h"
-#include "KeyWordAutomata.h"
+#include "DerivedTerminalGrammarAutomataData.h"
 #include "SyntaxDfa.h"
 #include "TokenDfa.h"
 #include <map>
@@ -30,7 +30,7 @@ class AutomataData {
   int sizeOfProductionRules;
 
   // token dfa
-  const KeyWordAutomata *keyWordAutomata;
+  const DerivedTerminalGrammarAutomataData *derivedTerminalGrammarAutomataData;
   const TokenDfa *tokenDfa;
   // ast dfa
   AstAutomataType astAutomataType;

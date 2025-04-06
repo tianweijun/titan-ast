@@ -11,7 +11,8 @@ import titan.ast.grammar.LanguageGrammar;
 import titan.ast.grammar.syntax.ProductionRule;
 import titan.ast.grammar.syntax.SyntaxDfa;
 import titan.ast.grammar.syntax.SyntaxDfaState;
-import titan.ast.grammar.token.KeyWordAutomata;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
 import titan.ast.grammar.token.TokenDfa;
 import titan.ast.grammar.token.TokenDfaState;
 import titan.ast.util.StringUtils;
@@ -93,12 +94,13 @@ public class PersistentData {
 
   public void initStringPool() {
     LanguageGrammar languageGrammar = astContext.languageGrammar;
-    KeyWordAutomata keyWordAutomata = languageGrammar.keyWordAutomataDetail.keyWordAutomata;
+    DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData =
+        languageGrammar.derivedTerminalGrammarAutomataDetail.derivedTerminalGrammarAutomataData;
     int capacity =
         languageGrammar.terminals.size()
             + languageGrammar.nonterminals.size()
             + 2
-            + keyWordAutomata.textTerminalMap.size();
+            + derivedTerminalGrammarAutomataData.sizeOfTextTerminalMap();
     stringPool = new LinkedHashMap<>(capacity);
     int indexOfString = 0;
     // terminals
@@ -122,10 +124,14 @@ public class PersistentData {
       }
     }
     // text of KeyWords
-    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.NOT_EMPTY) {
-      for (String text : keyWordAutomata.textTerminalMap.keySet()) {
-        if (!stringPool.containsKey(text)) {
-          stringPool.put(text, indexOfString++);
+    if (!derivedTerminalGrammarAutomataData.isEmpty()) {
+      for (RootTerminalGrammarMap rootTerminalGrammarMap :
+          derivedTerminalGrammarAutomataData.rootTerminalGrammarMaps) {
+        for (Entry<String, Grammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
+          String text = entry.getKey();
+          if (!stringPool.containsKey(text)) {
+            stringPool.put(text, indexOfString++);
+          }
         }
       }
     }

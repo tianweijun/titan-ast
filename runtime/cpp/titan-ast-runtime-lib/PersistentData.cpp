@@ -47,11 +47,13 @@ PersistentData::getProductionRulesByInputStream() {
     ProductionRule *productionRule = heapProductionRules[indexOfProductionRule];
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteProductionRules(productionRules, sizeOfProductionRules);
       return GetProductionRulesByInputStreamResult{false};
     }
     productionRule->grammar = grammars[readIntResult.data];
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteProductionRules(productionRules, sizeOfProductionRules);
       return GetProductionRulesByInputStreamResult{false};
     }
     int indexOfAliasInStringPool = readIntResult.data;
@@ -61,12 +63,21 @@ PersistentData::getProductionRulesByInputStream() {
     GetSyntaxDfaByInputStreamResult getSyntaxDfaByInputStreamResult =
         getSyntaxDfaByInputStream();
     if (!getSyntaxDfaByInputStreamResult.isOk) {
+      deleteProductionRules(productionRules, sizeOfProductionRules);
       return GetProductionRulesByInputStreamResult{false};
     }
     productionRule->reducingDfa = getSyntaxDfaByInputStreamResult.data;
   }
   return GetProductionRulesByInputStreamResult{true, heapProductionRules,
                                                countOfProductionRules};
+}
+
+void PersistentData::deleteProductionRules(ProductionRule **productionRules,
+                                           int sizeOfProductionRules) {
+  for (int i = 0; i < sizeOfProductionRules; i++) {
+    delete productionRules[i];
+  }
+  delete productionRules;
 }
 
 GetSyntaxDfaByInputStreamResult PersistentData::getSyntaxDfaByInputStream() {
@@ -87,11 +98,13 @@ GetSyntaxDfaByInputStreamResult PersistentData::getSyntaxDfaByInputStream() {
     SyntaxDfaState *syntaxDfaState = syntaxDfaStates[indexOfSyntaxDfaState];
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteSyntaxDfaStates(syntaxDfaStates, sizeOfSyntaxDfaStates);
       return GetSyntaxDfaByInputStreamResult{false, nullptr};
     }
     syntaxDfaState->type = readIntResult.data;
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteSyntaxDfaStates(syntaxDfaStates, sizeOfSyntaxDfaStates);
       return GetSyntaxDfaByInputStreamResult{false, nullptr};
     }
     int sizeOfEdges = readIntResult.data;
@@ -102,11 +115,13 @@ GetSyntaxDfaByInputStreamResult PersistentData::getSyntaxDfaByInputStream() {
     for (int indexOfEdge = 0; indexOfEdge < sizeOfEdges; indexOfEdge++) {
       readIntResult = readInt();
       if (!readIntResult.isOk) {
+        deleteSyntaxDfaStates(syntaxDfaStates, sizeOfSyntaxDfaStates);
         return GetSyntaxDfaByInputStreamResult{false, nullptr};
       }
       Grammar *ch = grammars[readIntResult.data];
       readIntResult = readInt();
       if (!readIntResult.isOk) {
+        deleteSyntaxDfaStates(syntaxDfaStates, sizeOfSyntaxDfaStates);
         return GetSyntaxDfaByInputStreamResult{false, nullptr};
       }
       SyntaxDfaState *chToState = syntaxDfaStates[readIntResult.data];
@@ -115,6 +130,7 @@ GetSyntaxDfaByInputStreamResult PersistentData::getSyntaxDfaByInputStream() {
     }
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteSyntaxDfaStates(syntaxDfaStates, sizeOfSyntaxDfaStates);
       return GetSyntaxDfaByInputStreamResult{false, nullptr};
     }
     int sizeOfProductions = readIntResult.data;
@@ -122,6 +138,7 @@ GetSyntaxDfaByInputStreamResult PersistentData::getSyntaxDfaByInputStream() {
          indexOfProduction++) {
       readIntResult = readInt();
       if (!readIntResult.isOk) {
+        deleteSyntaxDfaStates(syntaxDfaStates, sizeOfSyntaxDfaStates);
         return GetSyntaxDfaByInputStreamResult{false, nullptr};
       }
       syntaxDfaState->closingProductionRules.push_back(
@@ -130,7 +147,17 @@ GetSyntaxDfaByInputStreamResult PersistentData::getSyntaxDfaByInputStream() {
     syntaxDfaState->closingProductionRules.shrink_to_fit();
   }
   return GetSyntaxDfaByInputStreamResult{
-      true, new SyntaxDfa(syntaxDfaStates[0], (const SyntaxDfaState **) syntaxDfaStates, sizeOfSyntaxDfaStates)};
+      true, new SyntaxDfa(syntaxDfaStates[0],
+                          (const SyntaxDfaState **)syntaxDfaStates,
+                          sizeOfSyntaxDfaStates)};
+}
+
+void PersistentData::deleteSyntaxDfaStates(SyntaxDfaState **syntaxDfaStates,
+                                           int sizeOfSyntaxDfaStates) {
+  for (int i = 0; i < sizeOfSyntaxDfaStates; i++) {
+    delete syntaxDfaStates[i];
+  }
+  delete syntaxDfaStates;
 }
 
 GetGrammarByInputStreamResult PersistentData::getGrammarByInputStream() {
@@ -159,16 +186,19 @@ GetTokenDfaByInputStreamResult PersistentData::getTokenDfaByInputStream() {
     TokenDfaState *tokenDfaState = tokenDfaStates[indexOfTokenDfaState];
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteTokenDfaStates(tokenDfaStates, sizeOfTokenDfaStates);
       return GetTokenDfaByInputStreamResult{false, nullptr};
     }
     tokenDfaState->type = readIntResult.data;
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteTokenDfaStates(tokenDfaStates, sizeOfTokenDfaStates);
       return GetTokenDfaByInputStreamResult{false, nullptr};
     }
     tokenDfaState->weight = readIntResult.data;
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteTokenDfaStates(tokenDfaStates, sizeOfTokenDfaStates);
       return GetTokenDfaByInputStreamResult{false, nullptr};
     }
     int intOfTerminal = readIntResult.data;
@@ -177,6 +207,7 @@ GetTokenDfaByInputStreamResult PersistentData::getTokenDfaByInputStream() {
     }
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteTokenDfaStates(tokenDfaStates, sizeOfTokenDfaStates);
       return GetTokenDfaByInputStreamResult{false, nullptr};
     }
     int sizeOfEdges = readIntResult.data;
@@ -185,11 +216,13 @@ GetTokenDfaByInputStreamResult PersistentData::getTokenDfaByInputStream() {
     for (int indexOfEdge = 0; indexOfEdge < sizeOfEdges; indexOfEdge++) {
       readIntResult = readInt();
       if (!readIntResult.isOk) {
+        deleteTokenDfaStates(tokenDfaStates, sizeOfTokenDfaStates);
         return GetTokenDfaByInputStreamResult{false, nullptr};
       }
       int ch = readIntResult.data;
       readIntResult = readInt();
       if (!readIntResult.isOk) {
+        deleteTokenDfaStates(tokenDfaStates, sizeOfTokenDfaStates);
         return GetTokenDfaByInputStreamResult{false, nullptr};
       }
       TokenDfaState *chToState = tokenDfaStates[readIntResult.data];
@@ -200,60 +233,92 @@ GetTokenDfaByInputStreamResult PersistentData::getTokenDfaByInputStream() {
 
   return GetTokenDfaByInputStreamResult{
       true,
-      new TokenDfa(tokenDfaStates[0], (const TokenDfaState **) tokenDfaStates,
+      new TokenDfa(tokenDfaStates[0], (const TokenDfaState **)tokenDfaStates,
                    sizeOfTokenDfaStates)};
 }
 
-GetKeyWordAutomataByInputStreamResult
-PersistentData::getKeyWordAutomataByInputStream() {
-  KeyWordAutomata *keyWordAutomata = new KeyWordAutomata();
+void PersistentData::deleteTokenDfaStates(TokenDfaState **tokenDfaStates,
+                                          int sizeOfTokenDfaStates) {
+  for (int i = 0; i < sizeOfTokenDfaStates; i++) {
+    delete tokenDfaStates[i];
+  }
+  delete tokenDfaStates;
+}
 
+GetDerivedTerminalGrammarAutomataDataByInputStreamResult
+PersistentData::getDerivedTerminalGrammarAutomataDataByInputStream() {
   ReadIntResult readIntResult = readInt();
   if (!readIntResult.isOk) {
-    return GetKeyWordAutomataByInputStreamResult{false, nullptr};
+    return GetDerivedTerminalGrammarAutomataDataByInputStreamResult{false,
+                                                                    nullptr};
   }
-  keyWordAutomata->emptyOrNot = readIntResult.data;
+  auto *derivedTerminalGrammarAutomataData =
+      new DerivedTerminalGrammarAutomataData();
+  derivedTerminalGrammarAutomataData->count = readIntResult.data;
 
-  if (keyWordAutomata->emptyOrNot == KeyWordAutomata::EMPTY) {
-    return GetKeyWordAutomataByInputStreamResult{true, keyWordAutomata};
+  if (derivedTerminalGrammarAutomataData->count == 0) {
+    return GetDerivedTerminalGrammarAutomataDataByInputStreamResult{
+        true, derivedTerminalGrammarAutomataData};
   }
+
+  for (int indexOfRootTerminalGrammarMap = 0;
+       indexOfRootTerminalGrammarMap <
+       derivedTerminalGrammarAutomataData->count;
+       indexOfRootTerminalGrammarMap++) {
+    auto result = getRootTerminalGrammarMapByInputStream(
+        &derivedTerminalGrammarAutomataData->rootTerminalGrammarMaps);
+    if (!result.isOk) {
+      delete derivedTerminalGrammarAutomataData;
+      return GetDerivedTerminalGrammarAutomataDataByInputStreamResult{false,
+                                                                      nullptr};
+    }
+  }
+
+  return GetDerivedTerminalGrammarAutomataDataByInputStreamResult{
+      true, derivedTerminalGrammarAutomataData};
+}
+
+GetRootTerminalGrammarMapByInputStreamResult
+PersistentData::getRootTerminalGrammarMapByInputStream(
+    std::vector<RootTerminalGrammarMap> *rootTerminalGrammarMaps) {
+  ReadIntResult readIntResult = readInt();
+  if (!readIntResult.isOk) {
+    return GetRootTerminalGrammarMapByInputStreamResult{false};
+  }
+
+  Grammar *rootTerminalGrammar = grammars[readIntResult.data];
 
   readIntResult = readInt();
   if (!readIntResult.isOk) {
-    return GetKeyWordAutomataByInputStreamResult{false, nullptr};
+    return GetRootTerminalGrammarMapByInputStreamResult{false};
   }
-  keyWordAutomata->rootKeyWord = grammars[readIntResult.data];
+  int terminalGrammarSize = readIntResult.data;
 
-  readIntResult = readInt();
-  if (!readIntResult.isOk) {
-    return GetKeyWordAutomataByInputStreamResult{false, nullptr};
-  }
-  int keyWordsSize = readIntResult.data;
-
-  keyWordAutomata->textTerminalMap =
+  auto textTerminalMap =
       std::unordered_map<std::string *, Grammar *, TextTerminalMapHash,
-                         TextTerminalMapEq>(keyWordsSize);
-  for (int indexOfKeyWords = 0; indexOfKeyWords < keyWordsSize;
+                         TextTerminalMapEq>(terminalGrammarSize);
+  for (int indexOfKeyWords = 0; indexOfKeyWords < terminalGrammarSize;
        indexOfKeyWords++) {
     readIntResult = readInt();
     if (!readIntResult.isOk) {
-      return GetKeyWordAutomataByInputStreamResult{false, nullptr};
+      return GetRootTerminalGrammarMapByInputStreamResult{false};
     }
     int intOfText = readIntResult.data;
     std::string *text = stringPool[intOfText];
 
     readIntResult = readInt();
     if (!readIntResult.isOk) {
-      return GetKeyWordAutomataByInputStreamResult{false, nullptr};
+      return GetRootTerminalGrammarMapByInputStreamResult{false};
     }
     int intOfTerminal = readIntResult.data;
     Grammar *terminal = grammars[intOfTerminal];
 
     std::pair<std::string *, Grammar *> pair(text, terminal);
-    keyWordAutomata->textTerminalMap.insert(pair);
+    textTerminalMap.insert(pair);
   }
-
-  return GetKeyWordAutomataByInputStreamResult{true, keyWordAutomata};
+  rootTerminalGrammarMaps->push_back(
+      RootTerminalGrammarMap(rootTerminalGrammar, textTerminalMap));
+  return GetRootTerminalGrammarMapByInputStreamResult{true};
 }
 
 GetGrammarsByInputStreamResult PersistentData::getGrammarsByInputStream() {
@@ -268,24 +333,31 @@ GetGrammarsByInputStreamResult PersistentData::getGrammarsByInputStream() {
        indexOfGrammar++) {
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteGrammars(heapGrammars,indexOfGrammar);
       return GetGrammarsByInputStreamResult{false, nullptr};
     }
     auto type = GrammarType(readIntResult.data);
     auto *grammar = newGrammarByType(type, indexOfGrammar);
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteGrammars(heapGrammars,indexOfGrammar);
+      delete grammar;
       return GetGrammarsByInputStreamResult{false, nullptr};
     }
     grammar->name = *(stringPool[readIntResult.data]);
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteGrammars(heapGrammars,indexOfGrammar);
+      delete grammar;
       return GetGrammarsByInputStreamResult{false, nullptr};
     }
     grammar->action = GrammarAction(readIntResult.data);
     if (type == GrammarType::TERMINAL) {
-      auto *terminalGrammar = (TerminalGrammar *) grammar;
+      auto *terminalGrammar = (TerminalGrammar *)grammar;
       readIntResult = readInt();
       if (!readIntResult.isOk) {
+        deleteGrammars(heapGrammars,indexOfGrammar);
+        delete grammar;
         return GetGrammarsByInputStreamResult{false, nullptr};
       }
       terminalGrammar->lookaheadMatchingMode =
@@ -298,19 +370,26 @@ GetGrammarsByInputStreamResult PersistentData::getGrammarsByInputStream() {
   return GetGrammarsByInputStreamResult{true, heapGrammars, _sizeOfGramamrs};
 }
 
+void PersistentData::deleteGrammars(Grammar **grammars, int sizeOfGrammars) {
+  for(int i = 0 ; i < sizeOfGrammars;i++){
+    delete grammars[i];
+  }
+  delete grammars;
+}
+
 Grammar *PersistentData::newGrammarByType(GrammarType type,
                                           int indexOfGrammar) {
   Grammar *grammar = nullptr;
   switch (type) {
-    case GrammarType::TERMINAL:
-      grammar = new TerminalGrammar(indexOfGrammar);
-      break;
-    case GrammarType::NONTERMINAL:
-      grammar = new NonterminalGrammar(indexOfGrammar);
-      break;
-    case GrammarType::TERMINAL_FRAGMENT:
-    default:
-      break;
+  case GrammarType::TERMINAL:
+    grammar = new TerminalGrammar(indexOfGrammar);
+    break;
+  case GrammarType::NONTERMINAL:
+    grammar = new NonterminalGrammar(indexOfGrammar);
+    break;
+  case GrammarType::TERMINAL_FRAGMENT:
+  default:
+    break;
   }
   return grammar;
 }
@@ -325,11 +404,13 @@ GetStringPoolByInputStreamResult PersistentData::getStringPoolByInputStream() {
   for (int indexOfString = 0; indexOfString < sizeOfStrings; indexOfString++) {
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      deleteStrings(strings,indexOfString);
       return GetStringPoolByInputStreamResult{false, nullptr};
     }
     int countOfStringBytes = readIntResult.data;
     ReadStringResult readStringResult = readByteString(countOfStringBytes);
     if (!readStringResult.isOk) {
+      deleteStrings(strings,indexOfString);
       return GetStringPoolByInputStreamResult{false, nullptr};
     }
     std::string *str = readStringResult.data;
@@ -340,11 +421,22 @@ GetStringPoolByInputStreamResult PersistentData::getStringPoolByInputStream() {
   return GetStringPoolByInputStreamResult{true, strings, sizeOfStrings};
 }
 
+void PersistentData::deleteStrings(std::string **strings, int sizeOfStrings) {
+  for(int i = 0 ; i < sizeOfStrings;i++){
+    delete strings[i];
+  }
+  delete strings;
+}
+
 ReadStringResult PersistentData::readByteString(int countOfStringBytes) {
   auto *str = new std::string(countOfStringBytes, 0);
   char *buf = const_cast<char *>(str->data());
-  bool readResult = doRead((byte *) (buf), 0, countOfStringBytes);
-  return ReadStringResult{readResult, str};
+  bool readResult = doRead((byte *)(buf), 0, countOfStringBytes);
+  if(!readResult){
+    delete str;
+    return {false, nullptr};
+  }
+  return ReadStringResult{true, str};
 }
 
 ReadIntResult PersistentData::readInt() {
@@ -392,12 +484,14 @@ PersistentData::getNonterminalFollowMapByInputStream() {
     GetGrammarByInputStreamResult getGrammarByInputStreamResult =
         getGrammarByInputStream();
     if (!getGrammarByInputStreamResult.isOk) {
+      delete nonterminalFollowMap;
       return GetNonterminalFollowMapByInputStreamResult{false};
     }
     Grammar *nonterminal = getGrammarByInputStreamResult.data;
 
     readIntResult = readInt();
     if (!readIntResult.isOk) {
+      delete nonterminalFollowMap;
       return GetNonterminalFollowMapByInputStreamResult{false};
     }
     int sizeOfFollow = readIntResult.data;
@@ -406,6 +500,7 @@ PersistentData::getNonterminalFollowMapByInputStream() {
     for (int indexOfFollow = 0; indexOfFollow < sizeOfFollow; indexOfFollow++) {
       getGrammarByInputStreamResult = getGrammarByInputStream();
       if (!getGrammarByInputStreamResult.isOk) {
+        delete nonterminalFollowMap;
         return GetNonterminalFollowMapByInputStreamResult{false};
       }
       follow->insert(getGrammarByInputStreamResult.data);

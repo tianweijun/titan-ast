@@ -217,7 +217,7 @@ IdentifierPart
 
 @TerminalFragmentGrammar end ;
 
-@KeyWord RootKeyWord(Identifier) begin ;
+@DerivedTerminalGrammar derive(Identifier) begin ;
 
 Crate : 'crate' ;
 Super : 'super' ;
@@ -250,4 +250,4 @@ If : 'if' ;
 Else : 'else' ;
 Return : 'return' ;
 
-@KeyWord end ;
+@DerivedTerminalGrammar end ;

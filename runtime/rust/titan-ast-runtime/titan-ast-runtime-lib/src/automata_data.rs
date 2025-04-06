@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use crate::{
     ast::Grammar,
     ast_automata::AstAutomataType,
-    key_word_automata::KeyWordAutomata,
+    derived_terminal_grammar_automata_data::DerivedTerminalGrammarAutomataData,
     persistent_object::PersistentObject,
     syntax_dfa::{ProductionRule, SyntaxDfa},
     token_dfa::TokenDfa,
@@ -15,7 +15,7 @@ pub(crate) struct AutomataData {
     pub(crate) grammars: Vec<Grammar>,
     pub(crate) production_rules: Vec<ProductionRule>,
     //token dfa
-    pub(crate) key_word_automata: KeyWordAutomata,
+    pub(crate) derived_terminal_grammar_automata_data: DerivedTerminalGrammarAutomataData,
     pub(crate) token_dfa: TokenDfa,
     //ast dfa
     pub(crate) ast_automata_type: AstAutomataType,
@@ -31,7 +31,7 @@ impl From<PersistentObject> for AutomataData {
             string_pool: value.persistent_data.string_pool,
             grammars: value.persistent_data.grammars,
             production_rules: value.persistent_data.production_rules,
-            key_word_automata: value.key_word_automata,
+            derived_terminal_grammar_automata_data: value.derived_terminal_grammar_automata_data,
             token_dfa: value.token_dfa,
             ast_automata_type: value.ast_automata_type,
             start_grammar: value.start_grammar,
@@ -48,7 +48,7 @@ impl Default for AutomataData {
             string_pool: Default::default(),
             grammars: Default::default(),
             production_rules: Default::default(),
-            key_word_automata: Default::default(),
+            derived_terminal_grammar_automata_data: Default::default(),
             token_dfa: Default::default(),
             ast_automata_type: Default::default(),
             start_grammar: Default::default(),

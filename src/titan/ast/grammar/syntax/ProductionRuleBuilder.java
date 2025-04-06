@@ -14,6 +14,8 @@ import titan.ast.grammar.regexp.RegExp.RegExpCharSet;
 import titan.ast.grammar.regexp.RegExp.RegExpCharSetType;
 import titan.ast.grammar.regexp.RegExp.RegExpType;
 import titan.ast.grammar.regexp.RelationshipQualifier;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
 
 /**
  * 根据终结符正则构造产生式，并将产生式中的[]、''的基本正则转为token终结符正则.
@@ -24,7 +26,7 @@ public class ProductionRuleBuilder {
 
   private final LinkedHashMap<String, Grammar> nonterminals;
   private LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap;
-  private Map<RegExp, Grammar> unitRegExpTerminalsMap;
+  private Map<RegExp, Grammar> sequenceCharsUnitRegExpTerminalMap;
   private Grammar nonterminal;
 
   /**
@@ -53,7 +55,7 @@ public class ProductionRuleBuilder {
     // 2.处理产生式别名问题
     setAliasForProductionRule();
     // 3.所有正则替换为终结符和非终结符（复合正则、grammar引用的单元正则）
-    initUnitRegExpTerminalsMap();
+    initSequenceCharsUnitRegExpTerminalMap();
     formatRegExpForProductionRule();
   }
 
@@ -121,7 +123,7 @@ public class ProductionRuleBuilder {
    */
   private void sequenceCharsRegExp2TerminalGrammarUnitRegExp(RegExp sequenceCharsRegExp) {
     RegExp eleGrammarRegExp = cloneSequenceCharsRegExpForTerminalsMap(sequenceCharsRegExp);
-    Grammar terminal = unitRegExpTerminalsMap.get(eleGrammarRegExp);
+    Grammar terminal = sequenceCharsUnitRegExpTerminalMap.get(eleGrammarRegExp);
 
     if (null == terminal) {
       throw new AstRuntimeException(
@@ -208,15 +210,15 @@ public class ProductionRuleBuilder {
     nonterminalProductionRulesMap.put(nonterminal, productionRules);
   }
 
-  private void initUnitRegExpTerminalsMap() {
+  private void initSequenceCharsUnitRegExpTerminalMap() {
     AstContext astContext = AstContext.get();
     LanguageGrammar languageGrammar = astContext.languageGrammar;
-    unitRegExpTerminalsMap = new LinkedHashMap<>(languageGrammar.terminals.size());
-    buildUnitRegExpTerminalsMapByTerminals(languageGrammar);
-    buildUnitRegExpTerminalsMapByKeyWords(languageGrammar);
+    sequenceCharsUnitRegExpTerminalMap = new LinkedHashMap<>(languageGrammar.terminals.size());
+    buildSequenceCharsUnitRegExpTerminalMapByTerminals(languageGrammar);
+    buildSequenceCharsUnitRegExpTerminalMapByDerivedTerminalGrammars(languageGrammar);
   }
 
-  private void buildUnitRegExpTerminalsMapByTerminals(LanguageGrammar languageGrammar) {
+  private void buildSequenceCharsUnitRegExpTerminalMapByTerminals(LanguageGrammar languageGrammar) {
     LinkedHashMap<String, Grammar> terminals = languageGrammar.terminals;
     // 普通的串字符
     for (Grammar terminal : terminals.values()) {
@@ -227,7 +229,7 @@ public class ProductionRuleBuilder {
             && unitRegExp.unitType == RegExp.RegExpUnitType.SEQUENCE_CHARS) {
           if (unitRegExp.repMinTimes.isNumberTimesAndEqual(1)
               && unitRegExp.repMaxTimes.isNumberTimesAndEqual(1)) {
-            unitRegExpTerminalsMap.put(unitRegExp, terminal);
+            sequenceCharsUnitRegExpTerminalMap.put(unitRegExp, terminal);
           }
         }
       }
@@ -235,33 +237,39 @@ public class ProductionRuleBuilder {
   }
 
   /**
-   * keyWords,虽然已经处于terminals了，但仅仅是LanguageGrammarInitializer.init()， 正则没有构建（为空），
-   * 所以不能通过SEQUENCE_CHARS正则map,需要特殊处理 .
+   * derivedTerminalGrammars,虽然已经处于terminals了， 正则为空，text中的正则可能是或关系，
+   * buildSequenceCharsUnitRegExpTerminalMapByTerminals方法无法处理derivedTerminalGrammars, 特此特殊处理
+   * derivedTerminalGrammars.
    *
    * @param languageGrammar languageGrammar
    */
-  public void buildUnitRegExpTerminalsMapByKeyWords(LanguageGrammar languageGrammar) {
-    if (languageGrammar.keyWordAutomataDetail.isEmpty()) {
+  public void buildSequenceCharsUnitRegExpTerminalMapByDerivedTerminalGrammars(
+      LanguageGrammar languageGrammar) {
+    DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData =
+        languageGrammar.derivedTerminalGrammarAutomataDetail.derivedTerminalGrammarAutomataData;
+    if (derivedTerminalGrammarAutomataData.isEmpty()) {
       return;
     }
-    for (Entry<String, Grammar> entry :
-        languageGrammar.keyWordAutomataDetail.keyWordAutomata.textTerminalMap.entrySet()) {
-      String textOfKeyWord = entry.getKey();
-      Grammar keyWord = entry.getValue();
-      RegExp unitRegExp = new RegExp(null);
-      unitRegExp.type = RegExpType.UNIT;
-      unitRegExp.isNot = false;
-      unitRegExp.repMinTimes.setTimes(1);
-      unitRegExp.repMaxTimes.setTimes(1);
-      unitRegExp.matchingPattern = MatchingPattern.UNBACKTRACKING_GREEDINESS;
-      unitRegExp.children.clear();
-      unitRegExp.relationshipOfChildren = RelationshipQualifier.AND;
-      unitRegExp.unitType = RegExp.RegExpUnitType.SEQUENCE_CHARS;
-      RegExpCharSet regExpCharSet = new RegExpCharSet();
-      regExpCharSet.type = RegExpCharSetType.SEQUENCE_CHARS;
-      regExpCharSet.chars = textOfKeyWord.toCharArray();
-      unitRegExp.sets.add(regExpCharSet);
-      unitRegExpTerminalsMap.put(unitRegExp, keyWord);
+    for (RootTerminalGrammarMap rootTerminalGrammarMap :
+        derivedTerminalGrammarAutomataData.rootTerminalGrammarMaps) {
+      for (Entry<String, Grammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
+        RegExp unitRegExp = new RegExp(null);
+        unitRegExp.type = RegExpType.UNIT;
+        unitRegExp.isNot = false;
+        unitRegExp.repMinTimes.setTimes(1);
+        unitRegExp.repMaxTimes.setTimes(1);
+        unitRegExp.matchingPattern = MatchingPattern.UNBACKTRACKING_GREEDINESS;
+        unitRegExp.children.clear();
+        unitRegExp.relationshipOfChildren = RelationshipQualifier.AND;
+        unitRegExp.unitType = RegExp.RegExpUnitType.SEQUENCE_CHARS;
+        RegExpCharSet regExpCharSet = new RegExpCharSet();
+        regExpCharSet.type = RegExpCharSetType.SEQUENCE_CHARS;
+        String textOfSequenceChars = entry.getKey();
+        regExpCharSet.chars = textOfSequenceChars.toCharArray();
+        unitRegExp.sets.add(regExpCharSet);
+        Grammar derivedTerminalGrammar = entry.getValue();
+        sequenceCharsUnitRegExpTerminalMap.put(unitRegExp, derivedTerminalGrammar);
+      }
     }
   }
 }

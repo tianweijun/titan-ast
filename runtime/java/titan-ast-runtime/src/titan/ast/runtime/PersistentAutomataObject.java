@@ -10,7 +10,7 @@ import java.util.Set;
  */
 class PersistentAutomataObject {
   // TokenAutomata
-  KeyWordAutomata keyWordAutomata = null;
+  DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData = null;
   TokenDfa tokenDfa = null;
 
   // AstAutomata
@@ -30,7 +30,7 @@ class PersistentAutomataObject {
   void init() throws AutomataDataIoException {
     initStringPool();
     initGrammars();
-    initKeyWordAutomata();
+    initDerivedTerminalGrammarAutomataData();
     initTokenDfa();
     initProductionRules();
     initAstAutomata();
@@ -70,8 +70,9 @@ class PersistentAutomataObject {
     tokenDfa = persistentAutomataData.getTokenDfaByInputStream();
   }
 
-  private void initKeyWordAutomata() throws AutomataDataIoException {
-    keyWordAutomata = persistentAutomataData.getKeyWordAutomataByInputStream();
+  private void initDerivedTerminalGrammarAutomataData() throws AutomataDataIoException {
+    derivedTerminalGrammarAutomataData =
+        persistentAutomataData.getDerivedTerminalGrammarAutomataDataByInputStream();
   }
 
   private void initGrammars() throws AutomataDataIoException {
@@ -89,7 +90,7 @@ class PersistentAutomataObject {
     automataData.grammars = persistentAutomataData.grammars;
     automataData.productionRules = persistentAutomataData.productionRules;
     // TokenAutomata
-    automataData.keyWordAutomata = keyWordAutomata;
+    automataData.derivedTerminalGrammarAutomataData = derivedTerminalGrammarAutomataData;
     automataData.tokenDfa = tokenDfa;
     // AstAutomata
     automataData.astAutomataType = astAutomataType;

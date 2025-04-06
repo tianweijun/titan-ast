@@ -33,10 +33,10 @@ Test :   (~[a] )  ;
 
 @TerminalFragmentGrammar end ;
 
-@KeyWord RootKeyWord(Identifier) begin ;
+@DerivedTerminalGrammar derive(Identifier) begin ;
 
 Set : 'set' ;
 Equal : 'equal' | 'Equal'   ;
 End : 'end' ;
 
-@KeyWord end ;
+@DerivedTerminalGrammar end ;

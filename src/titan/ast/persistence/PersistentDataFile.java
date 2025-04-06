@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import titan.ast.AstRuntimeException;
@@ -19,7 +20,8 @@ import titan.ast.grammar.syntax.BacktrackingBottomUpAstAutomata;
 import titan.ast.grammar.syntax.FollowFilterBacktrackingBottomUpAstAutomata;
 import titan.ast.grammar.syntax.ProductionRule;
 import titan.ast.grammar.syntax.SyntaxDfa;
-import titan.ast.grammar.token.KeyWordAutomata;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
 import titan.ast.util.StringUtils;
 
 /**
@@ -50,7 +52,7 @@ public class PersistentDataFile {
     this.outputStream = outputStream;
     writeStringPool();
     writeGrammars();
-    writeKeyWordAutomata();
+    writeDerivedTerminalGrammarAutomata();
     writeTokenDfa();
     writeProductionRules();
     writeAstAutomata();
@@ -136,24 +138,37 @@ public class PersistentDataFile {
     }
   }
 
-  private void writeKeyWordAutomata() {
-    LinkedHashMap<Grammar, Integer> grammarIntegerMap = persistentData.grammarIntegerMap;
-    KeyWordAutomata keyWordAutomata =
-        persistentData.astContext.languageGrammar.keyWordAutomataDetail.keyWordAutomata;
+  private void writeDerivedTerminalGrammarAutomata() {
+    DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData =
+        persistentData
+            .astContext
+            .languageGrammar
+            .derivedTerminalGrammarAutomataDetail
+            .derivedTerminalGrammarAutomataData;
+    List<RootTerminalGrammarMap> rootTerminalGrammarMaps =
+        derivedTerminalGrammarAutomataData.rootTerminalGrammarMaps;
 
-    writeInt(keyWordAutomata.emptyOrNot);
+    int count = rootTerminalGrammarMaps.size();
+    writeInt(count);
 
-    if (keyWordAutomata.emptyOrNot == KeyWordAutomata.EMPTY) {
+    if (count == 0) {
       return;
     }
 
-    writeInt(grammarIntegerMap.get(keyWordAutomata.rootKeyWord));
+    for (RootTerminalGrammarMap rootTerminalGrammarMap : rootTerminalGrammarMaps) {
+      writeRootTerminalGrammarMap(rootTerminalGrammarMap);
+    }
+  }
 
-    int keyWordsSize = keyWordAutomata.textTerminalMap.size();
+  private void writeRootTerminalGrammarMap(RootTerminalGrammarMap rootTerminalGrammarMap) {
+    LinkedHashMap<Grammar, Integer> grammarIntegerMap = persistentData.grammarIntegerMap;
+    writeInt(grammarIntegerMap.get(rootTerminalGrammarMap.rootTerminalGrammar));
+
+    int keyWordsSize = rootTerminalGrammarMap.textTerminalMap.size();
     writeInt(keyWordsSize);
 
     LinkedHashMap<String, Integer> stringPool = persistentData.stringPool;
-    for (Entry<String, Grammar> entry : keyWordAutomata.textTerminalMap.entrySet()) {
+    for (Entry<String, Grammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
       String text = entry.getKey();
       int intOfText = stringPool.get(text);
       writeInt(intOfText);

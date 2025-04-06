@@ -32,7 +32,7 @@ impl TokenBuilder for SuperDfaTokenAutomata {
         let mut tokens = self.do_build_token(source_code_file_path)?;
         match &self.sub_dfa_token_automata {
             SubDfaTokenAutomata::DfaTokenAutomata(_) => Ok(tokens),
-            SubDfaTokenAutomata::KeyWordDfaTokenAutomata(key_word_dfa_token_automata) => {
+            SubDfaTokenAutomata::DerivedTerminalGrammarAutomata(key_word_dfa_token_automata) => {
                 key_word_dfa_token_automata.build_token(&mut tokens);
                 Ok(tokens)
             }

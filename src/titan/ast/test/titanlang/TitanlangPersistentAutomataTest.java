@@ -14,12 +14,14 @@ public class TitanlangPersistentAutomataTest {
         "D:\\github-pro\\titan\\titan-language-compiler\\src\\resources\\grammar\\";
     String[] testArgs = {
       "-grammarFilePaths",
+      fileDirectory + "titanLanguageAsciiLexer.txt",
+      fileDirectory + "titanLanguageChineseLexer.txt",
+      fileDirectory + "titanLanguageEncodingLexer.txt",
       fileDirectory + "titanLanguageNotTextTokenLexer.txt",
       fileDirectory + "titanLanguageNumberLiteralLexer.txt",
       fileDirectory + "titanLanguageCharsLiteralLexer.txt",
       fileDirectory + "titanLanguagePunctuationLexer.txt",
       fileDirectory + "titanLanguageIdentifierLexer.txt",
-      fileDirectory + "titanLanguageKeyWordLexer.txt",
       fileDirectory + "titanLanguageParser.txt",
       "-persistentAutomataFilePath",
       fileDirectory + "titanLanguageGrammar.automata"

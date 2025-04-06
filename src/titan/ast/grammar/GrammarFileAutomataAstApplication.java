@@ -8,13 +8,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import titan.ast.AstContext;
 import titan.ast.AstRuntimeException;
+import titan.ast.grammar.DerivedTerminalGrammarAutomataDetail.RootTerminalGrammarMapDetail;
 import titan.ast.grammar.ambiguity.GrammarAmbiguousJudge;
 import titan.ast.grammar.ambiguity.GrammarAmbiguousJudgeResult;
 import titan.ast.grammar.io.LanguageGrammarInitializer;
 import titan.ast.grammar.regexp.LanguageGrammarRegExpBuilder;
 import titan.ast.grammar.syntax.DfaAstAutomataBuilder;
 import titan.ast.grammar.syntax.ProductionRuleBuilder;
-import titan.ast.grammar.token.KeyWordAutomataBuilder;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataDataBuilder;
 import titan.ast.grammar.token.TokenAutomataBuilder;
 import titan.ast.logger.Logger;
 import titan.ast.persistence.PersistentAutomataBuilder;
@@ -65,12 +66,16 @@ public class GrammarFileAutomataAstApplication {
     new LanguageGrammarInitializer().initGrammarByInputStream(grammarFileInputStream);
   }
 
-  /** 为了参与语法自动机的构建,keyWords不参与任何tokenDfa的构建，仅仅是LanguageGrammarInitializer.init(). */
-  private void addKeyWord2Terminals() {
+  /** 为了参与语法自动机的构建,derivedTerminalGrammars不参与任何tokenDfa的构建，参与syntaxDfa的构建. */
+  private void addDerivedTerminalGrammar2Terminals() {
     LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
     // 将keyword 添加到 terminals
-    for (Grammar keyWord : languageGrammar.keyWordAutomataDetail.keyWords.keySet()) {
-      languageGrammar.addGrammar(keyWord);
+    for (RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail :
+        languageGrammar.derivedTerminalGrammarAutomataDetail.rootTerminalGrammarMaps.values()) {
+      for (Grammar derivedTerminalGrammar :
+          rootTerminalGrammarMapDetail.derivedTerminalGrammars.keySet()) {
+        languageGrammar.addGrammar(derivedTerminalGrammar);
+      }
     }
   }
 
@@ -94,11 +99,11 @@ public class GrammarFileAutomataAstApplication {
     // token自动机
     regExpBuilder.buildRegExpOfFragment();
     regExpBuilder.buildRegExpOfTerminal();
-    new KeyWordAutomataBuilder(languageGrammar).build();
+    new DerivedTerminalGrammarAutomataDataBuilder(languageGrammar).build();
     TokenAutomataBuilder tokenAutomataBuilder = new TokenAutomataBuilder();
     tokenAutomataBuilder.build();
+    addDerivedTerminalGrammar2Terminals();
     // 语法自动机
-    addKeyWord2Terminals();
     regExpBuilder.buildRegExpOfNonterminal();
     buildProductionRule(languageGrammar.nonterminals);
     languageGrammar.clearTokens();
@@ -115,8 +120,9 @@ public class GrammarFileAutomataAstApplication {
     LanguageGrammarRegExpBuilder regExpBuilder = new LanguageGrammarRegExpBuilder(languageGrammar);
     regExpBuilder.buildRegExpOfFragment();
     regExpBuilder.buildRegExpOfTerminal();
+    new DerivedTerminalGrammarAutomataDataBuilder(languageGrammar).build();
+    addDerivedTerminalGrammar2Terminals();
 
-    addKeyWord2Terminals();
     regExpBuilder.buildRegExpOfNonterminal();
     // build ProductionRule
     buildProductionRule(languageGrammar.nonterminals);

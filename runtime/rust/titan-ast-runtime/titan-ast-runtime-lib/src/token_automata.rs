@@ -1,6 +1,6 @@
 use crate::{
     ast::Token, dfa_token_automata::DfaTokenAutomata, error::AstAppError,
-    key_word_dfa_token_automata::KeyWordDfaTokenAutomata,
+    derived_terminal_grammar_automata::DerivedTerminalGrammarAutomata,
 };
 
 pub(crate) trait TokenBuilder {
@@ -10,7 +10,7 @@ pub(crate) trait TokenBuilder {
 #[derive(Clone)]
 pub(crate) enum SubDfaTokenAutomata {
     DfaTokenAutomata(DfaTokenAutomata),
-    KeyWordDfaTokenAutomata(KeyWordDfaTokenAutomata),
+    DerivedTerminalGrammarAutomata(DerivedTerminalGrammarAutomata),
 }
 
 impl Default for SubDfaTokenAutomata {

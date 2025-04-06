@@ -40,8 +40,7 @@ add_library(titan-ast-runtime-lib SHARED Ast.cpp Ast.h
         TokenReducingSymbolInputStream.cpp TokenReducingSymbolInputStream.h
         BacktrackingBottomUpBranch.cpp BacktrackingBottomUpBranch.h ReducingSymbol.cpp
         ReducingSymbol.h AstToken.h AstToken.cpp
-        Runtime.h KeyWordAutomata.cpp KeyWordAutomata.h TokenAutomata.h
-        KeyWordDfaTokenAutomata.h KeyWordDfaTokenAutomata.cpp
+        Runtime.h TokenAutomata.h
         TokenAutomataBuilder.cpp TokenAutomataBuilder.h
         AstAutomata.h
         AstAutomataType.h AstAutomataBuilder.cpp
@@ -50,4 +49,8 @@ add_library(titan-ast-runtime-lib SHARED Ast.cpp Ast.h
         AutomataData.cpp AutomataData.h Result.cpp Result.h
         RuntimeAutomataRichAstApplication.cpp RuntimeAutomataRichAstApplication.h
         AstGeneratorResult2RichResultConverter.cpp
-        AstGeneratorResult2RichResultConverter.h)
+        AstGeneratorResult2RichResultConverter.h
+        DerivedTerminalGrammarAutomata.h DerivedTerminalGrammarAutomata.cpp
+        DerivedTerminalGrammarAutomataData.h DerivedTerminalGrammarAutomataData.cpp
+        SingleDerivedTerminalGrammarAutomata.h SingleDerivedTerminalGrammarAutomata.cpp
+        )

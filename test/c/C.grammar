@@ -846,7 +846,7 @@ WhitespaceFragment
     ;
 @TerminalFragmentGrammar end ;
 
-@KeyWord RootKeyWord(Identifier) begin ;
+@DerivedTerminalGrammar derive(Identifier) begin ;
 
 Auto : 'auto' ;
 Break : 'break' ;
@@ -913,4 +913,4 @@ Extension__builtin_va_arg : '__builtin_va_arg' ;
 Extension__builtin_offsetof : '__builtin_offsetof' ;
 Extension__attribute__ : '__attribute__' ;
 
-@KeyWord end ;
+@DerivedTerminalGrammar end ;

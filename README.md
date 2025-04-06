@@ -40,15 +40,15 @@ generate Abstract Syntax Tree by grammar file.
 # quick start
 a regular expression describes the format of grammars:
 
-keywords of statement :  -> ; : # nfa(s,t) regexp
+keywords of statement :  -> ; :
 
-keywords of regular expression:  ()[]''?*+-{}\s
+keywords of regular expression:  ()[]''?*+-{}
 
-default terminal grammar:  Epsilon
+default terminal grammar:  Epsilon Eof
 
 default nonterminal grammar:  augmentedNonterminal
 
-format of grammar's definition : nameOfGrammar  [nfa(start,end) regexp() greediness() laziness() ] : regularExpression [-> skip] ;
+format of grammar's definition : nameOfGrammar  : regularExpression ;
 
 The grammar file should be encoded in 8bits(iso-8859-1) format.
 
@@ -79,10 +79,10 @@ NewlineFragment
 ...
 @TerminalFragmentGrammar end ;
 
-@KeyWord RootKeyWord(Identifier) begin ;
+@DerivedTerminalGrammar derive(Identifier) begin ;
 If : 'if' ;
 ...
-@KeyWord end ;
+@DerivedTerminalGrammar end ;
 ```
 
 java -jar  titan-ast.jar  -grammarFilePath D:/github-pro/titan/titan-ast/test/c/C.grammar -sourceFilePath D:/github-pro/titan/titan-ast/test/c/helloworld.c  -graphicalViewOfAst utf-8

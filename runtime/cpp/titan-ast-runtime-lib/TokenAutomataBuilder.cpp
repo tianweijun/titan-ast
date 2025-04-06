@@ -3,19 +3,22 @@
 //
 
 #include "TokenAutomataBuilder.h"
-#include "KeyWordDfaTokenAutomata.h"
+#include "DerivedTerminalGrammarAutomata.h"
+#include "SingleDerivedTerminalGrammarAutomata.h"
 
 TokenAutomataBuilder::TokenAutomataBuilder() = default;
 
 TokenAutomata *TokenAutomataBuilder::build(AutomataData *automataData) {
-  const KeyWordAutomata *keyWordAutomata = automataData->keyWordAutomata;
+  const DerivedTerminalGrammarAutomataData *derivedTerminalGrammarAutomataData
+      = automataData->derivedTerminalGrammarAutomataData;
   const TokenDfa *tokenDfa = automataData->tokenDfa;
   TokenAutomata *tokenAutomata = nullptr;
-  if (keyWordAutomata->emptyOrNot == KeyWordAutomata::EMPTY) {
+  if (derivedTerminalGrammarAutomataData->count==0) {
     tokenAutomata = new DfaTokenAutomata(tokenDfa);
-  }
-  if (keyWordAutomata->emptyOrNot == KeyWordAutomata::NOT_EMPTY) {
-    tokenAutomata = new KeyWordDfaTokenAutomata(keyWordAutomata, tokenDfa);
+  }else if (derivedTerminalGrammarAutomataData->count==1) {
+    tokenAutomata = new SingleDerivedTerminalGrammarAutomata(derivedTerminalGrammarAutomataData, tokenDfa);
+  }else{
+    tokenAutomata = new DerivedTerminalGrammarAutomata(derivedTerminalGrammarAutomataData, tokenDfa);
   }
   return tokenAutomata;
 }

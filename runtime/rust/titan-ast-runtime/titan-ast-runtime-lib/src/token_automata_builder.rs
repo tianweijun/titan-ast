@@ -1,18 +1,17 @@
 use crate::{
-    automata_data::AutomataData, byte_buffer::ByteBuffer, key_word_automata, key_word_dfa_token_automata::KeyWordDfaTokenAutomata, super_dfa_token_automata::SuperDfaTokenAutomata, token_automata::SubDfaTokenAutomata
+    automata_data::AutomataData, byte_buffer::ByteBuffer, derived_terminal_grammar_automata::DerivedTerminalGrammarAutomata, super_dfa_token_automata::SuperDfaTokenAutomata, token_automata::SubDfaTokenAutomata
 };
 
 pub(crate) fn build(automata_data: &AutomataData) -> SuperDfaTokenAutomata {
     let sub_dfa_token_automata;
 
-    let key_word_empty_or_not = automata_data.key_word_automata.empty_or_not;
-    if key_word_empty_or_not == key_word_automata::EMPTY {
+    if automata_data.derived_terminal_grammar_automata_data.count==0 {
         sub_dfa_token_automata = SubDfaTokenAutomata::DfaTokenAutomata(Default::default());
     } else {
         sub_dfa_token_automata =
-            SubDfaTokenAutomata::KeyWordDfaTokenAutomata(KeyWordDfaTokenAutomata {
-                key_word_automata: automata_data.key_word_automata.clone(),
-            });
+            SubDfaTokenAutomata::DerivedTerminalGrammarAutomata(DerivedTerminalGrammarAutomata::build_derived_terminal_grammar_automata(
+                &automata_data.derived_terminal_grammar_automata_data,
+            ));
     }
 
     let super_token_automata: SuperDfaTokenAutomata = SuperDfaTokenAutomata {

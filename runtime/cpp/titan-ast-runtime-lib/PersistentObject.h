@@ -7,7 +7,7 @@
 
 #include "AutomataData.h"
 #include "Grammar.h"
-#include "KeyWordAutomata.h"
+#include "DerivedTerminalGrammarAutomataData.h"
 #include "PersistentData.h"
 #include "SyntaxDfa.h"
 #include "TokenDfa.h"
@@ -28,7 +28,7 @@ class PersistentObject {
  private:
   BuildAutomataResult initStringPool() const;
   BuildAutomataResult initGrammars() const;
-  BuildAutomataResult initKeyWordAutomata();
+  BuildAutomataResult initDerivedTerminalGrammarAutomataData();
   BuildAutomataResult initTokenDfa();
   BuildAutomataResult initProductionRules() const;
 
@@ -42,7 +42,7 @@ class PersistentObject {
 
  public:
   PersistentData *persistentData;
-  const KeyWordAutomata *keyWordAutomata;
+  const DerivedTerminalGrammarAutomataData *derivedTerminalGrammarAutomataData;
   const TokenDfa *tokenDfa;
 
   AstAutomataType astAutomataType;

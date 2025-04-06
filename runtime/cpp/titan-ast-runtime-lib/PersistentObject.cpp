@@ -6,13 +6,15 @@
 #include "AstAutomataType.h"
 
 PersistentObject::PersistentObject()
-    : persistentData(nullptr), keyWordAutomata(nullptr), tokenDfa(nullptr),
+    : persistentData(nullptr), derivedTerminalGrammarAutomataData(nullptr),
+      tokenDfa(nullptr),
       astAutomataType(AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA),
       astDfa(nullptr), startGrammar(nullptr), eofGrammar(nullptr),
       nonterminalFollowMap(nullptr) {}
 
 PersistentObject::PersistentObject(PersistentData *persistentData)
-    : persistentData(persistentData), keyWordAutomata(nullptr),
+    : persistentData(persistentData),
+      derivedTerminalGrammarAutomataData(nullptr),
       astAutomataType(AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA),
       tokenDfa(nullptr), astDfa(nullptr), startGrammar(nullptr),
       eofGrammar(nullptr), nonterminalFollowMap(nullptr) {
@@ -43,7 +45,7 @@ BuildAutomataResult PersistentObject::init() {
     persistentData->compact();
     return buildAutomataResult;
   }
-  buildAutomataResult = initKeyWordAutomata();
+  buildAutomataResult = initDerivedTerminalGrammarAutomataData();
   if (!buildAutomataResult.isOk) {
     persistentData->compact();
     return buildAutomataResult;
@@ -73,12 +75,12 @@ BuildAutomataResult PersistentObject::initAstAutomata() {
   BuildAutomataResult buildAutomataResult;
   astAutomataType = getAstAutomataTypeResult.data;
   switch (astAutomataType) {
-    case AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
-      buildAutomataResult = initBacktrackingBottomUpAstAutomata();
-      break;
-    case AstAutomataType::FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
-      buildAutomataResult = initFollowFilterBacktrackingBottomUpAstAutomata();
-      break;
+  case AstAutomataType::BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+    buildAutomataResult = initBacktrackingBottomUpAstAutomata();
+    break;
+  case AstAutomataType::FOLLOW_FILTER_BACKTRACKING_BOTTOM_UP_AST_AUTOMATA:
+    buildAutomataResult = initFollowFilterBacktrackingBottomUpAstAutomata();
+    break;
   }
   return buildAutomataResult;
 }
@@ -172,13 +174,13 @@ BuildAutomataResult PersistentObject::initTokenDfa() {
   return {true, ""};
 }
 
-BuildAutomataResult PersistentObject::initKeyWordAutomata() {
-  GetKeyWordAutomataByInputStreamResult getKeyWordAutomataByInputStreamResult =
-      persistentData->getKeyWordAutomataByInputStream();
-  if (!getKeyWordAutomataByInputStreamResult.isOk) {
+BuildAutomataResult PersistentObject::initDerivedTerminalGrammarAutomataData() {
+  GetDerivedTerminalGrammarAutomataDataByInputStreamResult result =
+      persistentData->getDerivedTerminalGrammarAutomataDataByInputStream();
+  if (!result.isOk) {
     return persistentData->sourceDataError();
   }
-  keyWordAutomata = getKeyWordAutomataByInputStreamResult.data;
+  derivedTerminalGrammarAutomataData = result.data;
   return {true, ""};
 }
 
@@ -213,7 +215,7 @@ void *PersistentObject::setAutomataData(AutomataData *automataData) const {
   automataData->sizeOfProductionRules =
       this->persistentData->sizeOfProductionRules;
   // token dfa
-  automataData->keyWordAutomata = keyWordAutomata;
+  automataData->derivedTerminalGrammarAutomataData = derivedTerminalGrammarAutomataData;
   automataData->tokenDfa = tokenDfa;
   // ast dfa
   automataData->astAutomataType = astAutomataType;

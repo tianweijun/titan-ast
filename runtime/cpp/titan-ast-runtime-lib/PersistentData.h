@@ -7,7 +7,7 @@
 #include "AstAutomataType.h"
 #include "ByteBuffer.h"
 #include "Grammar.h"
-#include "KeyWordAutomata.h"
+#include "DerivedTerminalGrammarAutomataData.h"
 #include "ProductionRule.h"
 #include "Result.h"
 #include "TokenDfa.h"
@@ -43,10 +43,15 @@ struct GetProductionRulesByInputStreamResult {
   int size{0};
 };
 
-struct GetKeyWordAutomataByInputStreamResult {
+struct GetDerivedTerminalGrammarAutomataDataByInputStreamResult {
   bool isOk{false};
-  KeyWordAutomata *data{nullptr};
+  DerivedTerminalGrammarAutomataData *data{nullptr};
 };
+
+struct GetRootTerminalGrammarMapByInputStreamResult {
+  bool isOk{false};
+};
+
 
 struct GetGrammarsByInputStreamResult {
   bool isOk{false};
@@ -97,14 +102,24 @@ class PersistentData {
   int sizeOfProductionRules;
 
   GetSyntaxDfaByInputStreamResult getSyntaxDfaByInputStream();
+  void deleteSyntaxDfaStates(SyntaxDfaState **syntaxDfaStates,int sizeOfSyntaxDfaStates);
   GetProductionRulesByInputStreamResult getProductionRulesByInputStream();
+  void deleteProductionRules(ProductionRule **productionRules,
+                             int sizeOfProductionRules);
   GetGrammarByInputStreamResult getGrammarByInputStream();
   GetTokenDfaByInputStreamResult getTokenDfaByInputStream();
-  GetKeyWordAutomataByInputStreamResult getKeyWordAutomataByInputStream();
+  void deleteTokenDfaStates(TokenDfaState **tokenDfaStates,
+                            int sizeOfTokenDfaStates);
+  GetDerivedTerminalGrammarAutomataDataByInputStreamResult
+  getDerivedTerminalGrammarAutomataDataByInputStream();
+  GetRootTerminalGrammarMapByInputStreamResult getRootTerminalGrammarMapByInputStream(
+      std::vector<RootTerminalGrammarMap> *rootTerminalGrammarMaps);
   GetGrammarsByInputStreamResult getGrammarsByInputStream();
+  void deleteGrammars(Grammar **grammars, int sizeOfGrammars);
   Grammar *newGrammarByType(GrammarType type, int indexOfGrammar);
   ReadStringResult readByteString(int countOfStringBytes);
   GetStringPoolByInputStreamResult getStringPoolByInputStream();
+  void deleteStrings(std::string **strings, int sizeOfStrings);
   GetAstAutomataTypeResult getAstAutomataTypeByInputStream();
   GetNonterminalFollowMapByInputStreamResult
   getNonterminalFollowMapByInputStream();

@@ -367,7 +367,7 @@ IdentifierPart
 
 @TerminalFragmentGrammar end ;
 
-@KeyWord  RootKeyWord(Identifier) begin ;
+@DerivedTerminalGrammar derive(Identifier) begin ;
 
 ABSTRACT : 'abstract' ;
 ASSERT : 'assert' ;
@@ -420,4 +420,4 @@ VOID : 'void' ;
 VOLATILE : 'volatile' ;
 WHILE : 'while' ;
 
-@KeyWord end ;
+@DerivedTerminalGrammar end ;
