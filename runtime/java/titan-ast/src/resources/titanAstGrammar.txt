@@ -94,7 +94,7 @@ nonterminalGrammarCompositeRegExp :
    nonterminalGrammarUnitRegExp ('|'? nonterminalGrammarUnitRegExp)*
 ;
 productionRule : 
-   nonterminalGrammarCompositeRegExp productionRuleAlias
+   nonterminalGrammarCompositeRegExp ProductionRuleAlias
 ;
 productionRules :
    productionRule ('|'? productionRule)*
@@ -169,7 +169,7 @@ GrammarUnitRegExp : GrammarUnitRegExpFragment ;
 SequenceCharsUnitRegExp : SequenceCharsUnitRegExpFragment ;
 OneCharOptionCharsetUnitRegExp : OneCharOptionCharsetUnitRegExpFragment ;
 ParenthesisUnitRegExpPrefix : '(' ;
-ParenthesisUnitRegExpSuffix : parenthesisUnitRegExpSuffixFragment ;
+ParenthesisUnitRegExpSuffix : ParenthesisUnitRegExpSuffixFragment ;
 
 NfaTerminalGrammarAttribute : NfaTerminalGrammarAttributeFragment ;
 LazinessTerminalGrammarAttribute :  LazinessTerminalGrammarAttributeFragment ;
@@ -206,7 +206,7 @@ CharsForOneCharOptionCharsetUnitRegExp :
 
 RepeatTimes :
       '?'
-      | *'
+      | '*'
       | '+'
       | '{' naturalNumber? ',' naturalNumber? '}'
 ;
@@ -216,6 +216,7 @@ SequenceCharsUnitRegExpFragment :
   '\'' CharsForSequenceCharsUnitRegExp '\'' RepeatTimes ;
 OneCharOptionCharsetUnitRegExpFragment : 
   '[' CharsForOneCharOptionCharsetUnitRegExp ']' RepeatTimes ;
+ParenthesisUnitRegExpSuffixFragment : ')' RepeatTimes ;
   
 NfaTerminalGrammarAttributeFragment : 'nfa' '(' IdentifierFragment ',' IdentifierFragment  ')' ;
 LazinessTerminalGrammarAttributeFragment :  'laziness()' ;
