@@ -1,6 +1,5 @@
 package titan.ast;
 
-import titan.ast.grammar.GrammarFileAutomataAstApplication;
 import titan.ast.input.CommandLineArgParser;
 import titan.ast.input.CommandLineParameters;
 import titan.ast.logger.Logger;
@@ -52,30 +51,24 @@ public class CommandLineAstApplication {
   private void buildByGrammarFile(CommandLineParameters commandLineParameters) {
     if (!(commandLineParameters.isPersistentAutomata()
         || commandLineParameters.isBuildingAstByGrammarFile()
-        || commandLineParameters.isAmbiguous()
-        || commandLineParameters.isBuildingAstVisitor())) {
+        || commandLineParameters.isAmbiguous())) {
       return;
     }
+    AstContext.init();
     GrammarFileAutomataAstApplication grammarFileAutomataAstApplication =
-        new GrammarFileAutomataAstApplication();
+        GrammarFileAutomataAstApplicationFactory.create();
     // build context
-    grammarFileAutomataAstApplication.setAstAutomataContext(commandLineParameters.grammarFilePaths);
+    if (commandLineParameters.isPersistentAutomata()
+        || commandLineParameters.isBuildingAstByGrammarFile()) {
+      grammarFileAutomataAstApplication.setAstAutomataContext(
+          commandLineParameters.grammarFilePaths);
+    }
 
     isAmbiguous(grammarFileAutomataAstApplication, commandLineParameters);
-    buildAstVisitor(grammarFileAutomataAstApplication, commandLineParameters);
     persistAutomata(grammarFileAutomataAstApplication, commandLineParameters);
     buildAstByGrammarFile(grammarFileAutomataAstApplication, commandLineParameters);
 
-    grammarFileAutomataAstApplication.clear();
-  }
-
-  private void buildAstVisitor(
-      GrammarFileAutomataAstApplication grammarFileAutomataAstApplication,
-      CommandLineParameters commandLineParameters) {
-    if (commandLineParameters.isBuildingAstVisitor()) {
-      grammarFileAutomataAstApplication.generateAstVisitor(
-          commandLineParameters.astVisitorFileDirectory, commandLineParameters.astVisitorPackage);
-    }
+    AstContext.clear();
   }
 
   private void isAmbiguous(
@@ -99,15 +92,17 @@ public class CommandLineAstApplication {
       GrammarFileAutomataAstApplication grammarFileAutomataAstApplication,
       CommandLineParameters commandLineParameters) {
     if (commandLineParameters.isBuildingAstByGrammarFile()) {
-      grammarFileAutomataAstApplication.setRuntimeAstApplicationCharset(
+      RuntimeAutomataRichAstApplication runtimeAutomataRichAstApplication =
+          grammarFileAutomataAstApplication.getRuntimeAutomataRichAstApplication();
+      runtimeAutomataRichAstApplication.setCharset(
           commandLineParameters.graphicalViewOfAstCharSet);
       RichAstGeneratorResult astGeneratorResult =
-          grammarFileAutomataAstApplication.buildAst(commandLineParameters.sourceFilePath);
+          runtimeAutomataRichAstApplication.buildRichAst(commandLineParameters.sourceFilePath);
       if (!astGeneratorResult.isOk()) {
         Logger.info(astGeneratorResult.getErrorMsg());
       }
       if (commandLineParameters.graphicalViewOfAst && astGeneratorResult.isOk()) {
-        grammarFileAutomataAstApplication.displayGraphicalViewOfAst(astGeneratorResult.getOkAst());
+        runtimeAutomataRichAstApplication.displayGraphicalViewOfAst(astGeneratorResult.getOkAst());
       }
     }
   }

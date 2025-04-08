@@ -1,0 +1,82 @@
+package titan.ast.impl.ast.contextast;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import titan.ast.AstRuntimeException;
+import titan.ast.runtime.Ast;
+import titan.ast.runtime.NonterminalAst;
+import titan.ast.runtime.TerminalAst;
+
+/**
+ * .
+ *
+ * @author tian wei jun
+ */
+public class Ast2ContextAstConvertor {
+
+  final Ast source;
+  final String primaryPackage;
+
+  public Ast2ContextAstConvertor(Ast source, String primaryPackage) {
+    this.source = source;
+    this.primaryPackage = primaryPackage;
+  }
+
+  public ContextAst convert() {
+    return doConvert(source);
+  }
+
+  private ContextAst doConvert(Ast ast) {
+    ContextAst contextAst = createContextAstInstance(ast);
+    ArrayList<ContextAst> contextAstChildren = new ArrayList<>(ast.children.size());
+    for (Ast astChild : ast.children) {
+      ContextAst child = doConvert(astChild);
+      child.parent = contextAst;
+      contextAstChildren.add(child);
+    }
+    contextAst.children = contextAstChildren;
+    return contextAst;
+  }
+
+  /**
+   * createContextAstInstance
+   * @param ast ast
+   * @return ContextAst  ContextAst.parent and ContextAst.parent is not set.
+   */
+  private ContextAst createContextAstInstance(Ast ast) {
+    if (ast instanceof TerminalAst terminalAst) {
+      TerminalContextAst terminalContextAst = new TerminalContextAst();
+      terminalContextAst.grammar = terminalAst.grammar;
+      terminalContextAst.token = terminalAst.token;
+      return terminalContextAst;
+    }
+
+    if (ast instanceof NonterminalAst nonterminalAst) {
+      String className = getNonterminalContextAstClassName(nonterminalAst);
+      NonterminalContextAst nonterminalContextAst;
+      try {
+        Class<?> contextClass = Class.forName(className);
+        Constructor<?> constructor = contextClass.getDeclaredConstructor();
+        nonterminalContextAst = (NonterminalContextAst) constructor.newInstance();
+      } catch (ClassNotFoundException
+               | NoSuchMethodException
+               | IllegalAccessException
+               | InstantiationException
+               | InvocationTargetException e) {
+        throw new AstRuntimeException(e);
+      }
+      nonterminalContextAst.grammar = nonterminalAst.grammar;
+      nonterminalContextAst.alias = nonterminalAst.alias;
+      return nonterminalContextAst;
+    }
+    return null;
+  }
+
+  private String getNonterminalContextAstClassName(NonterminalAst nonterminalAst) {
+    String className = nonterminalAst.grammar.name;
+    className = className.substring(0, 1).toUpperCase() + className.substring(1);
+    className = primaryPackage +"." + className + "Ast";
+    return className;
+  }
+}

@@ -1,0 +1,39 @@
+package titan.ast.impl.ast;
+
+import java.io.InputStream;
+import titan.ast.logger.Logger;
+import titan.ast.runtime.AutomataDataIoException;
+import titan.ast.runtime.RuntimeAutomataRichAstApplication;
+
+/**
+ * .
+ *
+ * @author tian wei jun
+ */
+public class RuntimeAutomataRichAstApplicationFactory {
+
+  private static final String GRAMMAR_AUTOMATA_RESOUCES_PATH =
+      "titanAstGrammar.automata";
+  private static RuntimeAutomataRichAstApplication astApplication = null;
+
+  public static RuntimeAutomataRichAstApplication getAstApplication() {
+    if (astApplication != null) {
+      return astApplication;
+    }
+    synchronized (RuntimeAutomataRichAstApplicationFactory.class) {
+      if (null == astApplication) {
+        InputStream automataInputStream =
+            RuntimeAutomataRichAstApplicationFactory.class.getClassLoader()
+                .getResourceAsStream(GRAMMAR_AUTOMATA_RESOUCES_PATH);
+        astApplication = new RuntimeAutomataRichAstApplication();
+        try {
+          astApplication.setContext(automataInputStream);
+        } catch (AutomataDataIoException e) {
+          Logger.info(e.getMessage());
+          System.exit(1);
+        }
+      }
+    }
+    return astApplication;
+  }
+}

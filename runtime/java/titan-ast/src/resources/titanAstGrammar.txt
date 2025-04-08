@@ -44,16 +44,27 @@ terminalFragmentGrammarBlock :
 // -------------terminalGrammar------------------
 terminalGrammarBeginning : '@TerminalGrammar' 'begin' ;
 terminalGrammarEnd : '@TerminalGrammar' 'end' ;
-nfaTerminalGrammarAttribute : NfaTerminalGrammarAttribute ;
-lazinessTerminalGrammarAttribute :  LazinessTerminalGrammarAttribute ;
-terminalGrammarAttributes :
-   nfaTerminalGrammarAttribute | lazinessTerminalGrammarAttribute
+terminalGrammarAction :  Arrow Skip ;
+nfaTerminalGrammarAttributes :
+   NfaTerminalGrammarAttribute LazinessTerminalGrammarAttribute?
+;
+regExpTerminalGrammarAttributes :
+   LazinessTerminalGrammarAttribute
+;
+nfaTerminalGrammar :
+ identifier nfaTerminalGrammarAttributes? ':'
+     NfaEdge+
+	 terminalGrammarAction?
+	 ';'
+;
+regExpTerminalGrammar :
+   identifier regExpTerminalGrammarAttributes? ':'
+     terminalGrammarCompositeRegExp
+	 terminalGrammarAction?
+	 ';'
 ;
 terminalGrammar :
-   identifier terminalGrammarAttributes? ':' 
-     terminalGrammarCompositeRegExp  
-	 terminalGrammarAction?   
-	 ';'
+   nfaTerminalGrammar | regExpTerminalGrammar
 ;
 terminalGrammarBlock :
    terminalGrammarBeginning
@@ -128,8 +139,6 @@ identifier :
  | Skip
 ;
 
-terminalGrammarAction :  Arrow Skip ;
-
 @NonterminalGrammar end ;
 
 @TerminalGrammar begin ;
@@ -174,6 +183,7 @@ ParenthesisUnitRegExpSuffix : ParenthesisUnitRegExpSuffixFragment ;
 NfaTerminalGrammarAttribute : NfaTerminalGrammarAttributeFragment ;
 LazinessTerminalGrammarAttribute :  LazinessTerminalGrammarAttributeFragment ;
 DerivedTerminalGrammarAttribute : DerivedTerminalGrammarAttributeFragment ;
+NfaEdge : NfaEdgeFragment ;
 
 ProductionRuleAlias : ProductionRuleAliasFragment ;
 
@@ -193,12 +203,12 @@ HexadecimalEscapeChar :
       '\\' [xX] HexadecimalDigit
     | '\\' [xX] HexadecimalDigit HexadecimalDigit
 ;
-CharsForSequenceCharsUnitRegExp :
+CharsForSequenceChars :
         ~['] | '\\\''
         | HexadecimalEscapeChar
         | '\\' [0\\abfnrtv]
 ;
-CharsForOneCharOptionCharsetUnitRegExp :
+CharsForOneCharOptionCharset :
        ~[\]] | '\\]'
        | HexadecimalEscapeChar
        | '\\' [0\\abfnrtv]
@@ -213,14 +223,18 @@ RepeatTimes :
 
 GrammarUnitRegExpFragment : IdentifierFragment RepeatTimes ;
 SequenceCharsUnitRegExpFragment : 
-  '\'' CharsForSequenceCharsUnitRegExp '\'' RepeatTimes ;
+  '\'' CharsForSequenceChars '\'' RepeatTimes ;
 OneCharOptionCharsetUnitRegExpFragment : 
-  '[' CharsForOneCharOptionCharsetUnitRegExp ']' RepeatTimes ;
+  '~'? '[' CharsForOneCharOptionCharset ']' RepeatTimes ;
 ParenthesisUnitRegExpSuffixFragment : ')' RepeatTimes ;
   
 NfaTerminalGrammarAttributeFragment : 'nfa' '(' IdentifierFragment ',' IdentifierFragment  ')' ;
 LazinessTerminalGrammarAttributeFragment :  'laziness()' ;
 DerivedTerminalGrammarAttributeFragment :  'derive' '(' IdentifierFragment ')' ;
+NfaEdgeFragment :
+    IdentifierFragment '\'' CharsForSequenceChars '\'' IdentifierFragment
+    | IdentifierFragment '~'? '[' CharsForOneCharOptionCharset ']' IdentifierFragment
+;
 
 ProductionRuleAliasFragment : '#'  IdentifierFragment ;
 

@@ -41,8 +41,6 @@ public class CommandLineArgParser {
     GRAPHICAL_VIEW_OF_AST("-graphicalViewOfAst", new GraphicalViewOfAstOptionParser()),
     IS_AMBIGUOUS("--isAmbiguous", new IsAmbiguousOptionParser()),
     HELP("--help", new HelpOptionParser()),
-    AST_VISITOR_FILE_DIRECTORY(
-        "-astVisitorFileDirectory", new AstVisitorFileDirectoryOptionParser()),
     ILLEGAL("", new IllegalOptionParser());
 
     private final String strOptionType;
@@ -170,24 +168,6 @@ public class CommandLineArgParser {
     public void parse(OptionParserDto dto) {
       if (dto.hasNext()) {
         dto.commandLineParameters.automataFilePath = dto.next();
-      }
-    }
-  }
-
-  static class AstVisitorFileDirectoryOptionParser implements OptionParser {
-
-    @Override
-    public void parse(OptionParserDto dto) {
-      if (dto.hasNext()) {
-        dto.commandLineParameters.astVisitorFileDirectory = dto.next();
-        if (dto.hasNext()) {
-          String arg = dto.peek();
-          if (OptionType.isRightStrOption(arg)) { // next is not astVisitorPackage,end.
-            return;
-          }
-          // next is astVisitorPackage,add it.
-          dto.commandLineParameters.astVisitorPackage = dto.next();
-        }
       }
     }
   }

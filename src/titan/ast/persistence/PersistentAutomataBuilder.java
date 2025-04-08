@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.OutputStream;
 import titan.ast.AstContext;
 import titan.ast.logger.Logger;
+import titan.ast.util.FileUtil;
 
 /**
  * 生成持久化自动机.

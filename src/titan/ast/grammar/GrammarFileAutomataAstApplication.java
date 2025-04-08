@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import titan.ast.AstContext;
 import titan.ast.AstRuntimeException;
+import titan.ast.autocode.visitor.ContextAstCodeGenerator;
+import titan.ast.autocode.visitor.VisitorCodeGenerator;
 import titan.ast.grammar.DerivedTerminalGrammarAutomataDetail.RootTerminalGrammarMapDetail;
 import titan.ast.grammar.ambiguity.GrammarAmbiguousJudge;
 import titan.ast.grammar.ambiguity.GrammarAmbiguousJudgeResult;
@@ -205,5 +207,10 @@ public class GrammarFileAutomataAstApplication {
     GrammarAmbiguousJudge grammarAmbiguousJudge = new GrammarAmbiguousJudge();
     GrammarAmbiguousJudgeResult ambiguousJudgeResult = grammarAmbiguousJudge.isAmbiguous();
     Logger.info(ambiguousJudgeResult.toString());
+  }
+
+  public void generateAstVisitor(String astVisitorFileDirectory, String astVisitorPackage) {
+    new ContextAstCodeGenerator(astVisitorFileDirectory, astVisitorPackage).generate();
+    new VisitorCodeGenerator(astVisitorFileDirectory, astVisitorPackage).generate();
   }
 }
