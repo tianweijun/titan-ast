@@ -1,7 +1,7 @@
 package titan.ast.impl.ast;
 
 import java.io.InputStream;
-import titan.ast.logger.Logger;
+import titan.ast.AstRuntimeException;
 import titan.ast.runtime.AutomataDataIoException;
 import titan.ast.runtime.RuntimeAutomataRichAstApplication;
 
@@ -29,8 +29,7 @@ public class RuntimeAutomataRichAstApplicationFactory {
         try {
           astApplication.setContext(automataInputStream);
         } catch (AutomataDataIoException e) {
-          Logger.info(e.getMessage());
-          System.exit(1);
+          throw new AstRuntimeException(e);
         }
       }
     }

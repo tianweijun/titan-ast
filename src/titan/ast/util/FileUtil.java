@@ -68,8 +68,8 @@ public class FileUtil {
     return fileList;
   }
 
-  public static void createtFileIfNotExists(String content, String filaPath) {
-    File file = new File(filaPath);
+  public static void createtFileIfNotExists(String content, String filePath) {
+    File file = new File(filePath);
     if (file.exists()) {
       return;
     }

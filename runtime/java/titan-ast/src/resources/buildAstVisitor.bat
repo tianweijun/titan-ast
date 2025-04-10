@@ -6,6 +6,7 @@ java -jar D:\github-pro\titan\titan-ast\out\artifacts\titan_ast_jar\titan-ast.ja
  -grammarFilePaths^
     titanAstGrammar.txt^
  -astVisitorFileDirectory^
-    %ast_file_dir%
+    %ast_file_dir%^
+    titan.ast.impl.ast.contextast
 
 pause

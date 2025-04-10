@@ -17,7 +17,6 @@ public class AstContext {
 
   public IdGenerator idGenerator = new IdGenerator();
   public LanguageGrammar languageGrammar = null;
-
   public LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap = null;
 
   /**

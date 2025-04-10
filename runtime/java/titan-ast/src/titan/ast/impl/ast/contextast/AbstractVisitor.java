@@ -50,8 +50,13 @@ public class AbstractVisitor implements Visitor {
   }
 
   @Override
-  public void visitTerminalGrammarCompositeRegExpAst(TerminalGrammarCompositeRegExpAst terminalGrammarCompositeRegExpAst) {
-    visitChildren(terminalGrammarCompositeRegExpAst);
+  public void visitExclusiveTerminalGrammarCompositeRegExpAst(ExclusiveTerminalGrammarCompositeRegExpAst exclusiveTerminalGrammarCompositeRegExpAst) {
+    visitChildren(exclusiveTerminalGrammarCompositeRegExpAst);
+  }
+
+  @Override
+  public void visitInclusiveTerminalGrammarCompositeRegExpAst(InclusiveTerminalGrammarCompositeRegExpAst inclusiveTerminalGrammarCompositeRegExpAst) {
+    visitChildren(inclusiveTerminalGrammarCompositeRegExpAst);
   }
 
   @Override
@@ -165,18 +170,13 @@ public class AbstractVisitor implements Visitor {
   }
 
   @Override
-  public void visitNonterminalGrammarCompositeRegExpAst(NonterminalGrammarCompositeRegExpAst nonterminalGrammarCompositeRegExpAst) {
-    visitChildren(nonterminalGrammarCompositeRegExpAst);
+  public void visitExclusiveNonterminalGrammarCompositeRegExpAst(ExclusiveNonterminalGrammarCompositeRegExpAst exclusiveNonterminalGrammarCompositeRegExpAst) {
+    visitChildren(exclusiveNonterminalGrammarCompositeRegExpAst);
   }
 
   @Override
-  public void visitProductionRuleAst(ProductionRuleAst productionRuleAst) {
-    visitChildren(productionRuleAst);
-  }
-
-  @Override
-  public void visitProductionRulesAst(ProductionRulesAst productionRulesAst) {
-    visitChildren(productionRulesAst);
+  public void visitInclusiveNonterminalGrammarCompositeRegExpAst(InclusiveNonterminalGrammarCompositeRegExpAst inclusiveNonterminalGrammarCompositeRegExpAst) {
+    visitChildren(inclusiveNonterminalGrammarCompositeRegExpAst);
   }
 
   @Override

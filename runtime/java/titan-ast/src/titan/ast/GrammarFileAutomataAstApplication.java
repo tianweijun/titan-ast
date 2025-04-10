@@ -6,6 +6,10 @@ import titan.ast.runtime.RuntimeAutomataRichAstApplication;
 
 public abstract class GrammarFileAutomataAstApplication {
 
+  public GrammarFileAutomataAstApplication() {
+    AstContext.init();
+  }
+
   public void setAstAutomataContext(List<String> grammarFilePaths) {
     doBeforeNfa(grammarFilePaths);
     buildTokenNfa();

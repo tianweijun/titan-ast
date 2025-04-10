@@ -5,7 +5,7 @@
 @NonterminalGrammar begin ;
 primaryExpression
     :   Identifier                               	#id_priExp
-    |   ( DigitSequence | Constant )				#const_priExp
+    |   ( DigitSequence | Constant )                #const_priExp
     |   StringLiteral+								#str_priExp
     |   '(' expression ')'							#exp_priExp
     |   genericSelection							#genericSelection_priExp
@@ -536,9 +536,9 @@ StringLiteral
 BlockComment
     nfa(start,end)
      :
-               start'/\*'prefix2
-               prefix2[\*]suffix1 prefix2~[\*]prefix2
-               suffix1[/]end suffix1[\*]suffix1 suffix1~[/\*]prefix2
+               start'/*'prefix2
+               prefix2[*]suffix1 prefix2~[*]prefix2
+               suffix1[/]end suffix1[*]suffix1 suffix1~[/*]prefix2
      -> skip
 ;
 

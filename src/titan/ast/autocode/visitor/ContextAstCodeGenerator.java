@@ -1,6 +1,12 @@
 package titan.ast.autocode.visitor;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import titan.ast.AstContext;
+import titan.ast.AstRuntimeException;
 import titan.ast.autocode.CodeGenerator;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
@@ -12,6 +18,7 @@ import titan.ast.util.FileUtil;
  * @author tian wei jun
  */
 public class ContextAstCodeGenerator {
+  final String AST_2_CONTEXT_AST_CONVERTOR_FLIE_NAME = "Ast2ContextAstConvertor.txt";
   final String contextAstFileDirectory;
   final String javaPackage;
 
@@ -26,6 +33,24 @@ public class ContextAstCodeGenerator {
     createNonterminalContextAst();
     createTerminalContextAst();
     createNonterminalAsts();
+    createAst2ContextAstConvertor();
+  }
+
+  private void createAst2ContextAstConvertor() {
+    String filePath = contextAstFileDirectory + "Ast2ContextAstConvertor.java";
+    File file = new File(filePath);
+    if (file.exists()) {
+      return;
+    }
+    try (InputStream inputStream =
+            this.getClass().getResourceAsStream("/" + AST_2_CONTEXT_AST_CONVERTOR_FLIE_NAME);
+        FileWriter fileWriter = new FileWriter(file); ) {
+      fileWriter.write(javaPackage);
+      fileWriter.write("\n");
+      fileWriter.write(new String(inputStream.readAllBytes(), StandardCharsets.ISO_8859_1));
+    } catch (IOException e) {
+      throw new AstRuntimeException(e);
+    }
   }
 
   private void createTerminalContextAst() {
