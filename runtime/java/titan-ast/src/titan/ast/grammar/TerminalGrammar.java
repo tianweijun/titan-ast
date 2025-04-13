@@ -8,11 +8,13 @@ import titan.ast.fa.token.TokenNfa;
  * @author tian wei jun
  */
 public class TerminalGrammar extends Grammar {
+
   public LookaheadMatchingMode lookaheadMatchingMode = LookaheadMatchingMode.GREEDINESS;
+  public GrammarAction action = GrammarAction.TEXT;
   public TokenNfa tokenNfa;
 
   public TerminalGrammar(String name) {
-    super( GrammarType.TERMINAL,name);
+    super(GrammarType.TERMINAL, name);
   }
 
   @Override

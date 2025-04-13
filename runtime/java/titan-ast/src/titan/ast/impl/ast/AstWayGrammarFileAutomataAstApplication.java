@@ -12,8 +12,8 @@ import titan.ast.impl.ast.regexp.RegExpBuilder;
  */
 public class AstWayGrammarFileAutomataAstApplication extends GrammarFileAutomataAstApplication {
 
-  public AstWayGrammarFileAutomataAstApplication() {
-    super();
+  public AstWayGrammarFileAutomataAstApplication(List<String> grammarFilePaths) {
+    super(grammarFilePaths);
   }
 
   protected void doBeforeNfa(List<String> grammarFilePaths) {
@@ -21,25 +21,5 @@ public class AstWayGrammarFileAutomataAstApplication extends GrammarFileAutomata
       ContextAst contextAst = AstBuilder.build(grammarFilePath);
       new RegExpBuilder(contextAst).build();
     }
-  }
-
-  @Override
-  protected void buildSyntaxDfa() {
-
-  }
-
-  @Override
-  protected void buildSyntaxNfa() {
-
-  }
-
-  @Override
-  protected void buildTokenDfa() {
-
-  }
-
-  @Override
-  protected void buildTokenNfa() {
-
   }
 }

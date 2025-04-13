@@ -1,9 +1,8 @@
 package titan.ast.grammar;
 
-import java.util.ArrayList;
 import java.util.List;
-import titan.ast.grammar.regexp.CompositeRegExp;
-import titan.ast.runtime.Token;
+import java.util.Set;
+import titan.ast.grammar.regexp.OrCompositeRegExp;
 
 /**
  * .
@@ -13,8 +12,9 @@ import titan.ast.runtime.Token;
 public abstract class PrimaryGrammarContent {
 
   public final PrimaryGrammarContentType type;
-
-  public List<Token> tokens = new ArrayList<>();
+  public String grammarName;
+  public Set<GrammarAttribute> grammarAttributes;
+  public GrammarAction grammarAction;
 
   protected PrimaryGrammarContent(PrimaryGrammarContentType type) {
     this.type = type;
@@ -28,8 +28,7 @@ public abstract class PrimaryGrammarContent {
 
   public static class RegExpPrimaryGrammarContent extends PrimaryGrammarContent {
 
-    // 最顶层是作为wrapper的COMPOSITE正则
-    public CompositeRegExp regExp = new CompositeRegExp();
+    public OrCompositeRegExp orCompositeRegExp;
 
     public RegExpPrimaryGrammarContent() {
       super(PrimaryGrammarContentType.REG_EXP);
@@ -38,8 +37,25 @@ public abstract class PrimaryGrammarContent {
 
   public static class NfaPrimaryGrammarContent extends PrimaryGrammarContent {
 
+    public String start;
+    public String end;
+    public List<NfaPrimaryGrammarContentEdge> edges;
+
     public NfaPrimaryGrammarContent() {
       super(PrimaryGrammarContentType.NFA);
+    }
+  }
+
+  public static class NfaPrimaryGrammarContentEdge {
+
+    public String from;
+    public String to;
+    public char[] chars;
+
+    public NfaPrimaryGrammarContentEdge(String from, String to, char[] chars) {
+      this.from = from;
+      this.to = to;
+      this.chars = chars;
     }
   }
 }

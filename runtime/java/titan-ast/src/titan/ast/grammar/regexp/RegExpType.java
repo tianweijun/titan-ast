@@ -1,9 +1,9 @@
 package titan.ast.grammar.regexp;
 
 public enum RegExpType {
-    COMPOSITE,
+    OR_COMPOSITE,
+    AND_COMPOSITE,
     PARENTHESIS,
-    EMPTY,
     GRAMMAR,
     SEQUENCE_CHARS,
     ONE_CHAR_OPTION_CHARSET

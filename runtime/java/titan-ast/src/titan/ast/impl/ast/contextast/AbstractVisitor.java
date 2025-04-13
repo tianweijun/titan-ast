@@ -40,23 +40,48 @@ public class AbstractVisitor implements Visitor {
   }
 
   @Override
-  public void visitParenthesisTerminalGrammarUnitRegExpAst(ParenthesisTerminalGrammarUnitRegExpAst parenthesisTerminalGrammarUnitRegExpAst) {
-    visitChildren(parenthesisTerminalGrammarUnitRegExpAst);
+  public void visitParenthesisUnitRegExpAst(ParenthesisUnitRegExpAst parenthesisUnitRegExpAst) {
+    visitChildren(parenthesisUnitRegExpAst);
   }
 
   @Override
-  public void visitTerminalGrammarUnitRegExpAst(TerminalGrammarUnitRegExpAst terminalGrammarUnitRegExpAst) {
-    visitChildren(terminalGrammarUnitRegExpAst);
+  public void visitUnitRegExpAst(UnitRegExpAst unitRegExpAst) {
+    visitChildren(unitRegExpAst);
   }
 
   @Override
-  public void visitExclusiveTerminalGrammarCompositeRegExpAst(ExclusiveTerminalGrammarCompositeRegExpAst exclusiveTerminalGrammarCompositeRegExpAst) {
-    visitChildren(exclusiveTerminalGrammarCompositeRegExpAst);
+  public void visitAndCompositeRegExpAst(AndCompositeRegExpAst andCompositeRegExpAst) {
+    visitChildren(andCompositeRegExpAst);
   }
 
   @Override
-  public void visitInclusiveTerminalGrammarCompositeRegExpAst(InclusiveTerminalGrammarCompositeRegExpAst inclusiveTerminalGrammarCompositeRegExpAst) {
-    visitChildren(inclusiveTerminalGrammarCompositeRegExpAst);
+  public void visitExclusiveOrCompositeRegExpAst(ExclusiveOrCompositeRegExpAst exclusiveOrCompositeRegExpAst) {
+    visitChildren(exclusiveOrCompositeRegExpAst);
+  }
+
+  @Override
+  public void visitInclusiveOrCompositeRegExpAst(InclusiveOrCompositeRegExpAst inclusiveOrCompositeRegExpAst) {
+    visitChildren(inclusiveOrCompositeRegExpAst);
+  }
+
+  @Override
+  public void visitGrammarAttributeAst(GrammarAttributeAst grammarAttributeAst) {
+    visitChildren(grammarAttributeAst);
+  }
+
+  @Override
+  public void visitGrammarAttributesAst(GrammarAttributesAst grammarAttributesAst) {
+    visitChildren(grammarAttributesAst);
+  }
+
+  @Override
+  public void visitGrammarActionAst(GrammarActionAst grammarActionAst) {
+    visitChildren(grammarActionAst);
+  }
+
+  @Override
+  public void visitRegExpGrammarAst(RegExpGrammarAst regExpGrammarAst) {
+    visitChildren(regExpGrammarAst);
   }
 
   @Override
@@ -67,11 +92,6 @@ public class AbstractVisitor implements Visitor {
   @Override
   public void visitTerminalFragmentGrammarEndAst(TerminalFragmentGrammarEndAst terminalFragmentGrammarEndAst) {
     visitChildren(terminalFragmentGrammarEndAst);
-  }
-
-  @Override
-  public void visitTerminalFragmentGrammarAst(TerminalFragmentGrammarAst terminalFragmentGrammarAst) {
-    visitChildren(terminalFragmentGrammarAst);
   }
 
   @Override
@@ -90,28 +110,8 @@ public class AbstractVisitor implements Visitor {
   }
 
   @Override
-  public void visitTerminalGrammarActionAst(TerminalGrammarActionAst terminalGrammarActionAst) {
-    visitChildren(terminalGrammarActionAst);
-  }
-
-  @Override
-  public void visitNfaTerminalGrammarAttributesAst(NfaTerminalGrammarAttributesAst nfaTerminalGrammarAttributesAst) {
-    visitChildren(nfaTerminalGrammarAttributesAst);
-  }
-
-  @Override
-  public void visitRegExpTerminalGrammarAttributesAst(RegExpTerminalGrammarAttributesAst regExpTerminalGrammarAttributesAst) {
-    visitChildren(regExpTerminalGrammarAttributesAst);
-  }
-
-  @Override
   public void visitNfaTerminalGrammarAst(NfaTerminalGrammarAst nfaTerminalGrammarAst) {
     visitChildren(nfaTerminalGrammarAst);
-  }
-
-  @Override
-  public void visitRegExpTerminalGrammarAst(RegExpTerminalGrammarAst regExpTerminalGrammarAst) {
-    visitChildren(regExpTerminalGrammarAst);
   }
 
   @Override
@@ -135,16 +135,6 @@ public class AbstractVisitor implements Visitor {
   }
 
   @Override
-  public void visitDerivedTerminalGrammarCompositeRegExpAst(DerivedTerminalGrammarCompositeRegExpAst derivedTerminalGrammarCompositeRegExpAst) {
-    visitChildren(derivedTerminalGrammarCompositeRegExpAst);
-  }
-
-  @Override
-  public void visitDerivedTerminalGrammarAst(DerivedTerminalGrammarAst derivedTerminalGrammarAst) {
-    visitChildren(derivedTerminalGrammarAst);
-  }
-
-  @Override
   public void visitDerivedTerminalGrammarBlockAst(DerivedTerminalGrammarBlockAst derivedTerminalGrammarBlockAst) {
     visitChildren(derivedTerminalGrammarBlockAst);
   }
@@ -157,31 +147,6 @@ public class AbstractVisitor implements Visitor {
   @Override
   public void visitNonterminalGrammarEndAst(NonterminalGrammarEndAst nonterminalGrammarEndAst) {
     visitChildren(nonterminalGrammarEndAst);
-  }
-
-  @Override
-  public void visitParenthesisNonterminalGrammarUnitRegExpAst(ParenthesisNonterminalGrammarUnitRegExpAst parenthesisNonterminalGrammarUnitRegExpAst) {
-    visitChildren(parenthesisNonterminalGrammarUnitRegExpAst);
-  }
-
-  @Override
-  public void visitNonterminalGrammarUnitRegExpAst(NonterminalGrammarUnitRegExpAst nonterminalGrammarUnitRegExpAst) {
-    visitChildren(nonterminalGrammarUnitRegExpAst);
-  }
-
-  @Override
-  public void visitExclusiveNonterminalGrammarCompositeRegExpAst(ExclusiveNonterminalGrammarCompositeRegExpAst exclusiveNonterminalGrammarCompositeRegExpAst) {
-    visitChildren(exclusiveNonterminalGrammarCompositeRegExpAst);
-  }
-
-  @Override
-  public void visitInclusiveNonterminalGrammarCompositeRegExpAst(InclusiveNonterminalGrammarCompositeRegExpAst inclusiveNonterminalGrammarCompositeRegExpAst) {
-    visitChildren(inclusiveNonterminalGrammarCompositeRegExpAst);
-  }
-
-  @Override
-  public void visitNonterminalGrammarAst(NonterminalGrammarAst nonterminalGrammarAst) {
-    visitChildren(nonterminalGrammarAst);
   }
 
   @Override

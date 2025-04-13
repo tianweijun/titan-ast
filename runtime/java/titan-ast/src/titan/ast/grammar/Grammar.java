@@ -11,8 +11,8 @@ public abstract class Grammar implements Comparable<Grammar> {
   public final GrammarType type;
   public final String name;
 
+  // transient
   public PrimaryGrammarContent primaryGrammarContent;
-
 
   public Grammar(GrammarType type, String name) {
     this.type = type;

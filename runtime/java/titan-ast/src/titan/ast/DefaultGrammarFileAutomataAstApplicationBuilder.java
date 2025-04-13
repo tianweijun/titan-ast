@@ -29,10 +29,9 @@ public class DefaultGrammarFileAutomataAstApplicationBuilder implements GrammarF
     }
     switch (type) {
       case AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION -> {
-        automataAstApplication = new AstWayGrammarFileAutomataAstApplication();
+        automataAstApplication = new AstWayGrammarFileAutomataAstApplication(grammarFilePaths);
       }
     }
-    automataAstApplication.setAstAutomataContext(grammarFilePaths);
   }
 
   @Override

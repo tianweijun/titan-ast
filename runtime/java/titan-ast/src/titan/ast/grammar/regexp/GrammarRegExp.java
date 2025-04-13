@@ -1,16 +1,27 @@
 package titan.ast.grammar.regexp;
 
+import titan.ast.grammar.Grammar;
+
 /**
  * .
  *
  * @author tian wei jun
  */
-public class GrammarRegExp extends RegExp {
+public class GrammarRegExp extends UnitRegExp {
 
-  String grammarName = "";
+  public final String grammarName;
 
-  public GrammarRegExp() {
+  public Grammar grammar;
+
+  public GrammarRegExp(String grammarName) {
     super(RegExpType.GRAMMAR);
+    this.grammarName = grammarName;
+  }
+
+  public GrammarRegExp(String grammarName, RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
+    this(grammarName);
+    this.repMinTimes.setTimes(repMinTimes);
+    this.repMaxTimes.setTimes(repMaxTimes);
   }
 
   @Override

@@ -5,12 +5,12 @@ package titan.ast.grammar;
  *
  * @author tian wei jun
  */
-public enum TerminalGrammarAction {
+public enum GrammarAction {
   TEXT("text"),
   SKIP("skip");
   private final String name;
 
-  TerminalGrammarAction(String name) {
+  GrammarAction(String name) {
     this.name = name;
   }
 
@@ -20,9 +20,9 @@ public enum TerminalGrammarAction {
    * @param name GrammarAction的name
    * @return GrammarAction
    */
-  public static TerminalGrammarAction getActionByString(String name) {
-    TerminalGrammarAction res = TEXT;
-    for (TerminalGrammarAction action : TerminalGrammarAction.values()) {
+  public static GrammarAction getActionByString(String name) {
+    GrammarAction res = TEXT;
+    for (GrammarAction action : GrammarAction.values()) {
       if (action.name.equalsIgnoreCase(name)) {
         res = action;
         break;
@@ -31,7 +31,7 @@ public enum TerminalGrammarAction {
     return res;
   }
 
-  public static titan.ast.runtime.GrammarAction toRuntimeAction(TerminalGrammarAction action) {
+  public static titan.ast.runtime.GrammarAction toRuntimeAction(GrammarAction action) {
     titan.ast.runtime.GrammarAction runtimeAction = titan.ast.runtime.GrammarAction.SKIP;
     switch (action) {
       case TEXT:

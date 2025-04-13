@@ -1,7 +1,9 @@
 package titan.ast.impl.ast.contextast;
 
-public class OneCharOptionCharsetUnitRegExpAst extends NonterminalContextAst {
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp;
 
+public class OneCharOptionCharsetUnitRegExpAst extends NonterminalContextAst {
+   public OneCharOptionCharsetRegExp oneCharOptionCharsetRegExp;
   @Override
   public void accept(Visitor visitor) {
     visitor.visitOneCharOptionCharsetUnitRegExpAst(this);

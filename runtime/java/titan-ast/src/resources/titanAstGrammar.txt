@@ -8,67 +8,54 @@
 
 startGrammar : '@StartGrammar' identifier ';'  ;
 
-// --------------------------UnitRegExp start-------------------------------
+// --------------------------RegExp-------------------------------
 grammarUnitRegExp : identifier | GrammarUnitRegExpRepeatTimes ;
 sequenceCharsUnitRegExp : SequenceCharsUnitRegExp ;
 oneCharOptionCharsetUnitRegExp : OneCharOptionCharsetUnitRegExp ;
-// --------------------------UnitRegExp end---------------------------------
-
-// -----------------------TerminalGrammarRegExp start-----------------------
-
-parenthesisTerminalGrammarUnitRegExp :
-  ParenthesisUnitRegExpPrefix inclusiveTerminalGrammarCompositeRegExp ParenthesisUnitRegExpSuffix
+parenthesisUnitRegExp :
+  ParenthesisUnitRegExpPrefix inclusiveOrCompositeRegExp ParenthesisUnitRegExpSuffix
 ;
-terminalGrammarUnitRegExp :
+unitRegExp :
       grammarUnitRegExp
     | sequenceCharsUnitRegExp
     | oneCharOptionCharsetUnitRegExp
-    | parenthesisTerminalGrammarUnitRegExp
+    | parenthesisUnitRegExp
 ;
-exclusiveTerminalGrammarCompositeRegExp :
-  terminalGrammarUnitRegExp
+andCompositeRegExp : unitRegExp+ ;
+exclusiveOrCompositeRegExp : andCompositeRegExp AndCompositeRegExpAlias? ;
+inclusiveOrCompositeRegExp :
+  exclusiveOrCompositeRegExp
+  | inclusiveOrCompositeRegExp '|' exclusiveOrCompositeRegExp
 ;
-inclusiveTerminalGrammarCompositeRegExp :
-  exclusiveTerminalGrammarCompositeRegExp
-  | inclusiveTerminalGrammarCompositeRegExp '|'? exclusiveTerminalGrammarCompositeRegExp
+
+// --------------------------RegExpGrammar---------------------------------
+grammarAttribute :
+  NfaTerminalGrammarAttribute | LazinessTerminalGrammarAttribute
 ;
+grammarAttributes : grammarAttribute+ ;
+grammarAction :  Arrow Skip ;
+regExpGrammar :
+   identifier grammarAttributes? ':' inclusiveOrCompositeRegExp grammarAction? ';'
+;
+
 // -------------terminalFragmentGrammar------------------
 terminalFragmentGrammarBeginning : '@TerminalFragmentGrammar' 'begin' ';' ;
 terminalFragmentGrammarEnd : '@TerminalFragmentGrammar' 'end' ';' ;
-terminalFragmentGrammar :
-   identifier ':' inclusiveTerminalGrammarCompositeRegExp ';'
-;
 terminalFragmentGrammarBlock :
    terminalFragmentGrammarBeginning
-   terminalFragmentGrammar*
+   regExpGrammar*
    terminalFragmentGrammarEnd
 ;
-
 
 // -------------terminalGrammar------------------
 terminalGrammarBeginning : '@TerminalGrammar' 'begin' ';' ;
 terminalGrammarEnd : '@TerminalGrammar' 'end' ';' ;
-terminalGrammarAction :  Arrow Skip ;
-nfaTerminalGrammarAttributes :
-   NfaTerminalGrammarAttribute LazinessTerminalGrammarAttribute?
-;
-regExpTerminalGrammarAttributes :
-   LazinessTerminalGrammarAttribute
-;
+
 nfaTerminalGrammar :
- identifier nfaTerminalGrammarAttributes? ':'
-     NfaEdge+
-	 terminalGrammarAction?
-	 ';'
-;
-regExpTerminalGrammar :
-   identifier regExpTerminalGrammarAttributes? ':'
-     inclusiveTerminalGrammarCompositeRegExp
-	 terminalGrammarAction?
-	 ';'
+ identifier grammarAttributes? ':' NfaEdge+ grammarAction? ';'
 ;
 terminalGrammar :
-   nfaTerminalGrammar | regExpTerminalGrammar
+   regExpGrammar | nfaTerminalGrammar
 ;
 terminalGrammarBlock :
    terminalGrammarBeginning
@@ -79,49 +66,24 @@ terminalGrammarBlock :
 // -------------DerivedTerminalGrammar------------------
 derivedTerminalGrammarBeginning : '@DerivedTerminalGrammar' DerivedTerminalGrammarAttribute 'begin' ';' ;
 derivedTerminalGrammarEnd : '@DerivedTerminalGrammar' 'end' ';' ;
-derivedTerminalGrammarCompositeRegExp :
-  sequenceCharsUnitRegExp ('|' sequenceCharsUnitRegExp)*
-;
-derivedTerminalGrammar :
-   identifier ':' derivedTerminalGrammarCompositeRegExp ';'
-;
+
 derivedTerminalGrammarBlock :
    derivedTerminalGrammarBeginning
-   derivedTerminalGrammar*
+   regExpGrammar*  // regExpGrammar:sequenceCharsUnitRegExp ('|' sequenceCharsUnitRegExp)*
    derivedTerminalGrammarEnd
 ;
-// -----------------------TerminalGrammarRegExp end-----------------------
 
-
-// -----------------------NonterminalGrammarRegExp start-----------------------
+// -----------------------NonterminalGrammar-----------------------
 nonterminalGrammarBeginning : '@NonterminalGrammar' 'begin' ';' ;
 nonterminalGrammarEnd : '@NonterminalGrammar' 'end' ';' ;
 
-parenthesisNonterminalGrammarUnitRegExp :
-  ParenthesisUnitRegExpPrefix inclusiveNonterminalGrammarCompositeRegExp ParenthesisUnitRegExpSuffix
-;
-nonterminalGrammarUnitRegExp :
-      grammarUnitRegExp
-    | sequenceCharsUnitRegExp
-    | parenthesisNonterminalGrammarUnitRegExp
-;
-exclusiveNonterminalGrammarCompositeRegExp :
- nonterminalGrammarUnitRegExp ProductionRuleAlias?
-;
-inclusiveNonterminalGrammarCompositeRegExp :
-   exclusiveNonterminalGrammarCompositeRegExp
-   | inclusiveNonterminalGrammarCompositeRegExp '|'? exclusiveNonterminalGrammarCompositeRegExp
-;
-nonterminalGrammar :
-   identifier  ':' inclusiveNonterminalGrammarCompositeRegExp ';'
-;
 nonterminalGrammarBlock :
    nonterminalGrammarBeginning
-   nonterminalGrammar*
+   regExpGrammar*
    nonterminalGrammarEnd
 ;
-// -----------------------NonterminalGrammarRegExp end-------------------------
 
+// -----------------------compilationUnit-----------------------
 item :
   startGrammar
   | terminalFragmentGrammarBlock
@@ -130,16 +92,9 @@ item :
   | nonterminalGrammarBlock
 ;
 
-compilationUnit :
-   item+
-;
+compilationUnit : item+ ;
 
-identifier :
- Identifier
- | Begin
- | End
- | Skip
-;
+identifier : Identifier | Begin | End | Skip ;
 
 @NonterminalGrammar end ;
 
@@ -185,7 +140,7 @@ LazinessTerminalGrammarAttribute :  LazinessTerminalGrammarAttributeFragment ;
 DerivedTerminalGrammarAttribute : DerivedTerminalGrammarAttributeFragment ;
 NfaEdge : NfaEdgeFragment ;
 
-ProductionRuleAlias : ProductionRuleAliasFragment ;
+AndCompositeRegExpAlias : AndCompositeRegExpAliasFragment ;
 
 Identifier : IdentifierFragment ;
 
@@ -238,7 +193,7 @@ NfaEdgeFragment :
     | IdentifierFragment '~'? '[' CharForOneCharOptionCharset* ']' IdentifierFragment
 ;
 
-ProductionRuleAliasFragment : '#'  IdentifierFragment ;
+AndCompositeRegExpAliasFragment : '#'  IdentifierFragment ;
 
 @TerminalFragmentGrammar end ;
 

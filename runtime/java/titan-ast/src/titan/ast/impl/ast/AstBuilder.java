@@ -26,7 +26,6 @@ public class AstBuilder {
       throw new AstRuntimeException(getErrorMsg(richAstGeneratorResult));
     }
     return new Ast2ContextAstConvertor(richAstGeneratorResult.getOkAst(), AST_PACKAGE).convert();
-
   }
 
   private static String getErrorMsg(RichAstGeneratorResult richAstGeneratorResult) {

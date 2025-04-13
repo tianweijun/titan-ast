@@ -133,12 +133,8 @@ public class GrammarInitializer {
       String rootTerminalGrammar =
           midTokenText.substring(KW_DERIVE.length() + 1, midTokenText.length() - 1);
       rootTerminalGrammar = GrammarCharset.formatEscapeChar2Char(rootTerminalGrammar, KW_DERIVE);
-      RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail =
+      this.rootTerminalGrammarMapDetail =
           languageGrammar.getRootTerminalGrammarMap(rootTerminalGrammar);
-      if (null == rootTerminalGrammarMapDetail) {
-        throw new AstRuntimeException("the maximum of RootKeyWord grammar is one");
-      }
-      this.rootTerminalGrammarMapDetail = rootTerminalGrammarMapDetail;
       state = State.DERIVED_TERMINAL;
       return;
     }

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
-import titan.ast.AstContext;
 import titan.ast.AstRuntimeException;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.io.GrammarCharset;
@@ -31,7 +30,6 @@ public abstract class AbstractRegExpBuilder {
 
   /** 初始化字段：grammarCharset、splitCharByTextOfRegExp. */
   public AbstractRegExpBuilder() {
-    AstContext astContext = AstContext.get();
     splitCharByTextOfRegExp = GrammarCharset.SPACE;
   }
 

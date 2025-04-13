@@ -1,18 +1,19 @@
 package titan.ast.grammar.regexp;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * .
  *
  * @author tian wei jun
  */
-public class ParenthesisRegExp extends UnitRegExp {
+public class OrCompositeRegExp extends RegExp {
 
-  public OrCompositeRegExp child;
+  public List<AndCompositeRegExp> children = new ArrayList<>();
 
-  public ParenthesisRegExp(OrCompositeRegExp orCompositeRegExp) {
-    super(RegExpType.PARENTHESIS);
-    this.child = orCompositeRegExp;
+  public OrCompositeRegExp() {
+    super(RegExpType.OR_COMPOSITE);
   }
 
   @Override
@@ -27,14 +28,14 @@ public class ParenthesisRegExp extends UnitRegExp {
       return false;
     }
 
-    ParenthesisRegExp that = (ParenthesisRegExp) o;
-    return child.equals(that.child);
+    OrCompositeRegExp that = (OrCompositeRegExp) o;
+    return children.equals(that.children);
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + child.hashCode();
+    result = 31 * result + children.hashCode();
     return result;
   }
 }

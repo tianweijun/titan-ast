@@ -14,6 +14,7 @@ import titan.ast.fa.FaStateType;
  */
 public class TokenNfa implements Cloneable {
 
+  public static final int EPSILON = 0x100;
   public TokenNfaState start;
   public TokenNfaState end;
 

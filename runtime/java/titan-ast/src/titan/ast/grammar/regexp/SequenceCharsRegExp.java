@@ -1,18 +1,23 @@
 package titan.ast.grammar.regexp;
 
-import java.util.Arrays;
-
 /**
  * .
  *
  * @author tian wei jun
  */
-public class SequenceCharsRegExp extends RegExp {
+public class SequenceCharsRegExp extends UnitRegExp {
 
-  public char[] chars = new char[0];
+  public String chars = "";
 
   public SequenceCharsRegExp() {
     super(RegExpType.SEQUENCE_CHARS);
+  }
+
+  public SequenceCharsRegExp(String chars, RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
+    this();
+    this.chars = chars;
+    this.repMinTimes.setTimes(repMinTimes);
+    this.repMaxTimes.setTimes(repMaxTimes);
   }
 
   @Override
@@ -28,13 +33,13 @@ public class SequenceCharsRegExp extends RegExp {
     }
 
     SequenceCharsRegExp that = (SequenceCharsRegExp) o;
-    return Arrays.equals(chars, that.chars);
+    return chars.equals(that.chars);
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + Arrays.hashCode(chars);
+    result = 31 * result + chars.hashCode();
     return result;
   }
 }

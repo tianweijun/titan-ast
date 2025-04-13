@@ -2,6 +2,7 @@ package titan.ast.grammar;
 
 import java.util.LinkedHashMap;
 import titan.ast.AstRuntimeException;
+import titan.ast.grammar.DerivedTerminalGrammarAutomataDetail.RootTerminalGrammarMapDetail;
 
 /**
  * 语法文件所对应的实体，以及其所表示的自动机等.
@@ -20,6 +21,9 @@ public class LanguageGrammar {
   // for FollowFilterBacktrackingBottomUpAstAutomata
   // todo set startGrammar
   public NonterminalGrammar augmentedNonterminal = new NonterminalGrammar("augmentedNonterminal");
+
+  public DerivedTerminalGrammarAutomataDetail derivedTerminalGrammarAutomataDetail =
+      new DerivedTerminalGrammarAutomataDetail();
 
   public LanguageGrammar() {
   }
@@ -61,5 +65,9 @@ public class LanguageGrammar {
 
   public Grammar getStartGrammar() {
     return nonterminals.get(startGrammarName);
+  }
+
+  public RootTerminalGrammarMapDetail getRootTerminalGrammarMap(String rootTerminalGrammar) {
+    return derivedTerminalGrammarAutomataDetail.getRootTerminalGrammarMap(rootTerminalGrammar);
   }
 }

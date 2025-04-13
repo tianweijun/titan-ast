@@ -7,13 +7,19 @@ import java.util.Arrays;
  *
  * @author tian wei jun
  */
-public class OneCharOptionCharsetRegExp extends RegExp {
+public class OneCharOptionCharsetRegExp extends UnitRegExp {
 
-  public boolean isNot = false;
   public char[] chars = new char[0];
 
   public OneCharOptionCharsetRegExp() {
     super(RegExpType.ONE_CHAR_OPTION_CHARSET);
+  }
+
+  public OneCharOptionCharsetRegExp(char[] chars, RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
+    this();
+    this.chars = chars;
+    this.repMinTimes.setTimes(repMinTimes);
+    this.repMaxTimes.setTimes(repMaxTimes);
   }
 
   @Override
@@ -29,13 +35,12 @@ public class OneCharOptionCharsetRegExp extends RegExp {
     }
 
     OneCharOptionCharsetRegExp that = (OneCharOptionCharsetRegExp) o;
-    return isNot == that.isNot && Arrays.equals(chars, that.chars);
+    return Arrays.equals(chars, that.chars);
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + Boolean.hashCode(isNot);
     result = 31 * result + Arrays.hashCode(chars);
     return result;
   }

@@ -9,12 +9,21 @@ import titan.ast.AstRuntimeException;
  */
 public class RepeatTimes implements Cloneable {
 
+  private static RepeatTimes INFINITY_TIMES = new RepeatTimes(RepeatTimesType.INFINITY, 0);
   public RepeatTimesType type; // num
   public int times;
 
-  public RepeatTimes(RepeatTimesType type, int times) {
+  private RepeatTimes(RepeatTimesType type, int times) {
     this.type = type;
     this.times = times;
+  }
+
+  public static RepeatTimes getInfinityTimes() {
+    return INFINITY_TIMES;
+  }
+
+  public static RepeatTimes getNumberTimes(int times) {
+    return new RepeatTimes(RepeatTimesType.NUMBER, times);
   }
 
   public void setTimes(RepeatTimes repeatTimes) {
