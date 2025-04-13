@@ -23,20 +23,27 @@ public class GrammarCreater {
     return nonterminalGrammar;
   }
 
-
-  public static TerminalFragmentGrammar createTerminalFragmentGrammar(
-      RegExpPrimaryGrammarContent regExpPrimaryGrammarContent) {
-    TerminalFragmentGrammar terminalFragmentGrammar =
-        new TerminalFragmentGrammar(regExpPrimaryGrammarContent.grammarName);
-    terminalFragmentGrammar.primaryGrammarContent = regExpPrimaryGrammarContent;
-    return terminalFragmentGrammar;
-  }
-
   public static TerminalGrammar createDerivedTerminalGrammar(RegExpPrimaryGrammarContent regExpPrimaryGrammarContent) {
     TerminalGrammar terminalGrammar =
         new TerminalGrammar(regExpPrimaryGrammarContent.grammarName);
     terminalGrammar.primaryGrammarContent = regExpPrimaryGrammarContent;
     return terminalGrammar;
+  }
+
+  public static TerminalFragmentGrammar createTerminalFragmentGrammar(
+      PrimaryGrammarContent primaryGrammarContent) {
+    TerminalFragmentGrammar terminalFragmentGrammar =
+        new TerminalFragmentGrammar(primaryGrammarContent.grammarName);
+    terminalFragmentGrammar.primaryGrammarContent = primaryGrammarContent;
+    switch (primaryGrammarContent.type) {
+      case REG_EXP -> {
+      }
+      case NFA -> {
+        NfaPrimaryGrammarContent nfaPrimaryGrammarContent = (NfaPrimaryGrammarContent) primaryGrammarContent;
+        setNfaStartEnd(nfaPrimaryGrammarContent, nfaPrimaryGrammarContent.grammarAttributes);
+      }
+    }
+    return terminalFragmentGrammar;
   }
 
   public static TerminalGrammar createTerminalGrammar(PrimaryGrammarContent primaryGrammarContent) {

@@ -3,7 +3,7 @@ package titan.ast.impl.ast;
 import java.util.List;
 import titan.ast.GrammarFileAutomataAstApplication;
 import titan.ast.impl.ast.contextast.ContextAst;
-import titan.ast.impl.ast.regexp.RegExpBuilder;
+import titan.ast.impl.ast.regexp.GrammarInitializer;
 
 /**
  * .
@@ -16,10 +16,10 @@ public class AstWayGrammarFileAutomataAstApplication extends GrammarFileAutomata
     super(grammarFilePaths);
   }
 
-  protected void doBeforeNfa(List<String> grammarFilePaths) {
+  protected void initGrammar(List<String> grammarFilePaths) {
     for (String grammarFilePath : grammarFilePaths) {
       ContextAst contextAst = AstBuilder.build(grammarFilePath);
-      new RegExpBuilder(contextAst).build();
+      new GrammarInitializer(contextAst).init();
     }
   }
 }

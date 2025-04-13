@@ -14,7 +14,7 @@ import titan.ast.fa.FaStateType;
  */
 public class TokenNfa implements Cloneable {
 
-  public static final int EPSILON = 0x100;
+  public static final Integer EPSILON = 0x100;
   public TokenNfaState start;
   public TokenNfaState end;
 
@@ -24,9 +24,7 @@ public class TokenNfa implements Cloneable {
 
   void init() {
     start = new TokenNfaState();
-    start.type = FaStateType.NONE.getValue();
     end = new TokenNfaState();
-    end.type = FaStateType.NONE.getValue();
   }
 
   /**
@@ -90,8 +88,6 @@ public class TokenNfa implements Cloneable {
     private void cloneSourceState() {
       for (TokenNfaState sourceState : sourceStates) {
         TokenNfaState destState = sourceDestStateMap.get(sourceState);
-        destState.type = sourceState.type;
-        destState.terminal = sourceState.terminal;
         // edges
         sourceState.edges.forEach(
             (ch, sourceStateChToStates) -> {

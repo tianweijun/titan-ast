@@ -6,6 +6,7 @@ import titan.ast.AstContext;
 import titan.ast.fa.FaStateType;
 import titan.ast.fa.NfaState;
 import titan.ast.grammar.Grammar;
+import titan.ast.grammar.TerminalGrammar;
 
 /**
  * 非确定有限状态自动机的 状态.
@@ -14,7 +15,7 @@ import titan.ast.grammar.Grammar;
  */
 public class TokenNfaState extends NfaState<Integer, TokenNfaState> {
 
-  public Grammar terminal;
+  public TerminalGrammar terminal;
 
   /**
    * 初始化id、type、edges.

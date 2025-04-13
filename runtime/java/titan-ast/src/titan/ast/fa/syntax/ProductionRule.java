@@ -3,6 +3,8 @@ package titan.ast.fa.syntax;
 import java.util.Objects;
 import titan.ast.AstContext;
 import titan.ast.grammar.Grammar;
+import titan.ast.grammar.NonterminalGrammar;
+import titan.ast.grammar.regexp.AndCompositeRegExp;
 import titan.ast.grammar.regexp.RegExp;
 
 /**
@@ -14,9 +16,9 @@ public class ProductionRule implements Comparable<ProductionRule> {
 
   public final int id;
   // notNull
-  public Grammar grammar = null;
+  public NonterminalGrammar grammar = null;
   public String alias = "";
-  public RegExp rule = null;
+  public AndCompositeRegExp rule = null;
   public SyntaxNfa nfa;
   // 用于收敛产生式
   public SyntaxDfa reducingDfa = null;

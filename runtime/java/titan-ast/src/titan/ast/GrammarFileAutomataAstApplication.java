@@ -1,11 +1,12 @@
 package titan.ast;
 
 import java.util.List;
+import titan.ast.fa.syntax.ProductionRuleBuilder;
 import titan.ast.fa.token.DerivedTerminalGrammarAutomataDataBuilder;
-import titan.ast.fa.token.FragmentNfaBuilder;
-import titan.ast.grammar.DerivedTerminalGrammarAutomataDetail.RootTerminalGrammarMapDetail;
-import titan.ast.grammar.LanguageGrammar;
-import titan.ast.grammar.TerminalGrammar;
+import titan.ast.fa.token.DfaTokenAutomataFactory;
+import titan.ast.fa.token.TerminalFragmentGrammarNfaBuilder;
+import titan.ast.fa.token.TerminalGrammarNfaBuilder;
+import titan.ast.fa.token.TokenDfaBuilder;
 import titan.ast.logger.Logger;
 import titan.ast.runtime.RuntimeAutomataRichAstApplication;
 
@@ -17,50 +18,39 @@ public abstract class GrammarFileAutomataAstApplication {
 
   public void setAstAutomataContext(List<String> grammarFilePaths) {
     AstContext.init();
-    buildNfa(grammarFilePaths);
+    initGrammar(grammarFilePaths);
+    //token
+    buildTokenNfa();
     buildTokenDfa();
+    buildDfaTokenAutomata();
+    new DerivedTerminalGrammarAutomataDataBuilder().build();
+    //syntax
+    buildSyntaxNfa();
     buildSyntaxDfa();
   }
 
-  protected void buildNfa(List<String> grammarFilePaths) {
-    doBeforeNfa(grammarFilePaths);
-    buildTokenNfa();
-    buildSyntaxNfa();
-    new DerivedTerminalGrammarAutomataDataBuilder().build();
-    addDerivedTerminalGrammar2Terminals();
+  private void buildDfaTokenAutomata() {
+    DfaTokenAutomataFactory.create();
   }
 
-  private void buildTokenNfa() {
-    // fragment
-    FragmentNfaBuilder.buildNfa();
+  protected void buildTokenNfa() {
+    new TerminalFragmentGrammarNfaBuilder().buildNfa();
+    new TerminalGrammarNfaBuilder().buildNfa();
   }
 
   private void buildTokenDfa() {
+    new TokenDfaBuilder().buildDfa();
   }
 
-  private void buildSyntaxNfa() {
-
+  protected void buildSyntaxNfa() {
+    new ProductionRuleBuilder().build();
   }
 
   private void buildSyntaxDfa() {
   }
 
-  /**
-   * 为了参与语法自动机的构建,derivedTerminalGrammars不参与任何tokenDfa的构建，参与syntaxDfa的构建.
-   */
-  private void addDerivedTerminalGrammar2Terminals() {
-    LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
-    // 将keyword 添加到 terminals
-    for (RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail :
-        languageGrammar.derivedTerminalGrammarAutomataDetail.rootTerminalGrammarMaps.values()) {
-      for (TerminalGrammar derivedTerminalGrammar :
-          rootTerminalGrammarMapDetail.derivedTerminalGrammars.keySet()) {
-        languageGrammar.addTerminalGrammar(derivedTerminalGrammar);
-      }
-    }
-  }
 
-  protected abstract void doBeforeNfa(List<String> grammarFilePaths);
+  protected abstract void initGrammar(List<String> grammarFilePaths);
 
   public void buildPersistentAutomata(String persistentAutomataFilePath) {
 

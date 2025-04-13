@@ -1,7 +1,6 @@
 package titan.ast.grammar.regexp;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * .
@@ -10,7 +9,7 @@ import java.util.List;
  */
 public class OrCompositeRegExp extends RegExp {
 
-  public List<AndCompositeRegExp> children = new ArrayList<>();
+  public ArrayList<AndCompositeRegExp> children = new ArrayList<>();
 
   public OrCompositeRegExp() {
     super(RegExpType.OR_COMPOSITE);

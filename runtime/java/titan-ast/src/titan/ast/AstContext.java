@@ -1,10 +1,12 @@
 package titan.ast;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.List;
 import titan.ast.fa.syntax.ProductionRule;
-import titan.ast.grammar.Grammar;
+import titan.ast.fa.token.TokenAutomata;
+import titan.ast.fa.token.TokenDfa;
 import titan.ast.grammar.LanguageGrammar;
+import titan.ast.grammar.NonterminalGrammar;
 
 /**
  * 当前应用程序的 上下文.
@@ -17,7 +19,9 @@ public class AstContext {
 
   public IdGenerator idGenerator = new IdGenerator();
   public LanguageGrammar languageGrammar = null;
-  public LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap = null;
+  public TokenDfa tokenDfa;
+  public TokenAutomata tokenAutomata;
+  public LinkedHashMap<NonterminalGrammar, List<ProductionRule>> nonterminalProductionRulesMap;
 
   /**
    * 初始化并生成一个当前应用程序的 上下文.

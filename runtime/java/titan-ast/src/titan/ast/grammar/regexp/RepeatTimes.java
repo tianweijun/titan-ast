@@ -48,24 +48,7 @@ public class RepeatTimes implements Cloneable {
   public boolean isInfinityTimes() {
     return type == RepeatTimesType.INFINITY;
   }
-
-  public boolean lessThan(int otherRepTimes) {
-    if (this.isInfinityTimes()) { // INFINITY>=any
-      return false;
-    }
-    return this.times < otherRepTimes;
-  }
-
-  public boolean lessThanOrEqual(RepeatTimes otherRepeatTimes) {
-    if (otherRepeatTimes.isInfinityTimes()) { // any<=INFINITY
-      return true;
-    }
-    if (this.isInfinityTimes()) { // INFINITY>=any
-      return false;
-    }
-    return this.times <= otherRepeatTimes.times;
-  }
-
+  
   public boolean isNumberTimesAndGreatThanOrEqual(int otherTimes) {
     return type == RepeatTimesType.NUMBER && this.times >= otherTimes;
   }

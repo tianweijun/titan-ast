@@ -2,10 +2,13 @@ package titan.ast.impl.ast.regexp;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import titan.ast.AstRuntimeException;
 import titan.ast.grammar.GrammarAttribute.NfaTerminalGrammarAttribute;
+import titan.ast.grammar.GrammarCharset;
 import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdge;
 import titan.ast.grammar.regexp.GrammarRegExp;
 import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp;
+import titan.ast.grammar.regexp.RegExp;
 import titan.ast.grammar.regexp.RepeatTimes;
 import titan.ast.grammar.regexp.SequenceCharsRegExp;
 
@@ -14,13 +17,9 @@ import titan.ast.grammar.regexp.SequenceCharsRegExp;
  *
  * @author tian wei jun
  */
-public class RegExpParser {
+public class GrammarParser {
 
-  public static final int HEX_LENGTH_OF_TEXT_CHAR = 2;
-  public static final int MAX_CHAR = 0xFF;
-  private static final String KW_DERIVE = "derive";
-
-  private RegExpParser() {
+  private GrammarParser() {
   }
 
   public static OneCharOptionCharsetRegExp getOneCharOptionCharsetRegExp(String str) {
@@ -134,6 +133,11 @@ public class RegExpParser {
     if (!repMaxTimesStr.isEmpty()) {
       repMaxTimes.setTimes(Integer.parseInt(repMaxTimesStr.toString(), 10));
     }
+    if (!RegExp.isRightRepeatTimes(repMinTimes, repMaxTimes)) {
+      throw new AstRuntimeException(
+          String.format("{repMinTimes,repMaxTimes} is not right,error near : {%s,%s}", repMinTimesStr, repMaxTimesStr));
+    }
+
     return new RepeatTimes[]{
         repMinTimes, repMaxTimes
     };
@@ -288,7 +292,7 @@ public class RegExpParser {
   }
 
   private static int setHexadecimalEscapeChar(char[] charArray, int indexOfChar, StringBuilder stringBuilder) {
-    char[] hexNumberChars = new char[HEX_LENGTH_OF_TEXT_CHAR];
+    char[] hexNumberChars = new char[GrammarCharset.HEX_LENGTH_OF_TEXT_CHAR];
     int indexOfHexNumber = 0;
     int indexOfHexCharText = indexOfChar + 1;
     while (indexOfHexCharText < charArray.length && indexOfHexNumber < hexNumberChars.length) {
@@ -423,7 +427,8 @@ public class RegExpParser {
   // 'derive' '(' IdentifierFragment ')'
   public static String getRootTerminalGrammarNameByDerivedTerminalGrammarAttribute(
       String derivedTerminalGrammarAttribute) {
-    return derivedTerminalGrammarAttribute.substring(KW_DERIVE.length() + 1, derivedTerminalGrammarAttribute.length() - 1);
+    return derivedTerminalGrammarAttribute.substring(GrammarCharset.KW_DERIVE.length() + 1,
+        derivedTerminalGrammarAttribute.length() - 1);
   }
 
   private static class OneCharOptionCharsetRegExpCreationDescriptor {
@@ -434,7 +439,7 @@ public class RegExpParser {
     LinkedList<Integer> indexsOfRangeFlag = new LinkedList<>();
 
     public char[] getChars() {
-      chars = new boolean[MAX_CHAR + 1];
+      chars = new boolean[GrammarCharset.MAX_CHAR + 1];
       Arrays.fill(chars, false);
       //处理[]中的chars
       buildCharsRegExpUnitOptionChars();

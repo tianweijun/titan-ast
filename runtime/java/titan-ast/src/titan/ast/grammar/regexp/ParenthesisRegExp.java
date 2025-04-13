@@ -8,11 +8,11 @@ package titan.ast.grammar.regexp;
  */
 public class ParenthesisRegExp extends UnitRegExp {
 
-  public OrCompositeRegExp child;
+  public OrCompositeRegExp orCompositeRegExp;
 
   public ParenthesisRegExp(OrCompositeRegExp orCompositeRegExp) {
     super(RegExpType.PARENTHESIS);
-    this.child = orCompositeRegExp;
+    this.orCompositeRegExp = orCompositeRegExp;
   }
 
   @Override
@@ -28,13 +28,13 @@ public class ParenthesisRegExp extends UnitRegExp {
     }
 
     ParenthesisRegExp that = (ParenthesisRegExp) o;
-    return child.equals(that.child);
+    return orCompositeRegExp.equals(that.orCompositeRegExp);
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + child.hashCode();
+    result = 31 * result + orCompositeRegExp.hashCode();
     return result;
   }
 }

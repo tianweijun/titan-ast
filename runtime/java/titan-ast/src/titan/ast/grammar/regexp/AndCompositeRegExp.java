@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class AndCompositeRegExp extends RegExp {
 
-  public List<UnitRegExp> children = new ArrayList<>();
+  public ArrayList<UnitRegExp> children = new ArrayList<>();
 
   public String alias = "";
 

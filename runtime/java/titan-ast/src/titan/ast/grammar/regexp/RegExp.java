@@ -1,5 +1,7 @@
 package titan.ast.grammar.regexp;
 
+import titan.ast.grammar.regexp.RepeatTimes.RepeatTimesType;
+
 /**
  * 语法文件中所描述语法的文本形式.
  *
@@ -14,6 +16,20 @@ public abstract class RegExp {
 
   public RegExp(RegExpType type) {
     this.type = type;
+  }
+
+  public static boolean isRightRepeatTimes(RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
+    if (repMinTimes.type == RepeatTimesType.NUMBER) {
+      switch (repMaxTimes.type) {
+        case NUMBER -> {
+          return repMinTimes.times <= repMaxTimes.times;
+        }
+        case INFINITY -> {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public void setRepeatTimes(RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {

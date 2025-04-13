@@ -37,6 +37,21 @@ public class DerivedTerminalGrammarAutomataDataBuilder {
       return;
     }
     buildDerivedTerminalGrammarAutomataData();
+    addDerivedTerminalGrammar2Terminals();
+  }
+
+  /**
+   * 为了参与语法自动机的构建,derivedTerminalGrammars不参与任何tokenDfa的构建，参与syntaxDfa的构建.
+   */
+  private void addDerivedTerminalGrammar2Terminals() {
+    // 将keyword 添加到 terminals
+    for (RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail :
+        languageGrammar.derivedTerminalGrammarAutomataDetail.rootTerminalGrammarMaps.values()) {
+      for (TerminalGrammar derivedTerminalGrammar :
+          rootTerminalGrammarMapDetail.derivedTerminalGrammars.keySet()) {
+        languageGrammar.addTerminalGrammar(derivedTerminalGrammar);
+      }
+    }
   }
 
   private void buildDerivedTerminalGrammarAutomataData() {

@@ -38,15 +38,6 @@ regExpGrammar :
    identifier grammarAttributes? ':' inclusiveOrCompositeRegExp grammarAction? ';'
 ;
 
-// -------------terminalFragmentGrammar------------------
-terminalFragmentGrammarBeginning : '@TerminalFragmentGrammar' 'begin' ';' ;
-terminalFragmentGrammarEnd : '@TerminalFragmentGrammar' 'end' ';' ;
-terminalFragmentGrammarBlock :
-   terminalFragmentGrammarBeginning
-   regExpGrammar*
-   terminalFragmentGrammarEnd
-;
-
 // -------------terminalGrammar------------------
 terminalGrammarBeginning : '@TerminalGrammar' 'begin' ';' ;
 terminalGrammarEnd : '@TerminalGrammar' 'end' ';' ;
@@ -61,6 +52,15 @@ terminalGrammarBlock :
    terminalGrammarBeginning
    terminalGrammar*
    terminalGrammarEnd
+;
+
+// -------------terminalFragmentGrammar------------------
+terminalFragmentGrammarBeginning : '@TerminalFragmentGrammar' 'begin' ';' ;
+terminalFragmentGrammarEnd : '@TerminalFragmentGrammar' 'end' ';' ;
+terminalFragmentGrammarBlock :
+   terminalFragmentGrammarBeginning
+   terminalGrammar*
+   terminalFragmentGrammarEnd
 ;
 
 // -------------DerivedTerminalGrammar------------------

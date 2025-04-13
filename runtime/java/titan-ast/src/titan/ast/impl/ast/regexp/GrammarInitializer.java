@@ -51,18 +51,18 @@ import titan.ast.impl.ast.contextast.UnitRegExpAst;
  *
  * @author tian wei jun
  */
-public class RegExpBuilder extends AbstractVisitor {
+public class GrammarInitializer extends AbstractVisitor {
 
   final CompilationUnitAst compilationUnitAst;
   LanguageGrammar languageGrammar;
   private RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail;
 
-  public RegExpBuilder(ContextAst contextAst) {
+  public GrammarInitializer(ContextAst contextAst) {
     compilationUnitAst = (CompilationUnitAst) contextAst;
     languageGrammar = AstContext.get().languageGrammar;
   }
 
-  public void build() {
+  public void init() {
     visitCompilationUnitAst(compilationUnitAst);
   }
 
@@ -121,17 +121,17 @@ public class RegExpBuilder extends AbstractVisitor {
 
   /*
       terminalFragmentGrammarBeginning
-       regExpGrammar*
+       terminalGrammar*
        terminalFragmentGrammarEnd
        */
   @Override
   public void visitTerminalFragmentGrammarBlockAst(TerminalFragmentGrammarBlockAst terminalFragmentGrammarBlockAst) {
     super.visitTerminalFragmentGrammarBlockAst(terminalFragmentGrammarBlockAst);
     for (ContextAst child : terminalFragmentGrammarBlockAst.children) {
-      if (child instanceof RegExpGrammarAst regExpGrammarAst) {
-        RegExpPrimaryGrammarContent regExpPrimaryGrammarContent = regExpGrammarAst.regExpPrimaryGrammarContent;
-        TerminalFragmentGrammar terminalFragmentGrammar = GrammarCreater.createTerminalFragmentGrammar(
-            regExpPrimaryGrammarContent);
+      if (child instanceof TerminalGrammarAst terminalGrammarAst) {
+        PrimaryGrammarContent primaryGrammarContent = terminalGrammarAst.primaryGrammarContent;
+        TerminalFragmentGrammar terminalFragmentGrammar =
+            GrammarCreater.createTerminalFragmentGrammar(primaryGrammarContent);
         languageGrammar.addTerminalFragmentGrammar(terminalFragmentGrammar);
       }
     }
@@ -167,7 +167,7 @@ public class RegExpBuilder extends AbstractVisitor {
         continue;
       }
       if (child instanceof TerminalContextAst terminalContextAst && terminalContextAst.grammar.name.equals("NfaEdge")) {
-        nfaPrimaryGrammarContent.edges.add(RegExpParser.getNfaEdge(terminalContextAst.str));
+        nfaPrimaryGrammarContent.edges.add(GrammarParser.getNfaEdge(terminalContextAst.str));
         continue;
       }
       if (child instanceof GrammarActionAst grammarActionAst) {
@@ -231,7 +231,7 @@ public class RegExpBuilder extends AbstractVisitor {
     String terminalGrammarName = terminalContextAst.grammar.name;
     if ("NfaTerminalGrammarAttribute".equals(terminalGrammarName)) {
       String str = terminalContextAst.str;
-      grammarAttributeAst.grammarAttribute = RegExpParser.getNfaTerminalGrammarAttribute(str);
+      grammarAttributeAst.grammarAttribute = GrammarParser.getNfaTerminalGrammarAttribute(str);
     }
     if ("LazinessTerminalGrammarAttribute".equals(terminalGrammarName)) {
       grammarAttributeAst.grammarAttribute = LazinessTerminalGrammarAttribute.get();
@@ -269,7 +269,7 @@ public class RegExpBuilder extends AbstractVisitor {
     AndCompositeRegExp andCompositeRegExp = andCompositeRegExpAst.andCompositeRegExp;
     if (exclusiveOrCompositeRegExpAst.children.size() == 2) {
       String andCompositeRegExpAlias = ((TerminalContextAst) exclusiveOrCompositeRegExpAst.children.get(1)).str;
-      String alias = RegExpParser.getAliasByAndCompositeRegExpAlias(andCompositeRegExpAlias);
+      String alias = GrammarParser.getAliasByAndCompositeRegExpAlias(andCompositeRegExpAlias);
       andCompositeRegExp.setAlias(alias);
     }
     exclusiveOrCompositeRegExpAst.andCompositeRegExp = andCompositeRegExp;
@@ -280,6 +280,7 @@ public class RegExpBuilder extends AbstractVisitor {
   public void visitAndCompositeRegExpAst(AndCompositeRegExpAst andCompositeRegExpAst) {
     super.visitAndCompositeRegExpAst(andCompositeRegExpAst);
     AndCompositeRegExp andCompositeRegExp = new AndCompositeRegExp();
+    andCompositeRegExp.children = new ArrayList<>(andCompositeRegExpAst.children.size());
     for (ContextAst child : andCompositeRegExpAst.children) {
       if (child instanceof UnitRegExpAst unitRegExpAst) {
         andCompositeRegExp.children.add(unitRegExpAst.unitRegExp);
@@ -319,7 +320,7 @@ public class RegExpBuilder extends AbstractVisitor {
   public void visitParenthesisUnitRegExpAst(ParenthesisUnitRegExpAst parenthesisUnitRegExpAst) {
     super.visitParenthesisUnitRegExpAst(parenthesisUnitRegExpAst);
     String parenthesisUnitRegExpSuffix = ((TerminalContextAst) parenthesisUnitRegExpAst.children.get(2)).str;
-    RepeatTimes[] repeatTimes = RegExpParser.getRepeateTimesByParenthesisUnitRegExpSuffix(parenthesisUnitRegExpSuffix);
+    RepeatTimes[] repeatTimes = GrammarParser.getRepeateTimesByParenthesisUnitRegExpSuffix(parenthesisUnitRegExpSuffix);
     InclusiveOrCompositeRegExpAst inclusiveOrCompositeRegExpAst =
         (InclusiveOrCompositeRegExpAst) parenthesisUnitRegExpAst.children.get(
             1);
@@ -335,7 +336,7 @@ public class RegExpBuilder extends AbstractVisitor {
       OneCharOptionCharsetUnitRegExpAst oneCharOptionCharsetUnitRegExpAst) {
     super.visitOneCharOptionCharsetUnitRegExpAst(oneCharOptionCharsetUnitRegExpAst);
     String str = ((TerminalContextAst) oneCharOptionCharsetUnitRegExpAst.children.get(0)).str;
-    oneCharOptionCharsetUnitRegExpAst.oneCharOptionCharsetRegExp = RegExpParser.getOneCharOptionCharsetRegExp(str);
+    oneCharOptionCharsetUnitRegExpAst.oneCharOptionCharsetRegExp = GrammarParser.getOneCharOptionCharsetRegExp(str);
   }
 
   // sequenceCharsUnitRegExp : SequenceCharsUnitRegExp ;
@@ -343,7 +344,7 @@ public class RegExpBuilder extends AbstractVisitor {
   public void visitSequenceCharsUnitRegExpAst(SequenceCharsUnitRegExpAst sequenceCharsUnitRegExpAst) {
     super.visitSequenceCharsUnitRegExpAst(sequenceCharsUnitRegExpAst);
     String str = ((TerminalContextAst) sequenceCharsUnitRegExpAst.children.get(0)).str;
-    sequenceCharsUnitRegExpAst.sequenceCharsRegExp = RegExpParser.getSequenceCharsRegExp(str);
+    sequenceCharsUnitRegExpAst.sequenceCharsRegExp = GrammarParser.getSequenceCharsRegExp(str);
   }
 
   // grammarUnitRegExp : identifier | GrammarUnitRegExpRepeatTimes ;
@@ -352,13 +353,13 @@ public class RegExpBuilder extends AbstractVisitor {
     super.visitGrammarUnitRegExpAst(grammarUnitRegExpAst);
     ContextAst child = grammarUnitRegExpAst.children.get(0);
     if (child instanceof IdentifierAst identifierAst) {
-      grammarUnitRegExpAst.grammarRegExp = RegExpParser.getGrammarRegExp(identifierAst.identifierStr);
+      grammarUnitRegExpAst.grammarRegExp = GrammarParser.getGrammarRegExp(identifierAst.identifierStr);
     }
     if (child instanceof TerminalContextAst terminalContextAst) {
-      grammarUnitRegExpAst.grammarRegExp = RegExpParser.getGrammarUnitRegExpRepeatTimes(terminalContextAst.str);
+      grammarUnitRegExpAst.grammarRegExp = GrammarParser.getGrammarUnitRegExpRepeatTimes(terminalContextAst.str);
     }
   }
-  
+
   // '@DerivedTerminalGrammar' DerivedTerminalGrammarAttribute 'begin' ';'
   @Override
   public void visitDerivedTerminalGrammarBeginningAst(
@@ -366,7 +367,7 @@ public class RegExpBuilder extends AbstractVisitor {
     super.visitDerivedTerminalGrammarBeginningAst(derivedTerminalGrammarBeginningAst);
     String derivedTerminalGrammarAttribute =
         ((TerminalContextAst) derivedTerminalGrammarBeginningAst.children.get(1)).str;
-    String rootTerminalGrammarName = RegExpParser.getRootTerminalGrammarNameByDerivedTerminalGrammarAttribute(
+    String rootTerminalGrammarName = GrammarParser.getRootTerminalGrammarNameByDerivedTerminalGrammarAttribute(
         derivedTerminalGrammarAttribute);
     this.rootTerminalGrammarMapDetail =
         languageGrammar.getRootTerminalGrammarMap(rootTerminalGrammarName);
