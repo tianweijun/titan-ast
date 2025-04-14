@@ -1,6 +1,6 @@
 
 
-set "ast_file_dir=D:\github-pro\titan\titan-ast\runtime\java\titan-ast\src\titan\ast\impl\ast\contextast\"
+set "ast_file_dir=D:\github-pro\titan\titan-ast\src\titan\ast\impl\ast\contextast\"
 
 java -jar D:\github-pro\titan\titan-ast\out\artifacts\titan_ast_jar\titan-ast.jar^
  -grammarFilePaths^

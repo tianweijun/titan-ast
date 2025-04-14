@@ -38,21 +38,15 @@ generate Abstract Syntax Tree by grammar file.
 
 
 # quick start
-a regular expression describes the format of grammars:
+titan-ast grammar file with regular expression style syntax,see  [grammar-file-syntax](/titanAstGrammar.txt) for details.
 
-keywords of statement :  -> ; :
+default terminal grammar:  Epsilon Eof.
 
-keywords of regular expression:  ()[]''?*+-{}
+default nonterminal grammar:  augmentedNonterminal.
 
-default terminal grammar:  Epsilon Eof
+format of grammar's definition : nameOfGrammar  :  regularExpression ;
 
-default nonterminal grammar:  augmentedNonterminal
-
-format of grammar's definition : nameOfGrammar  : regularExpression ;
-
-The grammar file should be encoded in 8bits(iso-8859-1) format.
-
-each token separated by white spaces.tokens include  //, /*, */, :, ; and regExpUnit.
+the grammar file should be encoded in 8bits(iso-8859-1) format.
 
 content of grammar file like this；
 

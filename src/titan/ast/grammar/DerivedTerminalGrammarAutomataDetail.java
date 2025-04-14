@@ -3,7 +3,7 @@ package titan.ast.grammar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData;
+import titan.ast.fa.token.DerivedTerminalGrammarAutomataData;
 
 /**
  * .
@@ -11,6 +11,7 @@ import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData;
  * @author tian wei jun
  */
 public class DerivedTerminalGrammarAutomataDetail {
+
   public DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData =
       new DerivedTerminalGrammarAutomataData();
   public Map<String, RootTerminalGrammarMapDetail> rootTerminalGrammarMaps = new HashMap<>();
@@ -38,8 +39,9 @@ public class DerivedTerminalGrammarAutomataDetail {
   }
 
   public static class RootTerminalGrammarMapDetail {
-    public HashMap<Grammar, LinkedList<Grammar>> derivedTerminalGrammars =
-        new HashMap<Grammar, LinkedList<Grammar>>();
+
+    public HashMap<TerminalGrammar, LinkedList<TerminalGrammar>> derivedTerminalGrammars =
+        new HashMap<TerminalGrammar, LinkedList<TerminalGrammar>>();
     String rootTerminalGrammar;
 
     public RootTerminalGrammarMapDetail(String rootTerminalGrammar) {
@@ -50,8 +52,8 @@ public class DerivedTerminalGrammarAutomataDetail {
       return rootTerminalGrammar == null || derivedTerminalGrammars.isEmpty();
     }
 
-    public void addTerminalGrammar(Grammar derivedTerminalGrammar) {
-      LinkedList<Grammar> sameDerivedTerminalGrammars =
+    public void addTerminalGrammar(TerminalGrammar derivedTerminalGrammar) {
+      LinkedList<TerminalGrammar> sameDerivedTerminalGrammars =
           derivedTerminalGrammars.get(derivedTerminalGrammar);
       if (sameDerivedTerminalGrammars == null) {
         sameDerivedTerminalGrammars = new LinkedList<>();

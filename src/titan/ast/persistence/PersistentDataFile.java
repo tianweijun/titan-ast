@@ -14,14 +14,14 @@ import titan.ast.AstRuntimeException;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.GrammarType;
 import titan.ast.grammar.TerminalGrammar;
-import titan.ast.grammar.syntax.AstAutomata;
-import titan.ast.grammar.syntax.AstAutomataType;
-import titan.ast.grammar.syntax.BacktrackingBottomUpAstAutomata;
-import titan.ast.grammar.syntax.FollowFilterBacktrackingBottomUpAstAutomata;
-import titan.ast.grammar.syntax.ProductionRule;
-import titan.ast.grammar.syntax.SyntaxDfa;
-import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData;
-import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
+import titan.ast.fa.syntax.AstAutomata;
+import titan.ast.fa.syntax.AstAutomataType;
+import titan.ast.fa.syntax.BacktrackingBottomUpAstAutomata;
+import titan.ast.fa.syntax.FollowFilterBacktrackingBottomUpAstAutomata;
+import titan.ast.fa.syntax.ProductionRule;
+import titan.ast.fa.syntax.SyntaxDfa;
+import titan.ast.fa.token.DerivedTerminalGrammarAutomataData;
+import titan.ast.fa.token.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
 import titan.ast.util.StringUtils;
 
 /**
@@ -59,7 +59,7 @@ public class PersistentDataFile {
   }
 
   private void writeAstAutomata() {
-    AstAutomata astAutomata = persistentData.astContext.languageGrammar.astAutomata;
+    AstAutomata astAutomata = persistentData.astContext.astAutomata;
 
     AstAutomataType astAutomataType = astAutomata.getType();
     writeInt(astAutomataType.ordinal());
@@ -132,7 +132,7 @@ public class PersistentDataFile {
 
   private void writeTokenDfa() {
     int[] tokenDfaData =
-        persistentData.initTokenDfaStates(persistentData.astContext.languageGrammar.tokenDfa);
+        persistentData.initTokenDfaStates(persistentData.astContext.tokenDfa);
     for (int data : tokenDfaData) {
       writeInt(data);
     }
@@ -168,7 +168,7 @@ public class PersistentDataFile {
     writeInt(keyWordsSize);
 
     LinkedHashMap<String, Integer> stringPool = persistentData.stringPool;
-    for (Entry<String, Grammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
+    for (Entry<String, TerminalGrammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
       String text = entry.getKey();
       int intOfText = stringPool.get(text);
       writeInt(intOfText);

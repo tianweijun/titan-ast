@@ -1,14 +1,10 @@
 package titan.ast;
 
 import java.util.LinkedHashMap;
-import java.util.List;
-import titan.ast.fa.syntax.AstAutomata;
-import titan.ast.fa.syntax.ProductionRule;
-import titan.ast.fa.syntax.SyntaxDfa;
-import titan.ast.fa.token.TokenAutomata;
-import titan.ast.fa.token.TokenDfa;
+import java.util.LinkedList;
+import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
-import titan.ast.grammar.NonterminalGrammar;
+import titan.ast.grammar.syntax.ProductionRule;
 
 /**
  * 当前应用程序的 上下文.
@@ -19,13 +15,10 @@ public class AstContext {
 
   private static final ThreadLocal<AstContext> contextThreadLocal = new ThreadLocal<>();
 
-  public IdGenerator idGenerator = new IdGenerator();
+  public ResourceGenerator resourceGenerator = new ResourceGenerator();
   public LanguageGrammar languageGrammar = null;
-  public TokenDfa tokenDfa;
-  public TokenAutomata tokenAutomata;
-  public LinkedHashMap<NonterminalGrammar, List<ProductionRule>> nonterminalProductionRulesMap;
-  public SyntaxDfa astDfa;
-  public AstAutomata astAutomata;
+
+  public LinkedHashMap<Grammar, LinkedList<ProductionRule>> nonterminalProductionRulesMap = null;
 
   /**
    * 初始化并生成一个当前应用程序的 上下文.
@@ -49,5 +42,36 @@ public class AstContext {
 
   public static AstContext get() {
     return contextThreadLocal.get();
+  }
+
+  /** call after builded context. */
+  private void clearTransientObjects() {
+    AstContext astContext = AstContext.get();
+    LanguageGrammar languageGrammar = astContext.languageGrammar;
+    // fragment
+    for (Grammar terminalFragment : languageGrammar.terminalFragments.values()) {
+      terminalFragment.regExp = null;
+      terminalFragment.attributes = null;
+      terminalFragment.text = null;
+    }
+    // terminal
+    for (Grammar terminal : languageGrammar.terminals.values()) {
+      terminal.regExp = null;
+      terminal.attributes = null;
+      terminal.text = null;
+    }
+    // nonterminals
+    for (Grammar nonterminal : languageGrammar.nonterminals.values()) {
+      nonterminal.regExp = null;
+      nonterminal.attributes = null;
+      nonterminal.text = null;
+    }
+    // productionRules
+    for (LinkedList<ProductionRule> productionRules :
+        astContext.nonterminalProductionRulesMap.values()) {
+      for (ProductionRule productionRule : productionRules) {
+        productionRule.rule = null;
+      }
+    }
   }
 }

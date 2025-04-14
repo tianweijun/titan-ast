@@ -1,22 +1,28 @@
 package titan.ast.grammar;
 
+import titan.ast.fa.token.TokenNfa;
+import titan.ast.fa.token.TokenNfable;
+
 /**
  * TerminalFragmentGrammar.
  *
  * @author tian wei jun
  */
-public class TerminalFragmentGrammar extends Grammar {
+public class TerminalFragmentGrammar extends Grammar implements TokenNfable {
+
+  public TokenNfa tokenNfa = null;
 
   public TerminalFragmentGrammar(String name) {
-    super(name);
-    this.type = GrammarType.TERMINAL_FRAGMENT;
+    super(GrammarType.TERMINAL_FRAGMENT, name);
   }
 
   @Override
-  public int compareTo(Grammar that) {
-    if (type != that.type) {
-      return type.ordinal() - that.type.ordinal();
-    }
-    return name.compareTo(that.name);
+  public TokenNfa getTokenNfa() {
+    return tokenNfa;
+  }
+
+  @Override
+  public void setTokenNfa(TokenNfa tokenNfa) {
+    this.tokenNfa = tokenNfa;
   }
 }

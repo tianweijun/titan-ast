@@ -3,19 +3,18 @@ package titan.ast.persistence;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import titan.ast.AstContext;
-import titan.ast.fa.syntax.ProductionRule;
-import titan.ast.fa.syntax.SyntaxDfa;
-import titan.ast.fa.syntax.SyntaxDfaState;
-import titan.ast.fa.token.DerivedTerminalGrammarAutomataData;
-import titan.ast.fa.token.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
-import titan.ast.fa.token.TokenDfa;
-import titan.ast.fa.token.TokenDfaState;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
-import titan.ast.grammar.TerminalGrammar;
+import titan.ast.grammar.syntax.ProductionRule;
+import titan.ast.grammar.syntax.SyntaxDfa;
+import titan.ast.grammar.syntax.SyntaxDfaState;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData;
+import titan.ast.grammar.token.DerivedTerminalGrammarAutomataData.RootTerminalGrammarMap;
+import titan.ast.grammar.token.TokenDfa;
+import titan.ast.grammar.token.TokenDfaState;
 import titan.ast.util.StringUtils;
 
 /**
@@ -24,7 +23,6 @@ import titan.ast.util.StringUtils;
  * @author tian wei jun
  */
 public class PersistentData {
-
   // ----------data start-----------
   public LinkedHashMap<String, Integer> stringPool;
   // countOfGrammars-name-type-action
@@ -78,10 +76,8 @@ public class PersistentData {
 
   public void initGrammars() {
     LanguageGrammar languageGrammar = astContext.languageGrammar;
-    LinkedHashMap<String, TerminalGrammar> derivedTerminalGrammars =
-        languageGrammar.derivedTerminalGrammarAutomataDetail.derivedTerminalGrammarAutomataData.derivedTerminalGrammars;
     int countOfGrammars =
-        languageGrammar.terminals.size() + 2 + languageGrammar.nonterminals.size() + 1 + derivedTerminalGrammars.size();
+        languageGrammar.terminals.size() + languageGrammar.nonterminals.size() + 2;
     grammarIntegerMap = new LinkedHashMap<>(countOfGrammars);
     int indexOfGrammar = 0;
 
@@ -94,11 +90,6 @@ public class PersistentData {
     for (Grammar nonterminal : languageGrammar.nonterminals.values()) {
       grammarIntegerMap.put(nonterminal, indexOfGrammar++);
     }
-    grammarIntegerMap.put(languageGrammar.augmentedNonterminal, indexOfGrammar++);
-
-    for (Grammar derivedTerminalGrammar : derivedTerminalGrammars.values()) {
-      grammarIntegerMap.put(derivedTerminalGrammar, indexOfGrammar++);
-    }
   }
 
   public void initStringPool() {
@@ -107,10 +98,8 @@ public class PersistentData {
         languageGrammar.derivedTerminalGrammarAutomataDetail.derivedTerminalGrammarAutomataData;
     int capacity =
         languageGrammar.terminals.size()
-            + 2
             + languageGrammar.nonterminals.size()
-            + 1
-            + derivedTerminalGrammarAutomataData.derivedTerminalGrammars.size()
+            + 2
             + derivedTerminalGrammarAutomataData.sizeOfTextTerminalMap();
     stringPool = new LinkedHashMap<>(capacity);
     int indexOfString = 0;
@@ -134,21 +123,11 @@ public class PersistentData {
         stringPool.put(name, indexOfString++);
       }
     }
-    if (!stringPool.containsKey(languageGrammar.augmentedNonterminal.name)) {
-      stringPool.put(languageGrammar.augmentedNonterminal.name, indexOfString++);
-    }
-    // (grammarName,text) of derivedTerminalGrammar
-    for (TerminalGrammar terminalGrammar : derivedTerminalGrammarAutomataData.derivedTerminalGrammars.values()) {
-      String name = terminalGrammar.name;
-      if (!stringPool.containsKey(name)) {
-        stringPool.put(name, indexOfString++);
-      }
-    }
+    // text of KeyWords
     if (!derivedTerminalGrammarAutomataData.isEmpty()) {
-      //text
       for (RootTerminalGrammarMap rootTerminalGrammarMap :
           derivedTerminalGrammarAutomataData.rootTerminalGrammarMaps) {
-        for (Entry<String, TerminalGrammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
+        for (Entry<String, Grammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
           String text = entry.getKey();
           if (!stringPool.containsKey(text)) {
             stringPool.put(text, indexOfString++);
@@ -158,7 +137,7 @@ public class PersistentData {
     }
 
     // productionRule alias
-    for (List<ProductionRule> productionRules :
+    for (LinkedList<ProductionRule> productionRules :
         astContext.nonterminalProductionRulesMap.values()) {
       for (ProductionRule productionRule : productionRules) {
         String str = productionRule.alias;
@@ -170,15 +149,15 @@ public class PersistentData {
   }
 
   public void initProductionRules() {
-    Collection<List<ProductionRule>> productionRuleCollection =
+    Collection<LinkedList<ProductionRule>> productionRuleCollection =
         astContext.nonterminalProductionRulesMap.values();
     int capacity = 0;
-    for (List<ProductionRule> productionRules : productionRuleCollection) {
+    for (LinkedList<ProductionRule> productionRules : productionRuleCollection) {
       capacity += productionRules.size();
     }
     productionRuleIntegerMap = new LinkedHashMap<>(capacity);
     int intSymbolOfProductionRule = 0;
-    for (List<ProductionRule> productionRules : productionRuleCollection) {
+    for (LinkedList<ProductionRule> productionRules : productionRuleCollection) {
       for (ProductionRule productionRule : productionRules) {
         productionRuleIntegerMap.put(productionRule, intSymbolOfProductionRule++);
       }

@@ -1,29 +1,31 @@
 package titan.ast.grammar;
 
-import titan.ast.fa.token.TokenNfa;
-import titan.ast.fa.token.TokenNfable;
-
 /**
  * TerminalGrammar.
  *
  * @author tian wei jun
  */
-public class TerminalGrammar extends Grammar implements TokenNfable {
-
+public class TerminalGrammar extends Grammar {
   public LookaheadMatchingMode lookaheadMatchingMode = LookaheadMatchingMode.GREEDINESS;
-  public TokenNfa tokenNfa = null;
 
   public TerminalGrammar(String name) {
-    super(GrammarType.TERMINAL, name);
+    super(name);
+    this.type = GrammarType.TERMINAL;
+  }
+
+  public void setLookaheadMatchingMode() {
+    if (GrammarAttribute.isLaziness(attributes)) {
+      lookaheadMatchingMode = LookaheadMatchingMode.LAZINESS;
+    } else {
+      lookaheadMatchingMode = LookaheadMatchingMode.GREEDINESS;
+    }
   }
 
   @Override
-  public TokenNfa getTokenNfa() {
-    return tokenNfa;
-  }
-
-  @Override
-  public void setTokenNfa(TokenNfa tokenNfa) {
-    this.tokenNfa = tokenNfa;
+  public int compareTo(Grammar that) {
+    if (type != that.type) {
+      return type.ordinal() - that.type.ordinal();
+    }
+    return name.compareTo(that.name);
   }
 }

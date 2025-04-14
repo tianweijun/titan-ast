@@ -1,89 +1,62 @@
 package titan.ast.grammar;
 
+import java.util.List;
+import titan.ast.grammar.io.GrammarToken;
+
 /**
- * .
+ * GrammarAttribute.
  *
  * @author tian wei jun
  */
 public class GrammarAttribute {
+  // regexp()
+  private static final String KW_REGEXP_DESCRIPTOR = "regexp()";
+  // nfa(start,end)
+  private static final String PREFIX_NFA_REG_DESCRIPTOR = "nfa";
+  // greediness()
+  // 能被其他更重的token覆盖，也能被更长的自己覆盖
+  private static final String KW_GREEDINESS_DESCRIPTOR = "greediness()";
+  // laziness()
+  // 能被其他更重的token覆盖，但不能被更长的自己覆盖
+  private static final String KW_LAZINESS_DESCRIPTOR = "laziness()";
 
-  public final TerminalGrammarAttributeEnum type;
-
-  public GrammarAttribute(TerminalGrammarAttributeEnum type) {
-    this.type = type;
+  public static boolean isGrammarAttributeToken(GrammarToken token) {
+    String text = token.text;
+    return text.equals(KW_REGEXP_DESCRIPTOR)
+        || text.startsWith(PREFIX_NFA_REG_DESCRIPTOR)
+        || text.equals(KW_GREEDINESS_DESCRIPTOR)
+        || text.equals(KW_LAZINESS_DESCRIPTOR);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    GrammarAttribute that = (GrammarAttribute) o;
-    return type == that.type;
+  public static boolean isNfaRegexpAttribute(List<GrammarToken> attributes) {
+    return null != getNfaRegexpAttributeToken(attributes);
   }
 
-  @Override
-  public int hashCode() {
-    return type.hashCode();
+  private static boolean isNfaRegexpAttribute(String text) {
+    return text.startsWith(PREFIX_NFA_REG_DESCRIPTOR);
   }
 
-  public enum TerminalGrammarAttributeEnum {
-    NFA_TERMINAL_GRAMMAR_ATTRIBUTE,
-    LAZINESS_TERMINAL_GRAMMAR_ATTRIBUTE;
+  public static boolean isNormalRegexpAttribute(List<GrammarToken> attributes) {
+    return !isNfaRegexpAttribute(attributes);
   }
 
-  public static class LazinessTerminalGrammarAttribute extends GrammarAttribute {
-
-    private static LazinessTerminalGrammarAttribute LAZINESS =
-        new LazinessTerminalGrammarAttribute();
-
-    public static LazinessTerminalGrammarAttribute get(){
-      return LAZINESS;
+  public static GrammarToken getNfaRegexpAttributeToken(List<GrammarToken> attributes) {
+    GrammarToken nfaRegexpContent = null;
+    for (GrammarToken token : attributes) {
+      if (isNfaRegexpAttribute(token.text)) {
+        nfaRegexpContent = token;
+        break;
+      }
     }
-
-    private LazinessTerminalGrammarAttribute() {
-      super(TerminalGrammarAttributeEnum.LAZINESS_TERMINAL_GRAMMAR_ATTRIBUTE);
-    }
-
+    return nfaRegexpContent;
   }
 
-  public static class NfaTerminalGrammarAttribute extends GrammarAttribute {
-
-    public final String start;
-    public final String end;
-
-    public NfaTerminalGrammarAttribute(String start, String end) {
-      super(TerminalGrammarAttributeEnum.NFA_TERMINAL_GRAMMAR_ATTRIBUTE);
-      this.start = start;
-      this.end = end;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
+  public static boolean isLaziness(List<GrammarToken> attributes) {
+    for (GrammarToken token : attributes) {
+      if (KW_LAZINESS_DESCRIPTOR.equals(token.text)) {
         return true;
       }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      if (!super.equals(o)) {
-        return false;
-      }
-
-      NfaTerminalGrammarAttribute that = (NfaTerminalGrammarAttribute) o;
-      return start.equals(that.start) && end.equals(that.end);
     }
-
-    @Override
-    public int hashCode() {
-      int result = super.hashCode();
-      result = 31 * result + start.hashCode();
-      result = 31 * result + end.hashCode();
-      return result;
-    }
+    return false;
   }
 }
