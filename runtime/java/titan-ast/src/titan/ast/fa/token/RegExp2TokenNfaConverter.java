@@ -89,14 +89,14 @@ public class RegExp2TokenNfaConverter {
 
   private void buildNfa(Grammar grammar) {
     RegExpPrimaryGrammarContent grammarContent = (RegExpPrimaryGrammarContent) grammar.primaryGrammarContent;
-    TokenNfa tokenNfa = buildNfaByOrCompositeRegExp(grammarContent.orCompositeRegExp);
+    TokenNfa tokenNfa = buildByOrCompositeRegExp(grammarContent.orCompositeRegExp);
     ((TokenNfable) grammar).setTokenNfa(tokenNfa);
   }
 
   /**
    * 按照后序遍历顺序构造正则节点对应的nfa.
    */
-  private TokenNfa buildNfaByOrCompositeRegExp(OrCompositeRegExp orCompositeRegExp) {
+  private TokenNfa buildByOrCompositeRegExp(OrCompositeRegExp orCompositeRegExp) {
     TokenNfa orCompositeRegExpNfa = new TokenNfa();
     TokenNfaState start = orCompositeRegExpNfa.start;
     TokenNfaState end = orCompositeRegExpNfa.end;
@@ -124,7 +124,7 @@ public class RegExp2TokenNfaConverter {
     TokenNfa unitRegExpNfa = null;
     switch (unitRegExp.type) {
       case PARENTHESIS -> {
-        unitRegExpNfa = buildNfaByOrCompositeRegExp(((ParenthesisRegExp) unitRegExp).orCompositeRegExp);
+        unitRegExpNfa = buildByParenthesisRegExp(((ParenthesisRegExp) unitRegExp));
       }
       case GRAMMAR -> {
         unitRegExpNfa = buildByGrammarRegExp((GrammarRegExp) unitRegExp);
@@ -137,6 +137,12 @@ public class RegExp2TokenNfaConverter {
       }
     }
     return unitRegExpNfa;
+  }
+
+  private TokenNfa buildByParenthesisRegExp(ParenthesisRegExp parenthesisRegExp) {
+    OrCompositeRegExp orCompositeRegExp = parenthesisRegExp.orCompositeRegExp;
+    TokenNfa orCompositeRegExpNfa = buildByOrCompositeRegExp(orCompositeRegExp);
+    return buildByNfaAndTimes(orCompositeRegExpNfa, parenthesisRegExp.repMinTimes, parenthesisRegExp.repMaxTimes);
   }
 
   private TokenNfa buildByGrammarRegExp(GrammarRegExp grammarRegExp) {

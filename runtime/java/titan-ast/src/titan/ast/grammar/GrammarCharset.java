@@ -1,5 +1,7 @@
 package titan.ast.grammar;
 
+import titan.ast.fa.token.TokenNfa;
+
 /**
  * .
  *
@@ -28,4 +30,55 @@ public class GrammarCharset {
     }
     return chars;
   }
+
+  public static char[] getDisplayingChars(int tchar) {
+    if (tchar == TokenNfa.EPSILON) {
+      return new char[] {'\\', 'e'};
+    }
+    int postfixEscapeChar = -1;
+    switch (tchar) {
+      case 0:
+        postfixEscapeChar = '0';
+        break;
+      case 7:
+        postfixEscapeChar = 'a';
+        break;
+      case 8:
+        postfixEscapeChar = 'b';
+        break;
+      case 9:
+        postfixEscapeChar = 't';
+        break;
+      case 10:
+        postfixEscapeChar = 'n';
+        break;
+      case 11:
+        postfixEscapeChar = 'v';
+        break;
+      case 12:
+        postfixEscapeChar = 'f';
+        break;
+      case 13:
+        postfixEscapeChar = 'r';
+        break;
+      case 34:
+        postfixEscapeChar = '"';
+        break;
+      case 39:
+        postfixEscapeChar = '\'';
+        break;
+      case 63:
+        postfixEscapeChar = '?';
+        break;
+      case 92:
+        postfixEscapeChar = '\\';
+        break;
+      default:
+    }
+    if (postfixEscapeChar == -1) {
+      return new char[] {(char) tchar};
+    }
+    return new char[] {'\\', (char) postfixEscapeChar};
+  }
+
 }

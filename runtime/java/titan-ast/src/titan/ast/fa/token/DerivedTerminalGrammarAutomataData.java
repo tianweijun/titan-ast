@@ -2,7 +2,11 @@ package titan.ast.fa.token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import titan.ast.AstRuntimeException;
 import titan.ast.grammar.TerminalGrammar;
 
 /**
@@ -13,6 +17,7 @@ import titan.ast.grammar.TerminalGrammar;
 public class DerivedTerminalGrammarAutomataData {
 
   public List<RootTerminalGrammarMap> rootTerminalGrammarMaps = new ArrayList<>();
+  public LinkedHashMap<String, TerminalGrammar> derivedTerminalGrammars = new LinkedHashMap<>();
 
   public boolean isEmpty() {
     return rootTerminalGrammarMaps.isEmpty();
@@ -24,6 +29,33 @@ public class DerivedTerminalGrammarAutomataData {
       size += rootTerminalGrammarMap.textTerminalMap.size();
     }
     return size;
+  }
+
+  public void verifyTexts() {
+    int sizeOfTexts = sizeOfTextTerminalMap();
+    HashSet<String> texts = new HashSet<>(sizeOfTexts);
+    for (RootTerminalGrammarMap rootTerminalGrammarMap : rootTerminalGrammarMaps) {
+      for (Entry<String, TerminalGrammar> entry : rootTerminalGrammarMap.textTerminalMap.entrySet()) {
+        String text = entry.getKey();
+        if (texts.contains(text)) {
+          TerminalGrammar derivedTerminalGrammar = entry.getValue();
+          throw new AstRuntimeException(
+              String.format("terminal grammar %s : text(%s) is not unique.", derivedTerminalGrammar.name, text));
+        } else {
+          texts.add(text);
+        }
+      }
+    }
+  }
+
+  public TerminalGrammar getDerivedTerminalGrammarByText(String text) {
+    for (RootTerminalGrammarMap rootTerminalGrammarMap : rootTerminalGrammarMaps) {
+      TerminalGrammar terminalGrammar = rootTerminalGrammarMap.textTerminalMap.get(text);
+      if (null != terminalGrammar) {
+        return terminalGrammar;
+      }
+    }
+    return null;
   }
 
   public static class RootTerminalGrammarMap {

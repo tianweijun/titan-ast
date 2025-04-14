@@ -161,14 +161,18 @@ HexadecimalEscapeChar :
     | '\\' [xX] HexadecimalDigit HexadecimalDigit
 ;
 CharForSequenceChars :
-        ~[\\'] | '\\\''
+        ~['\\] | '\\\'' | '\\s'
         | HexadecimalEscapeChar
-        | '\\' [0\\abfnrtvs]
+        | '\\' [0\\abfnrtv]
+;
+OptionCharNonhyphens :
+       ~[\]\-\\] | '\\]' | '\\-' | '\\s'
+       | HexadecimalEscapeChar
+       | '\\' [0\\abfnrtv]
 ;
 CharForOneCharOptionCharset :
-       ~[\\\]] | '\\]'
-       | HexadecimalEscapeChar
-       | '\\' [0\\abfnrtvs]
+    OptionCharNonhyphens
+    | OptionCharNonhyphens '-' OptionCharNonhyphens
 ;
 
 RepeatTimes :

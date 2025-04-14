@@ -2,7 +2,9 @@ package titan.ast;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import titan.ast.fa.syntax.AstAutomata;
 import titan.ast.fa.syntax.ProductionRule;
+import titan.ast.fa.syntax.SyntaxDfa;
 import titan.ast.fa.token.TokenAutomata;
 import titan.ast.fa.token.TokenDfa;
 import titan.ast.grammar.LanguageGrammar;
@@ -22,6 +24,8 @@ public class AstContext {
   public TokenDfa tokenDfa;
   public TokenAutomata tokenAutomata;
   public LinkedHashMap<NonterminalGrammar, List<ProductionRule>> nonterminalProductionRulesMap;
+  public SyntaxDfa astDfa;
+  public AstAutomata astAutomata;
 
   /**
    * 初始化并生成一个当前应用程序的 上下文.

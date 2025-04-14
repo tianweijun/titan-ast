@@ -48,7 +48,7 @@ public class RepeatTimes implements Cloneable {
   public boolean isInfinityTimes() {
     return type == RepeatTimesType.INFINITY;
   }
-  
+
   public boolean isNumberTimesAndGreatThanOrEqual(int otherTimes) {
     return type == RepeatTimesType.NUMBER && this.times >= otherTimes;
   }
@@ -79,6 +79,14 @@ public class RepeatTimes implements Cloneable {
     int result = type != null ? type.hashCode() : 0;
     result = 31 * result + times;
     return result;
+  }
+
+  @Override
+  public String toString() {
+    if(type==RepeatTimesType.INFINITY){
+      return "infinity";
+    }
+    return String.valueOf(times);
   }
 
   public RepeatTimes clone() {

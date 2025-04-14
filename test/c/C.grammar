@@ -816,7 +816,7 @@ CChar
 
 IdentifierNondigit
     :   Nondigit
-    |   UniversalCharacterName
+    // |   UniversalCharacterName
     ;
 
 Nondigit

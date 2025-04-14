@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import titan.ast.AstContext;
 import titan.ast.AstRuntimeException;
+import titan.ast.fa.token.DerivedTerminalGrammarAutomataData;
 import titan.ast.grammar.Grammar;
+import titan.ast.grammar.LanguageGrammar;
 import titan.ast.grammar.NonterminalGrammar;
 import titan.ast.grammar.PrimaryGrammarContent;
 import titan.ast.grammar.PrimaryGrammarContent.RegExpPrimaryGrammarContent;
@@ -23,29 +25,33 @@ import titan.ast.grammar.regexp.UnitRegExp;
  *
  * @author tian wei jun
  */
-public class ProductionRuleBuilder {
+public class ProductionRuleInitializer {
 
   private final LinkedHashMap<String, NonterminalGrammar> nonterminals;
+  private final DerivedTerminalGrammarAutomataData derivedTerminalGrammarAutomataData;
   LinkedHashMap<String, TerminalGrammar> terminals;
   private Map<String, TerminalGrammar> sequenceCharsRegExpTerminalMap;
   private LinkedHashMap<NonterminalGrammar, List<ProductionRule>> nonterminalProductionRulesMap;
-  private NonterminalGrammar nonterminal;
+  private transient NonterminalGrammar nonterminal;
 
 
-  public ProductionRuleBuilder() {
-    AstContext astContext = AstContext.get();
-    this.nonterminals = astContext.languageGrammar.nonterminals;
-    this.terminals = astContext.languageGrammar.terminals;
+  public ProductionRuleInitializer() {
+    LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
+    this.nonterminals = languageGrammar.nonterminals;
+    this.terminals = languageGrammar.terminals;
+    derivedTerminalGrammarAutomataData =
+        languageGrammar.derivedTerminalGrammarAutomataDetail.derivedTerminalGrammarAutomataData;
   }
 
   /**
    * 将所有从构造方法传递进来的非终结符生成对应的产生式.
    */
-  public void build() {
+  public void init() {
     nonterminalProductionRulesMap = new LinkedHashMap<>(nonterminals.size());
     for (NonterminalGrammar nonterminal : nonterminals.values()) {
       build(nonterminal);
     }
+    buildForAugmentedNonterminal();
     AstContext.get().nonterminalProductionRulesMap = nonterminalProductionRulesMap;
   }
 
@@ -74,6 +80,25 @@ public class ProductionRuleBuilder {
       productionRules.add(productionRule);
     }
     nonterminalProductionRulesMap.put(nonterminal, productionRules);
+  }
+
+  private void buildForAugmentedNonterminal() {
+    LanguageGrammar languageGrammar = AstContext.get().languageGrammar;
+    NonterminalGrammar augmentedNonterminal = languageGrammar.augmentedNonterminal;
+    Grammar startGrammar = languageGrammar.getStartGrammar();
+
+    GrammarRegExp grammarRegExp = new GrammarRegExp(startGrammar.name);
+    grammarRegExp.grammar = startGrammar;
+    AndCompositeRegExp andCompositeRegExp = new AndCompositeRegExp();
+    andCompositeRegExp.children.add(grammarRegExp);
+
+    ProductionRule productionRule = new ProductionRule();
+    productionRule.grammar = augmentedNonterminal;
+    productionRule.rule = andCompositeRegExp;
+
+    List<ProductionRule> productionRules = new ArrayList<>(1);
+    productionRules.add(productionRule);
+    nonterminalProductionRulesMap.put(augmentedNonterminal, productionRules);
   }
 
   /**
@@ -105,6 +130,11 @@ public class ProductionRuleBuilder {
         case GRAMMAR -> {
           GrammarRegExp grammarRegExp = (GrammarRegExp) unitRegExp;
           grammarRegExp.grammar = getGrammarForGrammarRegExp(grammarRegExp.grammarName);
+          if (null == grammarRegExp.grammar) {
+            throw new AstRuntimeException(
+                String.format("nonterminal grammar(%s) : text(%s) not match any token(terminal "
+                    + "grammar)", nonterminal.name, grammarRegExp.grammarName));
+          }
         }
         case SEQUENCE_CHARS -> {
           SequenceCharsRegExp sequenceCharsRegExp = (SequenceCharsRegExp) unitRegExp;
@@ -121,7 +151,11 @@ public class ProductionRuleBuilder {
     String text = sequenceCharsRegExp.chars;
     TerminalGrammar terminalGrammar = sequenceCharsRegExpTerminalMap.get(text);
     if (null == terminalGrammar) {
-      //todo DerivedTerminalGrammar只放在DerivedTerminalGrammarAutomataDetail里
+      terminalGrammar = derivedTerminalGrammarAutomataData.getDerivedTerminalGrammarByText(text);
+    }
+    if (null == terminalGrammar) {
+      throw new AstRuntimeException(String.format("nonterminal grammar(%s) : text(%s) not match any token(terminal "
+          + "grammar)", nonterminal.name, text));
     }
     GrammarRegExp grammarRegExp = new GrammarRegExp(terminalGrammar.name);
     grammarRegExp.grammar = terminalGrammar;
@@ -134,16 +168,24 @@ public class ProductionRuleBuilder {
       PrimaryGrammarContent primaryGrammarContent = terminal.primaryGrammarContent;
       if (primaryGrammarContent instanceof RegExpPrimaryGrammarContent regExpPrimaryGrammarContent) {
         OrCompositeRegExp orCompositeRegExp = regExpPrimaryGrammarContent.orCompositeRegExp;
-        if (orCompositeRegExp.children.size() == 1) {
-          AndCompositeRegExp andCompositeRegExp = orCompositeRegExp.children.get(0);
-          if (andCompositeRegExp.children.size() == 1) {
-            UnitRegExp unitRegExp = andCompositeRegExp.children.get(0);
-            if (unitRegExp instanceof SequenceCharsRegExp sequenceCharsRegExp
-                && sequenceCharsRegExp.repMinTimes.isNumberTimesAndEqual(1) &&
-                sequenceCharsRegExp.repMaxTimes.isNumberTimesAndEqual(1)) {
-              sequenceCharsRegExpTerminalMap.put(sequenceCharsRegExp.chars, terminal);
-            }
+        initSequenceCharsRegExpTerminalMap(terminal, orCompositeRegExp);
+      }
+    }
+  }
+
+  private void initSequenceCharsRegExpTerminalMap(TerminalGrammar terminal, OrCompositeRegExp orCompositeRegExp) {
+    for (AndCompositeRegExp andCompositeRegExp : orCompositeRegExp.children) {
+      if (andCompositeRegExp.children.size() == 1) {
+        UnitRegExp unitRegExp = andCompositeRegExp.children.get(0);
+        if (unitRegExp instanceof SequenceCharsRegExp sequenceCharsRegExp
+            && sequenceCharsRegExp.repMinTimes.isNumberTimesAndEqual(1)
+            && sequenceCharsRegExp.repMaxTimes.isNumberTimesAndEqual(1)) {
+          String text = sequenceCharsRegExp.chars;
+          if (sequenceCharsRegExpTerminalMap.containsKey(text)) {
+            throw new AstRuntimeException(
+                String.format("terminal grammar %s : text(%s) is not unique.", terminal.name, text));
           }
+          sequenceCharsRegExpTerminalMap.put(text, terminal);
         }
       }
     }
@@ -153,6 +195,9 @@ public class ProductionRuleBuilder {
     Grammar grammar = nonterminals.get(grammarName);
     if (null == grammar) {
       grammar = terminals.get(grammarName);
+    }
+    if (null == grammar) {
+      grammar = derivedTerminalGrammarAutomataData.derivedTerminalGrammars.get(grammarName);
     }
     return grammar;
   }

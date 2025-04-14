@@ -1,6 +1,7 @@
 package titan.ast.util;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,4 +68,15 @@ public class FileUtil {
     return fileList;
   }
 
+  public static void createtFileIfNotExists(String content, String filePath) {
+    File file = new File(filePath);
+    if (file.exists()) {
+      return;
+    }
+    try (FileWriter fileWriter = new FileWriter(file)) {
+      fileWriter.write(content);
+    } catch (IOException e) {
+      throw new AstRuntimeException(e);
+    }
+  }
 }

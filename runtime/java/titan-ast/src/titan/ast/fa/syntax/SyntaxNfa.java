@@ -28,9 +28,7 @@ public class SyntaxNfa implements Cloneable {
 
   void init(ProductionRule productionRule) {
     start = new SyntaxNfaState(productionRule);
-    start.type = FaStateType.NONE.getValue();
     end = new SyntaxNfaState(productionRule);
-    end.type = FaStateType.NONE.getValue();
   }
 
   /**

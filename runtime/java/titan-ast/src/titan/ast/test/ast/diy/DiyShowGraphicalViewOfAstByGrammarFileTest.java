@@ -1,18 +1,21 @@
-package titan.ast.test;
+package titan.ast.test.ast.diy;
 
 import titan.ast.CommandLineAstApplication;
 import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder;
 import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
 
-/**
- * .
- *
- * @author tian wei jun
- */
-public class AstWayGrammarFileAutomataAstApplicationTest {
+public class DiyShowGraphicalViewOfAstByGrammarFileTest {
 
   public static void main(String[] args) {
-    CommandLineAstApplication commandLineAstApplication = new CommandLineAstApplication(args,
+    String[] testArgs = {
+      "-grammarFilePath",
+      "D://github-pro/titan/titan-ast/test/diy/diy.grammar",
+      "-sourceFilePath",
+      "D://github-pro/titan/titan-ast/test/diy/diy.txt",
+      "-graphicalViewOfAst",
+      "utf-8"
+    };
+    CommandLineAstApplication commandLineAstApplication = new CommandLineAstApplication(testArgs,
         new DefaultGrammarFileAutomataAstApplicationBuilder(
             GrammarFileAutomataAstApplicationEnum.AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION));
     commandLineAstApplication.run();

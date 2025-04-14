@@ -11,7 +11,6 @@ import titan.ast.fa.token.TokenNfable;
 public class TerminalGrammar extends Grammar implements TokenNfable {
 
   public LookaheadMatchingMode lookaheadMatchingMode = LookaheadMatchingMode.GREEDINESS;
-  public GrammarAction action = GrammarAction.TEXT;
   public TokenNfa tokenNfa = null;
 
   public TerminalGrammar(String name) {

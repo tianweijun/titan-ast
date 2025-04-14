@@ -2,6 +2,7 @@ package titan.ast.fa.token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -37,6 +38,7 @@ public class DerivedTerminalGrammarAutomataDataBuilder {
       return;
     }
     buildDerivedTerminalGrammarAutomataData();
+    derivedTerminalGrammarAutomataData.verifyTexts();
     addDerivedTerminalGrammar2Terminals();
   }
 
@@ -44,13 +46,24 @@ public class DerivedTerminalGrammarAutomataDataBuilder {
    * 为了参与语法自动机的构建,derivedTerminalGrammars不参与任何tokenDfa的构建，参与syntaxDfa的构建.
    */
   private void addDerivedTerminalGrammar2Terminals() {
-    // 将keyword 添加到 terminals
     for (RootTerminalGrammarMapDetail rootTerminalGrammarMapDetail :
         languageGrammar.derivedTerminalGrammarAutomataDetail.rootTerminalGrammarMaps.values()) {
       for (TerminalGrammar derivedTerminalGrammar :
           rootTerminalGrammarMapDetail.derivedTerminalGrammars.keySet()) {
-        languageGrammar.addTerminalGrammar(derivedTerminalGrammar);
+        addDerivedTerminalGrammar2Terminals(derivedTerminalGrammar);
       }
+    }
+  }
+
+  private void addDerivedTerminalGrammar2Terminals(TerminalGrammar derivedTerminalGrammar) {
+    LinkedHashMap<String, TerminalGrammar> derivedTerminalGrammars =
+        derivedTerminalGrammarAutomataData.derivedTerminalGrammars;
+    if (languageGrammar.isUniqueTerminalGrammar(derivedTerminalGrammar)
+        && !derivedTerminalGrammars.containsKey(derivedTerminalGrammar.name)) {
+      derivedTerminalGrammars.put(derivedTerminalGrammar.name, derivedTerminalGrammar);
+    } else {
+      throw new AstRuntimeException(
+          String.format("name of grammar '%s' is not unique.", derivedTerminalGrammar.name));
     }
   }
 
@@ -142,7 +155,10 @@ public class DerivedTerminalGrammarAutomataDataBuilder {
         break;
       }
       UnitRegExp unitRegExp = andCompositeRegExp.children.get(0);
-      if (unitRegExp.type != RegExpType.SEQUENCE_CHARS) {
+      if (!(unitRegExp.type == RegExpType.SEQUENCE_CHARS
+          && unitRegExp.repMinTimes.isNumberTimesAndEqual(1)
+          && unitRegExp.repMaxTimes.isNumberTimesAndEqual(1))
+      ) {
         isRight = false;
         break;
       }

@@ -10,6 +10,7 @@ public abstract class Grammar implements Comparable<Grammar> {
 
   public final GrammarType type;
   public final String name;
+  public GrammarAction action = GrammarAction.TEXT;
 
   // transient
   public PrimaryGrammarContent primaryGrammarContent;

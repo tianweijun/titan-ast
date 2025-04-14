@@ -17,7 +17,10 @@ set :
 @TerminalGrammar begin ;
 
 Identifier :
-  IdentifierChar+
+    IdentifierNondigit
+        (   IdentifierNondigit
+        |   Digit
+        )*
 ;
 
  WS
@@ -27,9 +30,16 @@ Identifier :
 
 @TerminalFragmentGrammar begin ;
 
-IdentifierChar : [a-zA-Z_0-9] ;
-
-Test :   (~[a] )  ;
+IdentifierNondigit
+    :   Nondigit
+    ;
+	
+Nondigit
+    :   [a-zA-Z_]
+    ;
+Digit
+    :   [0-9]
+    ;
 
 @TerminalFragmentGrammar end ;
 

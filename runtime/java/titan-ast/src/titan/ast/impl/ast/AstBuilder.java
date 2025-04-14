@@ -23,27 +23,29 @@ public class AstBuilder {
     RuntimeAutomataRichAstApplication astApplication = RuntimeAutomataRichAstApplicationFactory.getAstApplication();
     RichAstGeneratorResult richAstGeneratorResult = astApplication.buildRichAst(grammarFilePath);
     if (!richAstGeneratorResult.isOk()) {
-      throw new AstRuntimeException(getErrorMsg(richAstGeneratorResult));
+      throw new AstRuntimeException(getErrorMsg(grammarFilePath, richAstGeneratorResult));
     }
     return new Ast2ContextAstConvertor(richAstGeneratorResult.getOkAst(), AST_PACKAGE).convert();
   }
 
-  private static String getErrorMsg(RichAstGeneratorResult richAstGeneratorResult) {
+  private static String getErrorMsg(String grammarFilePath, RichAstGeneratorResult richAstGeneratorResult) {
     if (richAstGeneratorResult.richTokensResult.getType() == RichTokensResultType.TOKEN_PARSE_ERROR) {
       RichTokenParseErrorData error =
           richAstGeneratorResult.richTokensResult.getRichTokenParseErrorData();
       return String.format(
-          "an error occurred because the text is not matching any grammar of token,error near [%d-%d,%d-%d): %s",
-          error.startLineNumber, error.startOffsetInLine, error.endLineNumber, error.endOffsetInLine, error.errorText);
+          "an error occurred because the text is not matching any grammar of token,error near %s[%d-%d,%d-%d): %s",
+          grammarFilePath,error.startLineNumber, error.startOffsetInLine, error.endLineNumber, error.endOffsetInLine,
+          error.errorText);
 
     }
     if (richAstGeneratorResult.richAstResult.getType() == RichAstResultType.AST_PARSE_ERROR) {
       RichAstParseErrorData error =
           richAstGeneratorResult.richAstResult.getRichAstParseErrorData();
       return String.format(
-          "an error occurred because the text is not matching any grammar of nonterimal,error near [%d-%d,%d-%d): "
+          "an error occurred because the text is not matching any grammar of nonterimal,error near %s[%d-%d,%d-%d): "
               + "%s",
-          error.startLineNumber, error.startOffsetInLine, error.endLineNumber, error.endOffsetInLine, error.errorText);
+          grammarFilePath,error.startLineNumber, error.startOffsetInLine, error.endLineNumber, error.endOffsetInLine,
+          error.errorText);
 
     }
     return richAstGeneratorResult.getErrorMsg();

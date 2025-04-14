@@ -12,6 +12,10 @@ import titan.ast.impl.ast.regexp.GrammarInitializer;
  */
 public class AstWayGrammarFileAutomataAstApplication extends GrammarFileAutomataAstApplication {
 
+  public AstWayGrammarFileAutomataAstApplication(String grammarFilePath) {
+    super(grammarFilePath);
+  }
+
   public AstWayGrammarFileAutomataAstApplication(List<String> grammarFilePaths) {
     super(grammarFilePaths);
   }

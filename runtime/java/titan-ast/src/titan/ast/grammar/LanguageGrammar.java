@@ -19,7 +19,6 @@ public class LanguageGrammar {
   public TerminalGrammar epsilon = new TerminalGrammar("Epsilon"); // for Nfa
   public TerminalGrammar eof = new TerminalGrammar("Eof");
   // for FollowFilterBacktrackingBottomUpAstAutomata
-  // todo set startGrammar
   public NonterminalGrammar augmentedNonterminal = new NonterminalGrammar("augmentedNonterminal");
 
   public DerivedTerminalGrammarAutomataDetail derivedTerminalGrammarAutomataDetail =
@@ -42,20 +41,25 @@ public class LanguageGrammar {
   }
 
   public void addTerminalGrammar(TerminalGrammar grammar) {
-    boolean isNotUnique = terminalFragments.containsKey(grammar.name);
-    isNotUnique = isNotUnique || terminals.containsKey(grammar.name);
-    isNotUnique = isNotUnique || epsilon.name.equals(grammar.name);
-    isNotUnique = isNotUnique || eof.name.equals(grammar.name);
-    if (isNotUnique) {
+    boolean isUnique = isUniqueTerminalGrammar(grammar);
+    if (!isUnique) {
       throw new AstRuntimeException(
           String.format("name of grammar '%s' is not unique.", grammar.name));
     }
     terminals.put(grammar.name, grammar);
   }
 
+  public boolean isUniqueTerminalGrammar(TerminalGrammar grammar) {
+    boolean isNotUnique = terminalFragments.containsKey(grammar.name)
+        || terminals.containsKey(grammar.name)
+        || epsilon.name.equals(grammar.name)
+        || eof.name.equals(grammar.name);
+    return !isNotUnique;
+  }
+
   public void addNonterminalGrammar(NonterminalGrammar grammar) {
-    boolean isNotUnique = nonterminals.containsKey(grammar.name);
-    isNotUnique = isNotUnique || augmentedNonterminal.name.equals(grammar.name);
+    boolean isNotUnique = nonterminals.containsKey(grammar.name)
+        || augmentedNonterminal.name.equals(grammar.name);
     if (isNotUnique) {
       throw new AstRuntimeException(
           String.format("name of grammar '%s' is not unique.", grammar.name));

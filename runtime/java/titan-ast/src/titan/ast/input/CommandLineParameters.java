@@ -19,13 +19,16 @@ public class CommandLineParameters {
 
   public boolean graphicalViewOfAst = false;
   public String graphicalViewOfAstCharSet = AstGeneratorResult.DEFAULT_CHARSET.name();
+  public String astVisitorFileDirectory = "";
+  public String astVisitorPackage = "";
   public boolean isAmbiguous = false;
 
   public boolean isRight() {
     return isBuildingAstByAutomataFile()
         || isBuildingAstByGrammarFile()
         || isPersistentAutomata()
-        || isAmbiguous();
+        || isAmbiguous()
+        || isBuildingAstVisitor();
   }
 
   public boolean isBuildingAstByAutomataFile() {
@@ -44,6 +47,10 @@ public class CommandLineParameters {
     return !grammarFilePaths.isEmpty() && isAmbiguous;
   }
 
+  public boolean isBuildingAstVisitor() {
+    return !grammarFilePaths.isEmpty() && StringUtils.isNotBlank(astVisitorFileDirectory);
+  }
+
   public String infoOfHelper() {
 
     String stringBuilder =
@@ -57,6 +64,9 @@ public class CommandLineParameters {
             + "\n"
             + "         "
             + "[-persistentAutomataFilePath <filepath>]"
+            + "\n"
+            + "         "
+            + "[-astVisitorFileDirectory <fileDirectory>]"
             + "\n"
             + "         "
             + "[-automataFilePath <filepath>]"

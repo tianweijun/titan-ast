@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import titan.ast.AstContext;
+import titan.ast.AstRuntimeException;
 import titan.ast.fa.FaStateType;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.LanguageGrammar;
@@ -65,20 +66,25 @@ public class TerminalGrammarNfaBuilder {
     for (TerminalGrammar terminalGrammar : terminals.values()) {
       if (terminalGrammar.primaryGrammarContent instanceof RegExpPrimaryGrammarContent regExpPrimaryGrammarContent) {
         OrCompositeRegExp orCompositeRegExp = regExpPrimaryGrammarContent.orCompositeRegExp;
-        setGrammarOfGrammarRegExp(orCompositeRegExp);
+        setGrammarOfGrammarRegExp(terminalGrammar, orCompositeRegExp);
       }
     }
   }
 
 
-  private void setGrammarOfGrammarRegExp(OrCompositeRegExp orCompositeRegExp) {
+  private void setGrammarOfGrammarRegExp(TerminalGrammar terminalGrammar, OrCompositeRegExp orCompositeRegExp) {
     for (AndCompositeRegExp andCompositeRegExp : orCompositeRegExp.children) {
       for (UnitRegExp unitRegExp : andCompositeRegExp.children) {
         if (unitRegExp instanceof GrammarRegExp grammarRegExp) {
           grammarRegExp.grammar = getGrammarForGrammarRegExp(grammarRegExp.grammarName);
+          if (null == grammarRegExp.grammar) {
+            throw new AstRuntimeException(
+                String.format("terminal grammar(%s) : text(%s) not match any grammar(terminal "
+                    + "grammar and fragment)", terminalGrammar.name, grammarRegExp.grammarName));
+          }
         }
         if (unitRegExp instanceof ParenthesisRegExp parenthesisRegExp) {
-          setGrammarOfGrammarRegExp(parenthesisRegExp.orCompositeRegExp);
+          setGrammarOfGrammarRegExp(terminalGrammar, parenthesisRegExp.orCompositeRegExp);
         }
       }
     }

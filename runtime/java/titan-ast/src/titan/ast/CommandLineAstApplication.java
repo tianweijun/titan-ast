@@ -47,9 +47,9 @@ public class CommandLineAstApplication {
       return;
     }
 
+    buildAstByAutomataFile();
+    buildByGrammarFile();
     try {
-      buildAstByAutomataFile();
-      buildByGrammarFile();
     } catch (AstRuntimeException e) {
       Logger.info(
           String.format(
@@ -63,16 +63,25 @@ public class CommandLineAstApplication {
   private void buildByGrammarFile() {
     if (!(commandLineParameters.isPersistentAutomata()
         || commandLineParameters.isBuildingAstByGrammarFile()
-        || commandLineParameters.isAmbiguous())) {
+        || commandLineParameters.isAmbiguous()
+        || commandLineParameters.isBuildingAstVisitor())) {
       return;
     }
     grammarFileAutomataAstApplicationBuilder.build(commandLineParameters.grammarFilePaths);
 
     isAmbiguous();
+    buildAstVisitor();
     persistAutomata();
     buildAstByGrammarFile();
 
     AstContext.clear();
+  }
+
+  private void buildAstVisitor() {
+    if (commandLineParameters.isBuildingAstVisitor()) {
+      grammarFileAutomataAstApplicationBuilder.get().generateAstVisitor(
+          commandLineParameters.astVisitorFileDirectory, commandLineParameters.astVisitorPackage);
+    }
   }
 
   private void isAmbiguous(

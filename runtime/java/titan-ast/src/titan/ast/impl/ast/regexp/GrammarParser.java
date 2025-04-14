@@ -171,7 +171,7 @@ public class GrammarParser {
         break;
       }
       if (ch == '-') {
-        creationDescriptor.indexsOfRangeFlag.add(stringBuilder.length() - 1);
+        creationDescriptor.indexsOfRangeFlag.add(stringBuilder.length());
       }
       stringBuilder.append(ch);
       ++indexOfChar;
