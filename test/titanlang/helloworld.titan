@@ -1,19 +1,10 @@
-module entry {
-  /*use std::Io;*/
-
-  public function  main() -> i32 {
-      let num: i32 = 100 ;
-      printfln("1+2+3+...+%d=%d\n",num,sum(num));
-      return 0;
-  }
-
-  @Inline @inline
-  public function sum(num: i32) -> i32 {
-      let sum: i32 = 0;
-      for i in Range{1,num} {
-          sum += i;
-      }
-      return sum;
+公开（root） 模块 入口模块 {
+  公开 函数 _＿——测试() -> ｉ３２ {
+   令 意思 = 3 + ３＋５/６×８６９。９８；
+   令 你好世界 : 字符串 = “你好，世界。"；
+   令 窗前 : 字符 = ‘、ｎ’；
+   令 明月 : 字符 = '\ｔ'；
+   令 光 : 字符 = '中'；
+   返回 ０；
   }
 }
-//

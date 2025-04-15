@@ -3,6 +3,6 @@ java -jar D:\github-pro\titan\titan-ast\out\artifacts\titan_ast_jar\titan-ast.ja
  -grammarFilePaths^
     titanAstGrammar.txt^
  -persistentAutomataFilePath^
-    ./titanAstGrammar.automata
+    titanAstGrammar.automata
 
 pause

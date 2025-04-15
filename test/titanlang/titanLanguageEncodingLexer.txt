@@ -1,0 +1,121 @@
+@TerminalFragmentGrammar begin ;
+
+// DelimiterChar
+DelimiterChar : DelimiterCharAscii | DelimiterCharCn ;
+
+// ----------------LowercaseLetter start-----------------
+LowercaseLetterA : LowercaseLetterAAscii | LowercaseLetterACn ;
+LowercaseLetterB : LowercaseLetterBAscii | LowercaseLetterBCn ;
+LowercaseLetterC : LowercaseLetterCAscii | LowercaseLetterCCn ;
+LowercaseLetterD : LowercaseLetterDAscii | LowercaseLetterDCn ;
+LowercaseLetterE : LowercaseLetterEAscii | LowercaseLetterECn ;
+LowercaseLetterF : LowercaseLetterFAscii | LowercaseLetterFCn ;
+LowercaseLetterG : LowercaseLetterGAscii | LowercaseLetterGCn ;
+LowercaseLetterH : LowercaseLetterHAscii | LowercaseLetterHCn ;
+LowercaseLetterI : LowercaseLetterIAscii | LowercaseLetterICn ;
+LowercaseLetterJ : LowercaseLetterJAscii | LowercaseLetterJCn ;
+LowercaseLetterK : LowercaseLetterKAscii | LowercaseLetterKCn ;
+LowercaseLetterL : LowercaseLetterLAscii | LowercaseLetterLCn ;
+LowercaseLetterM : LowercaseLetterMAscii | LowercaseLetterMCn ;
+LowercaseLetterN : LowercaseLetterNAscii | LowercaseLetterNCn ;
+LowercaseLetterO : LowercaseLetterOAscii | LowercaseLetterOCn ;
+LowercaseLetterP : LowercaseLetterPAscii | LowercaseLetterPCn ;
+LowercaseLetterQ : LowercaseLetterQAscii | LowercaseLetterQCn ;
+LowercaseLetterR : LowercaseLetterRAscii | LowercaseLetterRCn ;
+LowercaseLetterS : LowercaseLetterSAscii | LowercaseLetterSCn ;
+LowercaseLetterT : LowercaseLetterTAscii | LowercaseLetterTCn ;
+LowercaseLetterU : LowercaseLetterUAscii | LowercaseLetterUCn ;
+LowercaseLetterV : LowercaseLetterVAscii | LowercaseLetterVCn ;
+LowercaseLetterW : LowercaseLetterWAscii | LowercaseLetterWCn ;
+LowercaseLetterX : LowercaseLetterXAscii | LowercaseLetterXCn ;
+LowercaseLetterY : LowercaseLetterYAscii | LowercaseLetterYCn ;
+LowercaseLetterZ : LowercaseLetterZAscii | LowercaseLetterZCn ;
+// ----------------LowercaseLetter end-------------------
+
+// ----------------UppercaseLetter start-----------------
+UppercaseLetterA : UppercaseLetterAAscii | UppercaseLetterACn ;
+UppercaseLetterB : UppercaseLetterBAscii | UppercaseLetterBCn ;
+UppercaseLetterC : UppercaseLetterCAscii | UppercaseLetterCCn ;
+UppercaseLetterD : UppercaseLetterDAscii | UppercaseLetterDCn ;
+UppercaseLetterE : UppercaseLetterEAscii | UppercaseLetterECn ;
+UppercaseLetterF : UppercaseLetterFAscii | UppercaseLetterFCn ;
+UppercaseLetterG : UppercaseLetterGAscii | UppercaseLetterGCn ;
+UppercaseLetterH : UppercaseLetterHAscii | UppercaseLetterHCn ;
+UppercaseLetterI : UppercaseLetterIAscii | UppercaseLetterICn ;
+UppercaseLetterJ : UppercaseLetterJAscii | UppercaseLetterJCn ;
+UppercaseLetterK : UppercaseLetterKAscii | UppercaseLetterKCn ;
+UppercaseLetterL : UppercaseLetterLAscii | UppercaseLetterLCn ;
+UppercaseLetterM : UppercaseLetterMAscii | UppercaseLetterMCn ;
+UppercaseLetterN : UppercaseLetterNAscii | UppercaseLetterNCn ;
+UppercaseLetterO : UppercaseLetterOAscii | UppercaseLetterOCn ;
+UppercaseLetterP : UppercaseLetterPAscii | UppercaseLetterPCn ;
+UppercaseLetterQ : UppercaseLetterQAscii | UppercaseLetterQCn ;
+UppercaseLetterR : UppercaseLetterRAscii | UppercaseLetterRCn ;
+UppercaseLetterS : UppercaseLetterSAscii | UppercaseLetterSCn ;
+UppercaseLetterT : UppercaseLetterTAscii | UppercaseLetterTCn ;
+UppercaseLetterU : UppercaseLetterUAscii | UppercaseLetterUCn ;
+UppercaseLetterV : UppercaseLetterVAscii | UppercaseLetterVCn ;
+UppercaseLetterW : UppercaseLetterWAscii | UppercaseLetterWCn ;
+UppercaseLetterX : UppercaseLetterXAscii | UppercaseLetterXCn ;
+UppercaseLetterY : UppercaseLetterYAscii | UppercaseLetterYCn ;
+UppercaseLetterZ : UppercaseLetterZAscii | UppercaseLetterZCn ;
+// ----------------UppercaseLetter end-------------------
+
+// ----------------Digit start-----------------
+Digit0 : Digit0Ascii | Digit0Cn ;
+Digit1 : Digit1Ascii | Digit1Cn ;
+Digit2 : Digit2Ascii | Digit2Cn ;
+Digit3 : Digit3Ascii | Digit3Cn ;
+Digit4 : Digit4Ascii | Digit4Cn ;
+Digit5 : Digit5Ascii | Digit5Cn ;
+Digit6 : Digit6Ascii | Digit6Cn ;
+Digit7 : Digit7Ascii | Digit7Cn ;
+Digit8 : Digit8Ascii | Digit8Cn ;
+Digit9 : Digit9Ascii | Digit9Cn ;
+// ----------------Digit end-------------------
+
+
+// ------------------punctuation Fragment start---------------
+LeftBraceFragment : LeftBraceFragmentAscii | LeftBraceCn ;
+RightBraceFragment : RightBraceFragmentAscii | RightBraceCn ;
+LeftParenFragment : LeftParenFragmentAscii | LeftParenCn ;
+RightParenFragment : RightParenFragmentAscii | RightParenCn ;
+LeftBracketFragment : LeftBracketFragmentAscii | LeftBracketCn ;
+RightBracketFragment : RightBracketFragmentAscii | RightBracketCn ;
+
+SemiFragment : SemiFragmentAscii | SemiCn ;
+CommaFragment : CommaFragmentAscii | CommaCn ;
+ColonFragment : ColonFragmentAscii | ColonCn ;
+DotFragment : DotFragmentAscii | DotCn ;
+
+PlusSignFragment    : PlusSignFragmentAscii | PlusSignCn ;
+MinusSignFragment   : MinusSignFragmentAscii | MinusSignCn ;
+AsteriskFragment : AsteriskFragmentAscii | AsteriskCn ;
+SlashFragment   : SlashFragmentAscii | SlashCn ;
+PercentSignFragment : PercentSignFragmentAscii | PercentSignCn ;
+
+AmpersandFragment : AmpersandFragmentAscii | AmpersandCn ;
+VerticalBarFragment : VerticalBarFragmentAscii | VerticalBarCn ;
+CaretFragment : CaretFragmentAscii | CaretCn ;
+TildeFragment : TildeFragmentAscii | TildeCn ;
+
+GreaterThanSignFragment : GreaterThanSignFragmentAscii | GreaterThanSignCn ;
+LessThanSignFragment : LessThanSignFragmentAscii | LessThanSignCn ;
+EqualsSignFragment : EqualsSignFragmentAscii ;
+ExclamationMarkFragment : ExclamationMarkFragmentAscii | ExclamationMarkCn ;
+
+AtSignFragment : AtSignFragmentAscii | AtSignCn ;
+QuestionMarkFragment : QuestionMarkFragmentAscii | QuestionMarkCn ;
+
+// reserved
+DollarSignFragment : DollarSignFragmentAscii | DollarSignCn ;
+NumberSignFragment : NumberSignFragmentAscii | NumberSignCn ;
+BackQuoteFragment : BackQuoteFragmentAscii | BackQuoteCn ;
+
+BackslashFragment : BackslashFragmentAscii | BackslashCn ;
+SingleQuoteFragment : SingleQuoteFragmentAscii | SingleQuoteCn ;
+DoubleQuoteFragment : DoubleQuoteFragmentAscii | DoubleQuoteCn ;
+UnderscoreFragment : UnderscoreFragmentAscii | UnderscoreCn ;
+// ------------------punctuation Fragment end---------------
+
+@TerminalFragmentGrammar end ;

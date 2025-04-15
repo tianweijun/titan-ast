@@ -1,0 +1,45 @@
+@TerminalGrammar begin ;
+
+BlockComment nfa(start,end) :
+// SlashCn :  \xEF\xBC\x8F' ;
+// AsteriskCn :  '\xEF\xBC\x8A' | '\xC3\x97' ;
+start'/'prefix1
+start'\xEF\xBC\x8F'prefix1
+
+prefix1'*'prefix2
+prefix1'\xEF\xBC\x8A'prefix2
+prefix1'\xC3\x97'prefix2
+
+prefix2'*'suffix1
+prefix2'\xEF'_01_suffix1 _01_suffix1'\xBC'_02_suffix1 _02_suffix1'\x8A'suffix1
+                         _01_suffix1~[\xBC]prefix2    _02_suffix1~[\x8A]prefix2
+prefix2'\xC3'_11_suffix1 _11_suffix1'\x97'suffix1
+                         _11_suffix1~[\x97]prefix2
+prefix2~[*\xEF\xC3]prefix2
+
+suffix1'/'end
+suffix1'\xEF'_01_suffix2 _01_suffix2'\xBC'_02_suffix2  _02_suffix2'\x8F'end
+                         _01_suffix2~[\xBC]prefix2
+_02_suffix2'\x8A'suffix1 _02_suffix2~[\x8F\x8A]prefix1
+
+suffix1'*'suffix1
+suffix1'\xC3'_11_loop_n1 _11_loop_n1'\x97'suffix1
+                         _11_loop_n1~[\x97]prefix2
+suffix1~[/\xEF*\xC3]prefix2
+
+    -> skip
+;
+
+LineComment nfa(start,end) :
+      start'//'prefix2
+      prefix2[]end prefix2[\n]end prefix2~[\n]prefix2
+
+      // SlashCn :  '\xEF\xBC\x8F' ;
+      start'\xEF\xBC\x8F\xEF\xBC\x8F'prefix2
+
+      -> skip
+;
+
+DelimiterChars : DelimiterChar+ -> skip ;
+
+@TerminalGrammar end ;

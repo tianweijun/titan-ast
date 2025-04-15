@@ -529,10 +529,6 @@ compilationUnit
 
 @TerminalGrammar begin ;
 
-StringLiteral
-    :   EncodingPrefix? '"' SCharSequence? '"'
-    ;
-
 BlockComment
     nfa(start,end)
      :
@@ -550,6 +546,10 @@ LineComment
     -> skip
 ;
 
+StringLiteral
+    :   EncodingPrefix? '"' SCharSequence? '"'
+    ;
+
 MacroStringLiteral
     :  '#'  SCharSequence+
     ;
@@ -564,40 +564,6 @@ Constant
     // |   EnumerationConstant
     |   CharacterConstant	// #characterConstant
     ;
-
-/*
-
-LeftShiftAssign : '<<=' ;
-RightShiftAssign : '>>=' ;
-Ellipsis : '...' ;
-
-LessEqual : '<=' ;
-GreaterEqual : '>=' ;
-LeftShift : '<<' ;
-RightShift : '>>' ;
-
-PlusPlus : '++' ;
-MinusMinus : '--' ;
-
-AndAnd : '&&' ;
-OrOr : '||' ;
-
-// '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|='
-StarAssign : '*=' ;
-DivAssign : '/=' ;
-ModAssign : '%=' ;
-PlusAssign : '+=' ;
-MinusAssign : '-=' ;
-AndAssign : '&=' ;
-XorAssign : '^=' ;
-OrAssign : '|=' ;
-
-Equal : '==' ;
-NotEqual : '!=' ;
-
-Arrow : '->' ;
-
-*/
 
 LeftParen : '(' ;
 RightParen : ')' ;

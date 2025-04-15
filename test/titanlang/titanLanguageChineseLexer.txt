@@ -1,0 +1,158 @@
+
+@TerminalFragmentGrammar begin ;
+
+// DelimiterChar
+DelimiterCharCn : '\xE3\x80\x80' ;
+
+// ----------------LowercaseLetter start-------------------
+LowercaseLetterACn : '\xEF\xBD\x81' ;
+LowercaseLetterBCn : '\xEF\xBD\x82' ;
+LowercaseLetterCCn : '\xEF\xBD\x83' ;
+LowercaseLetterDCn : '\xEF\xBD\x84' ;
+LowercaseLetterECn : '\xEF\xBD\x85' ;
+LowercaseLetterFCn : '\xEF\xBD\x86' ;
+LowercaseLetterGCn : '\xEF\xBD\x87' ;
+LowercaseLetterHCn : '\xEF\xBD\x88' ;
+LowercaseLetterICn : '\xEF\xBD\x89' ;
+LowercaseLetterJCn : '\xEF\xBD\x8A' ;
+LowercaseLetterKCn : '\xEF\xBD\x8B' ;
+LowercaseLetterLCn : '\xEF\xBD\x8C' ;
+LowercaseLetterMCn : '\xEF\xBD\x8D' ;
+LowercaseLetterNCn : '\xEF\xBD\x8E' ;
+LowercaseLetterOCn : '\xEF\xBD\x8F' ;
+LowercaseLetterPCn : '\xEF\xBD\x90' ;
+LowercaseLetterQCn : '\xEF\xBD\x91' ;
+LowercaseLetterRCn : '\xEF\xBD\x92' ;
+LowercaseLetterSCn : '\xEF\xBD\x93' ;
+LowercaseLetterTCn : '\xEF\xBD\x94' ;
+LowercaseLetterUCn : '\xEF\xBD\x95' ;
+LowercaseLetterVCn : '\xEF\xBD\x96' ;
+LowercaseLetterWCn : '\xEF\xBD\x97' ;
+LowercaseLetterXCn : '\xEF\xBD\x98' ;
+LowercaseLetterYCn : '\xEF\xBD\x99' ;
+LowercaseLetterZCn : '\xEF\xBD\x9A' ;
+// ----------------LowercaseLetter end---------------------
+
+
+// ----------------uppercaseLetterCn start-------------------
+UppercaseLetterACn : '\xEF\xBC\xA1' ;
+UppercaseLetterBCn : '\xEF\xBC\xA2' ;
+UppercaseLetterCCn : '\xEF\xBC\xA3' ;
+UppercaseLetterDCn : '\xEF\xBC\xA4' ;
+UppercaseLetterECn : '\xEF\xBC\xA5' ;
+UppercaseLetterFCn : '\xEF\xBC\xA6' ;
+UppercaseLetterGCn : '\xEF\xBC\xA7' ;
+UppercaseLetterHCn : '\xEF\xBC\xA8' ;
+UppercaseLetterICn : '\xEF\xBC\xA9' ;
+UppercaseLetterJCn : '\xEF\xBC\xAA' ;
+UppercaseLetterKCn : '\xEF\xBC\xAB' ;
+UppercaseLetterLCn : '\xEF\xBC\xAC' ;
+UppercaseLetterMCn : '\xEF\xBC\xAD' ;
+UppercaseLetterNCn : '\xEF\xBC\xAE' ;
+UppercaseLetterOCn : '\xEF\xBC\xAF' ;
+UppercaseLetterPCn : '\xEF\xBC\xB0' ;
+UppercaseLetterQCn : '\xEF\xBC\xB1' ;
+UppercaseLetterRCn : '\xEF\xBC\xB2' ;
+UppercaseLetterSCn : '\xEF\xBC\xB3' ;
+UppercaseLetterTCn : '\xEF\xBC\xB4' ;
+UppercaseLetterUCn : '\xEF\xBC\xB5' ;
+UppercaseLetterVCn : '\xEF\xBC\xB6' ;
+UppercaseLetterWCn : '\xEF\xBC\xB7' ;
+UppercaseLetterXCn : '\xEF\xBC\xB8' ;
+UppercaseLetterYCn : '\xEF\xBC\xB9' ;
+UppercaseLetterZCn : '\xEF\xBC\xBA' ;
+// ----------------uppercaseLetterCn end---------------------
+
+// ----------------DigitCn start-----------------
+Digit0Cn : '\xEF\xBC\x90' ;
+Digit1Cn : '\xEF\xBC\x91' ;
+Digit2Cn : '\xEF\xBC\x92' ;
+Digit3Cn : '\xEF\xBC\x93' ;
+Digit4Cn : '\xEF\xBC\x94' ;
+Digit5Cn : '\xEF\xBC\x95' ;
+Digit6Cn : '\xEF\xBC\x96' ;
+Digit7Cn : '\xEF\xBC\x97' ;
+Digit8Cn : '\xEF\xBC\x98' ;
+Digit9Cn : '\xEF\xBC\x99' ;
+// ----------------DigitCn end-------------------
+
+// ------------------punctuationCn  start---------------
+
+LeftBraceCn :        '\xEF\xBD\x9B' ;
+RightBraceCn :       '\xEF\xBD\x9D' ;
+LeftParenCn :        '\xEF\xBC\x88' ;
+RightParenCn :       '\xEF\xBC\x89' ;
+LeftBracketCn :      '\xE3\x80\x90' | '\xEF\xBC\xBB' ;
+RightBracketCn :     '\xE3\x80\x91' | '\xEF\xBC\xBD' ;
+
+SemiCn :             '\xEF\xBC\x9B' ;
+CommaCn :            '\xEF\xBC\x8C' ;
+ColonCn :            '\xEF\xBC\x9A' ;
+DotCn :              '\xE3\x80\x82' ;
+
+PlusSignCn :         '\xEF\xBC\x8B' ;
+MinusSignCn :        '\xEF\xBC\x8D' ;
+AsteriskCn :         '\xEF\xBC\x8A' | '\xC3\x97' ;
+SlashCn :            '\xEF\xBC\x8F' ;
+PercentSignCn :      '\xEF\xBC\x85' ;
+
+AmpersandCn :        '\xEF\xBC\x86' ;
+VerticalBarCn :      '\xEF\xBD\x9C' ;
+CaretCn :            '\xEF\xBC\xBE' | '\xE2\x80\xA6' ;
+TildeCn :            '\xEF\xBD\x9E' | '\xEF\xBF\xA3' ;
+
+GreaterThanSignCn :  '\xE3\x80\x8B' | '\xEF\xBC\x9E' ;
+LessThanSignCn :     '\xE3\x80\x8A' | '\xEF\xBC\x9C' ;
+// EqualsSignCn same as ascii
+ExclamationMarkCn :  '\xEF\xBC\x81' ;
+
+AtSignCn :           '\xEF\xBC\xA0' ;
+
+QuestionMarkCn :     '\xEF\xBC\x9F' ;
+DollarSignCn :       '\xEF\xBF\xA5' | '\xEF\xBC\x84' ;
+NumberSignCn :       '\xEF\xBC\x83' ;
+BackQuoteCn :        '\xEF\xBD\x80' | '\xC2\xB7' ;
+
+BackslashCn :        '\xEF\xBC\xBC' | '\xE3\x80\x81' ;
+SingleQuoteCn :      '\xE2\x80\x98' | '\xE2\x80\x99' ;
+DoubleQuoteCn :      '\xE2\x80\x9C' | '\xE2\x80\x9D' ;
+UnderscoreCn :       '\xEF\xBC\xBF' | '\xE2\x80\x94' ;
+// ------------------punctuationCn end------------------------
+
+@TerminalFragmentGrammar end ;
+
+@DerivedTerminalGrammar derive(Identifier) begin ;
+
+Crate :  '\xE5\x8C\x85'  ; // cn:包
+Super :  '\xE7\x88\xB6\xE7\xBA\xA7' ; // cn:父级
+SelfValue :  '\xE6\x9C\xAC\xE4\xBD\x93' ; // cn:本体
+Module :  '\xE6\xA8\xA1\xE5\x9D\x97' ; // cn:模块
+Use :  '\xE4\xBD\xBF\xE7\x94\xA8' ; // cn:使用
+Type :  '\xE7\xB1\xBB\xE5\x9E\x8B' ; // cn:类型
+Var :  '\xE5\x8F\x98\xE9\x87\x8F' ; // cn:变量
+Struct :  '\xE7\xBB\x93\xE6\x9E\x84\xE4\xBD\x93' ; // cn:结构体
+Annotation :  '\xE6\xB3\xA8\xE8\xA7\xA3' ; // cn:注解
+Enum :  '\xE6\x9E\x9A\xE4\xB8\xBE' ; // cn:枚举
+Class :  '\xE7\xB1\xBB' ; // cn:类
+Function : '\xE5\x87\xBD\xE6\x95\xB0' ; // cn:函数
+Trait : '\xE4\xBD\x9C\xE7\x94\xA8' ; // cn:作用
+SelfType :  '\xE6\x9C\xAC\xE7\xB1\xBB' ; // cn:本类
+Public :  '\xE5\x85\xAC\xE5\xBC\x80' ; // cn:公开
+Const :  '\xE4\xB8\x8D\xE5\x8F\x98\xE7\x9A\x84' ; // cn:不变的
+// Mut : '\xE5\x8F\xAF\xE5\x8F\x98\xE7\x9A\x84' ; // cn:可变的
+Implement :  '\xE5\xAE\x9E\xE7\x8E\xB0' ; // cn:实现
+Extends :  '\xE6\x89\xA9\xE5\xB1\x95' ; // cn:扩展
+Let : '\xE4\xBB\xA4' ;  // cn:令
+As :  '\xE5\xA6\x82\xE5\x90\x8C' ;   // cn:如同
+Loop : '\xE6\x97\xA0\xE9\x99\x90\xE5\xBE\xAA\xE7\x8E\xAF' ; // cn:无限循环
+While :  '\xE6\x9D\xA1\xE4\xBB\xB6\xE5\xBE\xAA\xE7\x8E\xAF' ; // cn:条件循环
+For :  '\xE9\x81\x8D\xE5\x8E\x86\xE5\xBE\xAA\xE7\x8E\xAF' ; // cn:遍历循环
+In : '\xE4\xB9\x8B\xE4\xBA\x8E' ; // cn:之于
+Continue :  '\xE4\xB8\x8B\xE4\xB8\x80\xE8\xBD\xAE' ; // cn:下一轮
+Break :  '\xE8\xB7\xB3\xE5\x87\xBA\xE5\xBE\xAA\xE7\x8E\xAF' ; // cn:跳出循环
+Match :  '\xE5\x8C\xB9\xE9\x85\x8D' ; // cn:匹配
+If :  '\xE5\xA6\x82\xE6\x9E\x9C' ; // cn:如果
+Else :  '\xE5\x90\xA6\xE5\x88\x99' ; // cn:否则
+Return : '\xE8\xBF\x94\xE5\x9B\x9E' ; // cn:返回
+
+@DerivedTerminalGrammar end ;

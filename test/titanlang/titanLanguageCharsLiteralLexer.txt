@@ -1,0 +1,80 @@
+@TerminalGrammar begin ;
+
+CharLiteral :  SingleQuoteFragment CharLiteralChar SingleQuoteFragment ;
+StringLiteral : DoubleQuoteFragment StringLiteralChar* DoubleQuoteFragment ;
+
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+// char=4byte=dword
+CharLiteralChar : Utf8CharForCharLiteral | EscapeSequence ;
+StringLiteralChar : Utf8CharForStringLiteral | EscapeSequence ;
+
+// ('\n','\xFF','\u{FFFF}',...)
+EscapeSequence : AsciiEscapeSequence | UnicodeEscapeSequence ;
+AsciiEscapeSequence :
+  BackslashFragment
+  // [0'"?\\abfnrtv]
+  (
+   Digit0 | SingleQuoteFragment | DoubleQuoteFragment | QuestionMarkFragment
+   | BackslashFragment | LowercaseLetterA | LowercaseLetterB
+   | LowercaseLetterF | LowercaseLetterN | LowercaseLetterR
+   | LowercaseLetterT | LowercaseLetterV
+  )
+  | BackslashFragment LowercaseLetterX OctalDigit HexadecimalDigit
+;
+// \u{FFFF}
+UnicodeEscapeSequence :
+BackslashFragment LowercaseLetterU LeftBraceFragment HexadecimalDigit{1,6} RightBraceFragment ;
+
+// no Backslash'\\'=x5C, BackslashCn:'\xEF\xBC\xBC'|'\xE3\x80\x81' ;
+Utf8CharForCharLiteral :
+    [\x00-\x5B\x5D-\x7F]            // 1 0xxx_xxxx                   [00-7F]
+    | [\xC0-\xDF] [\x80-\xBF]{1}    // 2 110x_xxxx 10xx_xxxx{1}      [0080-07FF]
+    // [\xE0-\xEF] [\x80-\xBF]{2}   // 3 1110_xxxx 10xx_xxxx{2}[0800-FFFF]
+    | Utf83ByteCharForCharLiteral
+    | [\xF0-\xF7] [\x80-\xBF]{3}    // 4 1111_0xxx 10xx_xxxx{3}      [01_0000-1F_FFFF]
+    | [\xF8-\xFB] [\x80-\xBF]{4}    // 5 1111_10xx 10xx_xxxx{4}      [20_0000-3FF_FFFF]
+    | [\xFC-\xFD] [\x80-\xBF]{5}    // 6 1111_110x 10xx_xxxx{5}      [400_0000-7FFF_FFFF]
+;
+
+// no BackslashCn:'\xE3\x80\x81'|'\xEF\xBC\xBC'
+Utf83ByteCharForCharLiteral :
+  // #########['\xE0\x80\x80','\xE3\x80\x81')BackslashCn#########
+  [\xE0-\xE2] [\x80-\xBF]{2} | '\xE3\x80\x80'
+
+  // #########('\xE3\x80\x81','\xEF\xBC\xBC')BackslashCn#########
+  | '\xE3\x80' [\x82-\xBF] | '\xE3' [\x81-\xBF] [\x80-\xBF] | [\xE4-\xEE] [\x80-\xBF]{2}
+  | '\xEF' [\x80-\xBB] [\x80-\xBF] | '\xEF\xBC' [\x80-\xBB]
+
+  // #########('\xEF\xBC\xBC','\xEF\xBF\xBF']#########
+  | '\xEF\xBC' [\xBD-\xBF] | '\xEF' [\xBD-\xBF] [\x80-\xBF]
+;
+
+// (1)no DoubleQuote:'\"'=x22,DoubleQuoteCn:'\xE2\x80\x9C'|'\xE2\x80\x9D';
+// (2)no Backslash :'\\'=x5C,BackslashCn:'\xEF\xBC\xBC'|'\xE3\x80\x81';
+Utf8CharForStringLiteral :
+    [\x00-\x21\x23-\x5B\x5D-\x7F]        // 1 0xxx_xxxx              [00-7F]
+    | [\xC0-\xDF] [\x80-\xBF]{1}         // 2 110x_xxxx 10xx_xxxx{1}      [0080-07FF]
+    // | [\xE0-\xEF] [\x80-\xBF]{2}      // 3 1110_xxxx 10xx_xxxx{2}      [0800-FFFF]
+    | Utf83CharForStringLiteral
+    | [\xF0-\xF7] [\x80-\xBF]{3}         // 4 1111_0xxx 10xx_xxxx{3}      [01_0000-1F_FFFF]
+    | [\xF8-\xFB] [\x80-\xBF]{4}         // 5 1111_10xx 10xx_xxxx{4}      [20_0000-3FF_FFFF]
+    | [\xFC-\xFD] [\x80-\xBF]{5}         // 6 1111_110x 10xx_xxxx{5}      [400_0000-7FFF_FFFF]
+;
+// no DoubleQuoteCn-BackslashCn:'\xE2\x80\x9C'|'\xE2\x80\x9D'|'\xE3\x80\x81'|'\xEF\xBC\xBC'
+Utf83CharForStringLiteral :
+    // #########['\xE0\x80\x80','\xE2\x80\x9C')DoubleQuoteCn#########
+    [\xE0-\xE1] [\x80-\xBF]{2} | '\xE2\x80' [\x80-\x9B]
+
+    // #########('\xE2\x80\x9D','\xE3\x80\x81')BackslashCn#########
+    | '\xE2\x80' [\x9E-\xBF] | '\xE2' [\x81-\xBF] [\x80-\xBF] | '\xE3\x80\x80'
+
+    // #########('\xE3\x80\x81','\xEF\xBC\xBC')BackslashCn#########
+    | '\xE3\x80' [\x82-\xBF] | '\xE3' [\x81-\xBF] [\x80-\xBF] | [\xE4-\xEE] [\x80-\xBF]{2}
+    | '\xEF' [\x80-\xBB] [\x80-\xBF] | '\xEF\xBC' [\x80-\xBB]
+
+    // #########('\xEF\xBC\xBC','\xEF\xBF\xBF']#########
+    | '\xEF\xBC' [\xBD-\xBF] | '\xEF' [\xBD-\xBF] [\x80-\xBF]
+;
+@TerminalFragmentGrammar end ;

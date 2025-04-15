@@ -1,0 +1,159 @@
+
+@TerminalFragmentGrammar begin ;
+
+// DelimiterChar
+DelimiterCharAscii : [\s\t\r\n] ;
+
+// ----------------LowercaseLetter start-------------------
+LowercaseLetterAAscii : 'a'  ;
+LowercaseLetterBAscii : 'b'  ;
+LowercaseLetterCAscii : 'c'  ;
+LowercaseLetterDAscii : 'd'  ;
+LowercaseLetterEAscii : 'e'  ;
+LowercaseLetterFAscii : 'f'  ;
+LowercaseLetterGAscii : 'g'  ;
+LowercaseLetterHAscii : 'h'  ;
+LowercaseLetterIAscii : 'i'  ;
+LowercaseLetterJAscii : 'j'  ;
+LowercaseLetterKAscii : 'k'  ;
+LowercaseLetterLAscii : 'l'  ;
+LowercaseLetterMAscii : 'm'  ;
+LowercaseLetterNAscii : 'n'  ;
+LowercaseLetterOAscii : 'o'  ;
+LowercaseLetterPAscii : 'p'  ;
+LowercaseLetterQAscii : 'q'  ;
+LowercaseLetterRAscii : 'r'  ;
+LowercaseLetterSAscii : 's'  ;
+LowercaseLetterTAscii : 't'  ;
+LowercaseLetterUAscii : 'u'  ;
+LowercaseLetterVAscii : 'v'  ;
+LowercaseLetterWAscii : 'w'  ;
+LowercaseLetterXAscii : 'x'  ;
+LowercaseLetterYAscii : 'y'  ;
+LowercaseLetterZAscii : 'z'  ;
+// ----------------LowercaseLetter end-------------------
+
+// ----------------UppercaseLetter start-------------------
+UppercaseLetterAAscii : 'A'  ;
+UppercaseLetterBAscii : 'B'  ;
+UppercaseLetterCAscii : 'C'  ;
+UppercaseLetterDAscii : 'D'  ;
+UppercaseLetterEAscii : 'E'  ;
+UppercaseLetterFAscii : 'F'  ;
+UppercaseLetterGAscii : 'G'  ;
+UppercaseLetterHAscii : 'H'  ;
+UppercaseLetterIAscii : 'I'  ;
+UppercaseLetterJAscii : 'J'  ;
+UppercaseLetterKAscii : 'K'  ;
+UppercaseLetterLAscii : 'L'  ;
+UppercaseLetterMAscii : 'M'  ;
+UppercaseLetterNAscii : 'N'  ;
+UppercaseLetterOAscii : 'O'  ;
+UppercaseLetterPAscii : 'P'  ;
+UppercaseLetterQAscii : 'Q'  ;
+UppercaseLetterRAscii : 'R'  ;
+UppercaseLetterSAscii : 'S'  ;
+UppercaseLetterTAscii : 'T'  ;
+UppercaseLetterUAscii : 'U'  ;
+UppercaseLetterVAscii : 'V'  ;
+UppercaseLetterWAscii : 'W'  ;
+UppercaseLetterXAscii : 'X'  ;
+UppercaseLetterYAscii : 'Y'  ;
+UppercaseLetterZAscii : 'Z'  ;
+// ----------------UppercaseLetter end-------------------
+
+// ----------------Digit start-----------------
+Digit0Ascii : '0'  ;
+Digit1Ascii : '1'  ;
+Digit2Ascii : '2'  ;
+Digit3Ascii : '3'  ;
+Digit4Ascii : '4'  ;
+Digit5Ascii : '5'  ;
+Digit6Ascii : '6'  ;
+Digit7Ascii : '7'  ;
+Digit8Ascii : '8'  ;
+Digit9Ascii : '9'  ;
+// ----------------Digit end-----------------
+
+// ------------------punctuation start---------------
+LeftBraceFragmentAscii   : '{'  ;
+RightBraceFragmentAscii  : '}' ;
+LeftParenFragmentAscii : '('  ;
+RightParenFragmentAscii : ')'  ;
+LeftBracketFragmentAscii : '['  ;
+RightBracketFragmentAscii : ']'  ;
+
+SemiFragmentAscii : ';'  ;
+CommaFragmentAscii : ','  ;
+ColonFragmentAscii : ':'  ;
+DotFragmentAscii : '.'  ;
+
+PlusSignFragmentAscii    : '+'  ;
+MinusSignFragmentAscii   : '-'  ;
+AsteriskFragmentAscii : '*'  ;
+SlashFragmentAscii   : '/'  ;
+PercentSignFragmentAscii : '%'  ;
+
+AmpersandFragmentAscii : '&'  ;
+VerticalBarFragmentAscii : '|'  ;
+CaretFragmentAscii : '^'  ;
+TildeFragmentAscii : '~'  ;
+
+GreaterThanSignFragmentAscii : '>'  ;
+LessThanSignFragmentAscii : '<'  ;
+EqualsSignFragmentAscii : '=' ;
+ExclamationMarkFragmentAscii : '!'  ;
+
+AtSignFragmentAscii : '@'  ;
+QuestionMarkFragmentAscii : '?'  ;
+
+// reserved
+DollarSignFragmentAscii : '$'  ;
+NumberSignFragmentAscii : '#'  ;
+BackQuoteFragmentAscii : '`'  ;
+
+BackslashFragmentAscii : '\\'  ;
+SingleQuoteFragmentAscii : '\''  ;
+DoubleQuoteFragmentAscii : '"'  ;
+UnderscoreFragmentAscii : '_'  ;
+// ------------------punctuation end---------------
+
+
+@TerminalFragmentGrammar end ;
+
+
+@DerivedTerminalGrammar derive(Identifier) begin ;
+
+Crate : 'crate'  ;
+Super : 'super'   ;
+SelfValue : 'self'  ;
+Module : 'module'   ;
+Use : 'use'  ;
+Type : 'type'  ;
+Var : 'var'   ;
+Struct : 'struct'   ;
+Annotation : 'annotation'  ;
+Enum : 'enum'   ;
+Class : 'class' ;
+Function : 'function'  ;
+Trait : 'trait'  ;
+SelfType : 'Self'  ;
+Public : 'public'   ;
+Const : 'const'   ;
+// Mut : 'mut' ;
+Implement : 'implement' ;
+Extends : 'extends'  ;
+Let : 'let' ;
+As : 'as'  ;
+Loop : 'loop'  ;
+While : 'while' ;
+For : 'for' ;
+In : 'in' ;
+Continue : 'continue'  ;
+Break : 'break'   ;
+Match : 'match'  ;
+If : 'if'  ;
+Else : 'else'  ;
+Return : 'return'  ;
+
+@DerivedTerminalGrammar end ;

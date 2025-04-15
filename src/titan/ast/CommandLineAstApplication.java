@@ -23,7 +23,8 @@ public class CommandLineAstApplication {
         new DefaultGrammarFileAutomataAstApplicationBuilder();
   }
 
-  public CommandLineAstApplication(String[] args,
+  public CommandLineAstApplication(
+      String[] args,
       GrammarFileAutomataAstApplicationBuilder grammarFileAutomataAstApplicationBuilder) {
     commandLineParameters = new CommandLineArgParser().parse(args);
     this.grammarFileAutomataAstApplicationBuilder = grammarFileAutomataAstApplicationBuilder;
@@ -38,23 +39,20 @@ public class CommandLineAstApplication {
     new CommandLineAstApplication(args).run();
   }
 
-  /**
-   * 接受命令行参数来运行.
-   */
+  /** 接受命令行参数来运行. */
   public void run() {
     if (!commandLineParameters.isRight()) {
       Logger.warn(commandLineParameters.infoOfHelper());
       return;
     }
-    buildAstByAutomataFile();
-    buildByGrammarFile();
     try {
-
+      buildAstByAutomataFile();
+      buildByGrammarFile();
     } catch (AstRuntimeException e) {
       Logger.info(
-          String.format(
-              "CommandLineAstApplication run failed,cause by %s", e.getMessage()));
+          String.format("CommandLineAstApplication run failed,cause by %s", e.getMessage()));
       return;
+      // throw e;
     }
 
     Logger.info("CommandLineAstApplication  run successfully");
@@ -79,13 +77,15 @@ public class CommandLineAstApplication {
 
   private void buildAstVisitor() {
     if (commandLineParameters.isBuildingAstVisitor()) {
-      grammarFileAutomataAstApplicationBuilder.get().generateAstVisitor(
-          commandLineParameters.astVisitorFileDirectory, commandLineParameters.astVisitorPackage);
+      grammarFileAutomataAstApplicationBuilder
+          .get()
+          .generateAstVisitor(
+              commandLineParameters.astVisitorFileDirectory,
+              commandLineParameters.astVisitorPackage);
     }
   }
 
-  private void isAmbiguous(
-  ) {
+  private void isAmbiguous() {
     if (commandLineParameters.isAmbiguous()) {
       grammarFileAutomataAstApplicationBuilder.get().isAmbiguous();
     }
@@ -93,18 +93,17 @@ public class CommandLineAstApplication {
 
   private void persistAutomata() {
     if (commandLineParameters.isPersistentAutomata()) {
-      grammarFileAutomataAstApplicationBuilder.get().buildPersistentAutomata(
-          commandLineParameters.persistentAutomataFilePath);
+      grammarFileAutomataAstApplicationBuilder
+          .get()
+          .buildPersistentAutomata(commandLineParameters.persistentAutomataFilePath);
     }
   }
 
-  private void buildAstByGrammarFile(
-  ) {
+  private void buildAstByGrammarFile() {
     if (commandLineParameters.isBuildingAstByGrammarFile()) {
       RuntimeAutomataRichAstApplication runtimeAutomataRichAstApplication =
           grammarFileAutomataAstApplicationBuilder.get().getRuntimeAutomataRichAstApplication();
-      runtimeAutomataRichAstApplication.setCharset(
-          commandLineParameters.graphicalViewOfAstCharSet);
+      runtimeAutomataRichAstApplication.setCharset(commandLineParameters.graphicalViewOfAstCharSet);
       RichAstGeneratorResult astGeneratorResult =
           runtimeAutomataRichAstApplication.buildRichAst(commandLineParameters.sourceFilePath);
       if (!astGeneratorResult.isOk()) {

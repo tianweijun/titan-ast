@@ -1,5 +1,6 @@
-set "code_file_path=D:\github-pro\titan\titan-language-compiler\src\resources\grammar\titanLanguageEncodingLexer.txt"
 
-java -jar  D:\github-pro\titan\titan-language-compiler\libs\titan-ast-runtime.jar^
-    titanAstGrammar.automata %code_file_path% utf-8
+java -jar  D:\github-pro\titan\titan-ast\out\artifacts\titan_ast_jar\titan-ast.jar^
+    -automataFilePath titanAstGrammar.automata^
+    -sourceFilePath titanAstGrammar.txt^
+    -graphicalViewOfAst utf-8
 pause

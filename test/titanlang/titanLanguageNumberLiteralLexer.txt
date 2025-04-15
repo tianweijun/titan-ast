@@ -1,0 +1,86 @@
+@TerminalGrammar begin ;
+
+UnsignedFloatingPointNumberLiteral : UnsignedDecimalFloatingPointNumberLiteral ;
+
+UnsignedIntegerLiteral :
+  UnsignedDecimalLiteral
+  | UnsignedHexadecimalLiteral
+  | UnsignedOctalLiteral
+  | UnsignedBinaryLiteral
+;
+
+@TerminalGrammar end ;
+
+
+@TerminalFragmentGrammar begin ;
+
+UnsignedDecimalLiteral : DecimalDigits IntegerSuffix? ;
+
+UnsignedHexadecimalLiteral :
+   Digit0 (LowercaseLetterX | UppercaseLetterX) UnderscoreFragment* HexadecimalDigits IntegerSuffix?
+;
+UnsignedOctalLiteral :
+   Digit0 (LowercaseLetterO | UppercaseLetterO) UnderscoreFragment* OctalDigits IntegerSuffix?
+;
+UnsignedBinaryLiteral : Digit0 LowercaseLetterB UnderscoreFragment* BinaryDigits IntegerSuffix? ;
+
+UnsignedDecimalFloatingPointNumberLiteral :
+  DecimalDigits DotFragment DecimalDigits FloatingPointNumberExponent? FloatingPointNumberSuffix?
+	|	DecimalDigits FloatingPointNumberExponent FloatingPointNumberSuffix?
+	|	DecimalDigits FloatingPointNumberSuffix
+;
+FloatingPointNumberExponent :
+  (LowercaseLetterE | UppercaseLetterE) (PlusSignFragment | MinusSignFragment)? DecimalDigits
+;
+FloatingPointNumberSuffix :
+    LowercaseLetterF Digit3 Digit2 // 'f32'
+ |  LowercaseLetterF Digit6 Digit4 // 'f64'
+;
+
+BinaryDigits :      BinaryDigit      (BinaryDigit      | UnderscoreFragment)* ;
+OctalDigits :       OctalDigit       (OctalDigit       | UnderscoreFragment)* ;
+DecimalDigits :     DecimalDigit     (DecimalDigit     | UnderscoreFragment)* ;
+HexadecimalDigits : HexadecimalDigit (HexadecimalDigit | UnderscoreFragment)* ;
+
+IntegerSuffix :
+    LowercaseLetterU Digit8 // 'u8'
+    | LowercaseLetterU Digit1 Digit6 // 'u16'
+    | LowercaseLetterU Digit3 Digit2 // 'u32'
+    | LowercaseLetterU Digit6 Digit4 // 'u64'
+    | LowercaseLetterU Digit1 Digit2 Digit8 // 'u128'
+    | LowercaseLetterU LowercaseLetterS LowercaseLetterI
+      LowercaseLetterZ LowercaseLetterE // 'usize'
+    | LowercaseLetterI Digit8 // 'i8'
+    | LowercaseLetterI Digit1 Digit6 // 'i16'
+    | LowercaseLetterI Digit3 Digit2 // 'i32'
+    | LowercaseLetterI Digit6 Digit4 // 'i64'
+    | LowercaseLetterI Digit1 Digit2 Digit8 // 'i128'
+    | LowercaseLetterI LowercaseLetterS LowercaseLetterI
+      LowercaseLetterZ LowercaseLetterE // 'isize'
+;
+
+BinaryDigit : Digit0 | Digit1 ;
+OctalDigit : BinaryDigit | Digit2 | Digit3 | Digit4 | Digit5 | Digit6 | Digit7 ;
+DecimalDigit :  OctalDigit | Digit8 | Digit9 ;
+HexadecimalDigit :   DecimalDigit | LowercaseLettersRangeAF | UppercaseLettersRangeAF ;
+
+
+LowercaseLettersRangeAF :
+  LowercaseLetterA
+| LowercaseLetterB
+| LowercaseLetterC
+| LowercaseLetterD
+| LowercaseLetterE
+| LowercaseLetterF
+;
+
+UppercaseLettersRangeAF :
+  UppercaseLetterA
+| UppercaseLetterB
+| UppercaseLetterC
+| UppercaseLetterD
+| UppercaseLetterE
+| UppercaseLetterF
+;
+
+@TerminalFragmentGrammar end ;

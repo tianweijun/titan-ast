@@ -11,104 +11,130 @@
 @NonterminalGrammar begin ;
 
 constLiteral :
-  '-'? UnsignedIntegerLiteral  #integerLiteral
-  | '-'? UnsignedFloatingPointNumberLiteral #floatingPointNumberLiteral
+  MinusSign? UnsignedIntegerLiteral  #integerLiteral
+  | MinusSign? UnsignedFloatingPointNumberLiteral #floatingPointNumberLiteral
   | CharLiteral #charLiteral
   | StringLiteral #stringLiteral
 ;
 
 // ---------------------generics start----------------------
 
-wildcard : '?' ;
+genericArgument : instanceTypeName ;
+genericArgumentList : genericArgument (Comma genericArgument)* ;
+genericArguments : LessThanSign genericArgumentList GreaterThanSign ;
 
-genericArgument :
-   instanceTypeName
-   | constLiteral
-   | wildcard
-;
-
-genericArgumentList :
-   genericArgument (',' genericArgument)*
-;
-
-genericArguments :
-   '<' genericArgumentList '>'
-;
-
-genericParameterBounds :
-    instanceTypeName ( '&' instanceTypeName )*
-;
-
-genericParameter :
-   identifier ( ':' genericParameterBounds )?
-;
-
-genericParameterList :
-   genericParameter ( ',' genericParameter)*
-;
-
+genericParameterBounds : plainInstanceTypeName ( Ampersand plainInstanceTypeName )* ;
+genericParameter : identifier ( Colon genericParameterBounds )? ;
+genericParameterList : genericParameter ( Comma genericParameter)* ;
 genericParameters :
-  '<' genericParameterList '>'
+  LessThanSign genericParameterList GreaterThanSign
 ;
 
 // ---------------------generics end------------------------
 
 // --------------------path start-------------------------
 
-pathSegment :
-   identifier
-;
+pathSegment : identifier ;
+rootPathSegment : LeftBracket RightBracket ;
+cratePathSegment : LeftBracket Crate RightBracket ;
+superPathSegment : LeftBracket Super RightBracket ;
 
+plainPath : pathSegment  (Colon Colon pathSegment)* ;
 // 具名路径或相对具名路径
-plainPath :
-  pathSegment (':' ':' pathSegment)*
+path :
+  rootPathSegment (Colon Colon plainPath)? #fromRootPath
+  | cratePathSegment (Colon Colon plainPath)? #fromCratePath
+  | superPathSegment ( Colon Colon superPathSegment)* (Colon Colon plainPath)? #fromSuperPath
+  | plainPath #plainPath
 ;
 
-useItem :
-   identifier // not function type,module scope,InstanceTypeAlias
-   | 'function' ':' identifier // function
-   | 'var' ':' identifier // var
+terminalPathItem :
+   identifier // not function type,module scope,typeAlias
+   | Function Colon identifier // function
+   | Var Colon identifier // var
 ;
 
-usePathTree :
-  (plainPath ':' ':')? useItem ( 'as' identifier )? #useItem
-  | (plainPath ':' ':')?  '{' usePathTree (',' usePathTree)* '}'
+linearPathItem :
+   terminalPathItem
+   | plainPath Colon Colon  terminalPathItem
+   | rootPathSegment
+   | rootPathSegment Colon Colon terminalPathItem
+   | rootPathSegment Colon Colon plainPath Colon Colon terminalPathItem
+   | cratePathSegment
+   | cratePathSegment Colon Colon terminalPathItem
+   | cratePathSegment Colon Colon plainPath Colon Colon  terminalPathItem
+   | superPathSegment ( Colon Colon superPathSegment)*
+   | superPathSegment ( Colon Colon superPathSegment)* Colon Colon terminalPathItem
+   | superPathSegment ( Colon Colon superPathSegment)*
+     Colon Colon plainPath Colon Colon  terminalPathItem
 ;
 
-// moduleIdentifierSegment: no (crate,super,self)
-modulePlainPath :
-  moduleIdentifierSegment (':' ':' moduleIdentifierSegment)*
+childTreePathItem :
+  (plainPath Colon Colon)? terminalPathItem #linearChildTreePathItem
+  |  plainPath Colon Colon
+     LeftBrace
+         childTreePathItem  (Comma childTreePathItem)*
+     RightBrace
+     #notLinearChildTreePathItem
 ;
+treePathItem :
+  path Colon Colon
+    LeftBrace
+       childTreePathItem (Comma childTreePathItem)*
+    RightBrace
+;
+pathItem : linearPathItem | treePathItem ;
 
-moduleIdentifier :
-    ( modulePlainPath ':' ':' )? moduleIdentifierSegment
+useChildTreePathItem :
+    (plainPath Colon Colon)? terminalPathItem (As identifier)? #linearUseChildTreePathItem
+    |  plainPath Colon Colon
+       LeftBrace
+           useChildTreePathItem  (Comma useChildTreePathItem)*
+       RightBrace
+       #notLinearUseChildTreePathItem
 ;
+useTreePathItem :
+   path Colon Colon
+      LeftBrace
+         useChildTreePathItem (Comma useChildTreePathItem)*
+      RightBrace
+;
+usePathItem : linearPathItem (As identifier)? |  useTreePathItem ;
 
 // --------------------path end-------------------------
 
 // --------------------type start-------------------------
 
-instanceTypeNameModifier :
-  'const'
-;
-
 /*
-function(params)->retType和Pointer<const function(params)->retType>是等价的.
+function(params)->retType是Reference<const function(params)->retType>别名.
 */
+variableParameterType : Dot Dot Dot ;
+normalParameterType : instanceTypeName ;
+parameterTypeList :
+  variableParameterType
+  | normalParameterType (Comma normalParameterType)* (Comma variableParameterType)?
+;
+functionReturnType : MinusSign GreaterThanSign instanceTypeName ;
 functionInstanceTypeName :
-  instanceTypeNameModifier* 'function' '(' parameterTypeList? ')' functionReturnType?
+  Function LeftParen parameterTypeList? RightParen functionReturnType?
 ;
+notFunctionInstanceTypeName : Const? plainNotFunctionInstanceTypeName ;
+instanceTypeName : notFunctionInstanceTypeName | functionInstanceTypeName ;
 
-notFunctionInstanceTypeName :
-  instanceTypeNameModifier* ( plainPath ':' ':' )? identifier genericArguments?
+// plainInstanceTypeName
+normalPlainParameterType : plainInstanceTypeName ;
+plainParameterTypeList :
+  variableParameterType
+  | normalPlainParameterType (Comma normalPlainParameterType)* (Comma variableParameterType)?
 ;
-
-instanceTypeName :
-   notFunctionInstanceTypeName | functionInstanceTypeName
+plainFunctionReturnType : MinusSign GreaterThanSign plainInstanceTypeName ;
+plainFunctionInstanceTypeName :
+   Function LeftParen plainParameterTypeList? RightParen plainFunctionReturnType ;
+plainNotFunctionInstanceTypeName :
+  ( plainPath Colon Colon )? identifier genericArguments?
 ;
-
-noGenericParameterNotFunctionTypeName :
-    ( plainPath ':' ':' )? identifier genericArguments?
+plainInstanceTypeName :
+  plainNotFunctionInstanceTypeName | plainFunctionInstanceTypeName
 ;
 
 // --------------------type end-------------------------
@@ -116,53 +142,53 @@ noGenericParameterNotFunctionTypeName :
 // --------------------statement start-------------------------
 
 typeAliasStatement :
-    'type' identifier '='  instanceTypeName  ';'
+    visibility? Type identifierPattern EqualsSign  plainInstanceTypeName  Semi
 ;
 
-useDeclarationStatement : 'use' usePathTree ';' ;
+useDeclarationStatement : Use usePathItem Semi ;
 
 emptyStatement :
-   ';'
+   Semi
 ;
 
 expressionStatement :
-   expression ';'
+   expression Semi
 ;
 
 returnStatement :
-     'return' expression? ';'
+     Return expression? Semi
 ;
 
 variableDeclarator :
-  variableDeclaratorPattern (':' instanceTypeName)? ('=' expression)?
+  variableDeclaratorPattern (Colon instanceTypeName)? (EqualsSign expression)?
 ;
 
 letStatement :
-   'let' variableDeclarator (',' variableDeclarator)* ';'
+   Let variableDeclarator (Comma variableDeclarator)* Semi
 ;
 
 iteratorLoopStatement :
-   'for' pattern 'in' expression blockAsPartOfStatement
+   For pattern In expression blockAsPartOfStatement
 ;
 
 forLoopStatement :
-  'for' '(' statement expressionStatement statement ')' blockAsPartOfStatement
+  For LeftParen statement expressionStatement statement RightParen blockAsPartOfStatement
 ;
 
 predicateLoopStatement :
-   'while' expression blockAsPartOfStatement
+   While expression blockAsPartOfStatement
 ;
 
 infiniteLoopStatement :
-  'loop' blockAsPartOfStatement
+  Loop blockAsPartOfStatement
 ;
 
 breakStatement :
-  'break' ';'
+  Break Semi
 ;
 
 continueStatement :
-  'continue'  ';'
+  Continue  Semi
 ;
 
 loopStatement :
@@ -173,15 +199,15 @@ loopStatement :
 ;
 
 blockStatement :
- '{' blockStatementItem* '}'
+ LeftBrace blockStatementItem* RightBrace
 ;
 
 ifThenStatement :
-   'if' expression  blockAsPartOfStatement
+   If expression  blockAsPartOfStatement
 ;
 
 ifThenElseStatement :
-   'if'  expression  blockAsPartOfStatement 'else' blockAsPartOfStatement
+   If  expression  blockAsPartOfStatement Else blockAsPartOfStatement
 ;
 
 ifStatement :
@@ -190,11 +216,11 @@ ifStatement :
 ;
 
 matchStatement :
-  'match' expression '{' matchArm+ '}'
+  Match expression LeftBrace matchArm+ RightBrace
 ;
 
 matchArm :
-   pattern '=' '>' '{' statement? '}'
+   pattern EqualsSign GreaterThanSign LeftBrace statement? RightBrace
 ;
 
 // (useDeclarationStatement,typeAliasStatement)只用于module起始部分，不算做常规语句。
@@ -212,7 +238,7 @@ statement :
 ;
 
 blockAsPartOfStatement :
-  '{' blockAsPartOfStatementItem* '}'
+  LeftBrace blockAsPartOfStatementItem* RightBrace
 ;
 
 blockAsPartOfStatementItem :
@@ -230,7 +256,7 @@ blockStatementItem :
 // --------------------pattern start--------------------------
 
 pattern :
-     patternNoTopAlt ('|' patternNoTopAlt)*
+     patternNoTopAlt (VerticalBar patternNoTopAlt)*
 ;
 
 patternNoTopAlt :
@@ -243,7 +269,7 @@ identifierPattern :
 ;
 
 fieldTypePattern :
-   instanceTypeName '{' fieldTypePatternElements? '}'
+   instanceTypeName LeftBrace fieldTypePatternElements? RightBrace
 ;
 
 fieldTypePatternElements :
@@ -251,11 +277,11 @@ fieldTypePatternElements :
 ;
 
 fieldTypePatternFields :
-  fieldTypePatternField (',' fieldTypePatternField)*
+  fieldTypePatternField (Comma fieldTypePatternField)*
 ;
 
 fieldTypePatternField :
-   identifier ':' pattern
+   identifier Colon pattern
 ;
 
 // variableDeclarator
@@ -267,213 +293,95 @@ variableDeclaratorPattern :
 
 // --------------------annotation start-------------------------
 
-annotationInstanceTypeName :
-  ( plainPath ':' ':' )? identifier
-;
-
-annotationInitListValue :
-	constLiteral
-  | annotationInstanceTypeName annotationInitList
-;
-
-annotationInitListField :
-  identifier ':' annotationInitListValue
-;
-
+annotationInstanceTypeName : ( plainPath Colon Colon )? identifier ;
+annotationInitListValue : constLiteral | annotationInstanceTypeName? annotationInitList ;
+annotationInitListField : identifier Colon annotationInitListValue ;
 annotationInitList :
-  '{' '}' #emptyAnnotationInitList
-  | '{' annotationInitListField ( ',' annotationInitListField )* '}' #fieldsAnnotationInitList
-  | '{' annotationInitListValue ( ',' annotationInitListValue )* '}' #valuesAnnotationInitList
+  LeftBrace RightBrace #emptyAnnotationInitList
+  | LeftBrace annotationInitListField ( Comma annotationInitListField )* RightBrace #fieldsAnnotationInitList
+  | LeftBrace annotationInitListValue ( Comma annotationInitListValue )* RightBrace #valuesAnnotationInitList
 ;
-
-markerAnnotation :
-   '@' annotationInstanceTypeName
-;
-
-normalAnnotation :
-  '@' annotationInstanceTypeName annotationInitList
-;
-
-annotation :
-  markerAnnotation
-  | normalAnnotation
-;
+markerAnnotation : AtSign annotationInstanceTypeName ;
+normalAnnotation : AtSign annotationInstanceTypeName annotationInitList ;
+annotation : markerAnnotation | normalAnnotation ;
 
 // --------------------annotation end-------------------------
 
 // --------------------function start-------------------------
 
-parameterModifiers :
-   annotation*
-;
-
-variableParameterType :
-   '.' '.' '.'
-;
-
-lastParameterType :
-  normalParameterType | variableParameterType
-;
-
-normalParameterType :
-  instanceTypeName
-;
-
-parameterTypeList :
-  lastParameterType
-  | normalParameterType ( ',' normalParameterType )*  ',' lastParameterType
-;
-
-functionReturnType :
-  '-' '>' instanceTypeName
-;
-
-selfParameter :
-   parameterModifiers? 'self'
-;
-
-normalParameter :
-   parameterModifiers? identifier ':' instanceTypeName
-;
-
-variableParameter :
-  parameterModifiers? '.' '.' '.'
-;
-
-lastParameter :
-   normalParameter
-   | variableParameter
-;
-
-singleParameter :
-  selfParameter | normalParameter | variableParameter
-;
-
-multiParameter :
-       selfParameter (',' normalParameter)*  ',' lastParameter
-   | normalParameter (',' normalParameter)*  ',' lastParameter
-;
-
+selfParameter : annotation* Const? SelfValue ;
+normalParameter : annotation* identifier Colon instanceTypeName ;
+variableParameter : Dot Dot Dot ;
 parameters :
-  singleParameter | multiParameter
+   selfParameter (Comma normalParameter)* (Comma variableParameter)?
+  | normalParameter (Comma normalParameter)* (Comma variableParameter)?
 ;
 
-functionBlockItem :
-    typeDefinition
-    | statement
-;
-
-functionBlock :
-	'{' functionBlockItem* '}'
-;
-
-functionBody :
-  functionBlock
-  | ';'
-;
-
-functionModifiers :
-   annotation* visibility?
-;
+functionBodyItem : typeDefinition | statement ;
+functionBody : LeftBrace functionBodyItem* RightBrace ;
+functionModifiers : annotation* visibility? ;
 
 functionDefinition :
-   functionModifiers? 'function' identifier genericParameters? '(' parameters? ')'
+   functionModifiers? Function identifier genericParameters? LeftParen parameters? RightParen
    functionReturnType? functionBody
 ;
-
-anonymousFunction :
-  'function'  '(' parameters? ')' functionReturnType? functionBody #anonymousFunction
-  | '(' parameters? ')' '-' '>' instanceTypeName? functionBody  #lambdaFunction
+functionDeclaration :
+   functionModifiers? Function identifier genericParameters? LeftParen parameters? RightParen
+   functionReturnType? Semi
 ;
-
+anonymousFunction :
+  Function  LeftParen parameters? RightParen functionReturnType? functionBody #anonymousFunction
+  | LeftParen parameters? RightParen MinusSign GreaterThanSign instanceTypeName? functionBody  #lambdaFunction
+;
 // --------------------function end---------------------------
 
 // --------------------type definition start------------------------
 
-fieldModifiers :
-   annotation* visibility?
-;
+superType : Extends plainNotFunctionInstanceTypeName ;
+typeModifiers : annotation* visibility? ;
 
-superType :
-  'extends' noGenericParameterNotFunctionTypeName
-;
+fieldModifiers : annotation* visibility? ;
+field : fieldModifiers? identifier Colon instanceTypeName ;
+fieldList : field (Comma field)* ;
 
-typeModifiers :
-   annotation* visibility?
-;
-
-field :
-   fieldModifiers? identifier ':' instanceTypeName
-;
-
-fieldList :
-   field (',' field)*
-;
-
-fieldTypeDefinitionBody :
-    '{' fieldList? '}'
-;
+fieldTypeDefinitionBody : LeftBrace fieldList? RightBrace ;
 
 structDefinition :
-   typeModifiers? 'struct' identifier genericParameters? fieldTypeDefinitionBody
+   typeModifiers? Struct identifier genericParameters? fieldTypeDefinitionBody
 ;
 
 classDefinition :
-   typeModifiers? 'class' identifier genericParameters? superType? fieldTypeDefinitionBody
+   typeModifiers? Class identifier genericParameters? superType? fieldTypeDefinitionBody
 ;
 
 annotationDefinition :
-   typeModifiers? 'annotation' identifier fieldTypeDefinitionBody
+   typeModifiers? Annotation identifier fieldTypeDefinitionBody
 ;
 
 enumDefinition :
-  typeModifiers? 'enum' identifier genericParameters? enumTypeDefinitionBody
+  typeModifiers? Enum identifier genericParameters? enumTypeDefinitionBody
 ;
 
 traitDefinition :
-  traitModifiers? 'trait' identifier genericParameters? extendsTraits? traitBody
+  traitModifiers? Trait identifier genericParameters? extendsTraits? traitBody
 ;
 
 // -- enum --
-enumItemAttachment :
-  '{' fieldList '}'
-;
-
-enumItem :
-  identifier enumItemAttachment?
-;
-
-enumItemList :
-  enumItem (',' enumItem)*
-;
-
-enumTypeDefinitionBody :
-  '{' enumItemList '}'
-;
-
+enumField : identifier Colon instanceTypeName ;
+enumFieldList : enumField (Comma enumField)* ;
+enumItemAttachment : LeftBrace enumFieldList RightBrace ;
+enumItem : identifier enumItemAttachment? ;
+enumItemList : enumItem (Comma enumItem)* ;
+enumTypeDefinitionBody : LeftBrace enumItemList RightBrace ;
 // -- enum end --
 
 // --tarit --
 extendsTraits :
-  'extends' noGenericParameterNotFunctionTypeNameList
+  Extends plainNotFunctionInstanceTypeName (Comma plainNotFunctionInstanceTypeName)*
 ;
-
-noGenericParameterNotFunctionTypeNameList :
-  noGenericParameterNotFunctionTypeName (',' noGenericParameterNotFunctionTypeName)*
-;
-
-traitModifiers :
-   annotation* visibility?
-;
-
-traitBodyItem :
-  functionDefinition
-;
-
-traitBody :
-  '{' traitBodyItem* '}'
-;
-
+traitModifiers : annotation* visibility? ;
+traitBodyItem : functionDefinition | functionDeclaration ;
+traitBody : LeftBrace traitBodyItem* RightBrace ;
 // --tarit end --
 
 typeDefinition :
@@ -492,58 +400,42 @@ typeDefinition :
 
 // --------------------implementation start-------------------------
 
-implementationModifiers :
-   annotation*
-;
-
-implementationBodyItem :
-     functionDefinition
-;
-
-implementationBody :
-  '{' implementationBodyItem* '}'
-;
+implementationModifiers : annotation* ;
+implementationBodyItem : functionDefinition ;
+implementationBody : LeftBrace implementationBodyItem* RightBrace ;
 
 inherentImplementation :
-  implementationModifiers? 'implement' genericParameters? noGenericParameterNotFunctionTypeName implementationBody
+  implementationModifiers? Implement genericParameters? plainNotFunctionInstanceTypeName
+  implementationBody
 ;
 
 traitImplementation :
-  implementationModifiers? 'implement' genericParameters? noGenericParameterNotFunctionTypeName 'for' noGenericParameterNotFunctionTypeName
-  implementationBody
+  implementationModifiers? Implement genericParameters? plainNotFunctionInstanceTypeName For
+  plainNotFunctionInstanceTypeName implementationBody
 ;
 
 // --------------------implementation end---------------------------
 
-moduleModifiers :
-   annotation* visibility?
-;
+// --------------------module start---------------------------
 
-visibilityArgument :
-  plainPath
-;
-
-visibility : 'public'  visibilityArgument? ;
-
+moduleModifiers : annotation* visibility? ;
+visibilityArguments : LeftParen pathItem ( Comma pathItem)* RightParen ;
+visibility : Public visibilityArguments? ;
 moduleBodyItem :
      module
      | typeDefinition
      | letStatement
 ;
-
 moduleBody :
-  '{' useDeclarationStatement* typeAliasStatement* moduleBodyItem* '}'
+  LeftBrace useDeclarationStatement* typeAliasStatement* moduleBodyItem* RightBrace
 ;
-
+moduleIdentifier : ( plainPath Colon Colon )? identifier ;
 module :
-    moduleModifiers? 'module' moduleIdentifier moduleBody
+    moduleModifiers? Module moduleIdentifier moduleBody
 ;
+compilationUnit : module+ ;
 
-compilationUnit :
-  module+
-;
-
-
+// --------------------module end---------------------------
 
 // --------------------expression start-------------------------
 
@@ -564,126 +456,117 @@ assignmentExpression :
 ;
 
 leftValueExpression :
-     identifier
-     | plainPath ':' ':' identifier
+     (plainPath Colon Colon)? identifier
 ;
 
 assignmentOperator :
-  '='
-  | '+' '='
-  | '-' '='
-  | '*' '='
-  | '/' '='
-  | '%' '='
-  | '&' '='
-  | '^' '='
-  | '|' '='
-  |	'<' '<' '='
-  |	'>' '>' '='
-  |	'>' '>' '>' '='
+  EqualsSign
+  | PlusSign EqualsSign
+  | MinusSign EqualsSign
+  | Asterisk EqualsSign
+  | Slash EqualsSign
+  | PercentSign EqualsSign
+  | Ampersand EqualsSign
+  | Caret EqualsSign
+  | Ampersand EqualsSign
+  |	LessThanSign LessThanSign EqualsSign
+  |	GreaterThanSign GreaterThanSign EqualsSign
+  |	GreaterThanSign GreaterThanSign GreaterThanSign EqualsSign
 ;
 
 conditionalOrExpression :
   conditionalAndExpression
-	|	conditionalOrExpression '|' '|' conditionalAndExpression
+	|	conditionalOrExpression VerticalBar VerticalBar conditionalAndExpression
 ;
 
 conditionalAndExpression :
   inclusiveOrExpression
-	|	conditionalAndExpression '&' '&' inclusiveOrExpression
+	|	conditionalAndExpression Ampersand Ampersand inclusiveOrExpression
 ;
 
 inclusiveOrExpression :
   exclusiveOrExpression
-	|	inclusiveOrExpression '|' exclusiveOrExpression
+	|	inclusiveOrExpression VerticalBar exclusiveOrExpression
 ;
 
 exclusiveOrExpression :
   andExpression
-	|	exclusiveOrExpression '^' andExpression
+	|	exclusiveOrExpression Caret andExpression
 ;
 
 andExpression :
   equalityExpression
-	|	andExpression '&' equalityExpression
+	|	andExpression Ampersand equalityExpression
 ;
 
 equalityExpression :
   relationalExpression
-	|	equalityExpression '=' '=' relationalExpression
-	|	equalityExpression '!' '=' relationalExpression
+	|	equalityExpression EqualsSign EqualsSign relationalExpression
+	|	equalityExpression ExclamationMark EqualsSign relationalExpression
 ;
 
 relationalExpression :
   shiftExpression
-	|	relationalExpression '<' shiftExpression
-	|	relationalExpression '>' shiftExpression
-	|	relationalExpression '<' '=' shiftExpression
-	|	relationalExpression '>' '=' shiftExpression
+	|	relationalExpression LessThanSign shiftExpression
+	|	relationalExpression GreaterThanSign shiftExpression
+	|	relationalExpression LessThanSign EqualsSign shiftExpression
+	|	relationalExpression GreaterThanSign EqualsSign shiftExpression
 ;
 
 shiftExpression :
   additiveExpression
-	|	shiftExpression '<' '<' additiveExpression
-	|	shiftExpression '>' '>' additiveExpression
-	|	shiftExpression '>' '>' '>' additiveExpression
+	|	shiftExpression LessThanSign LessThanSign additiveExpression
+	|	shiftExpression GreaterThanSign GreaterThanSign additiveExpression
+	|	shiftExpression GreaterThanSign GreaterThanSign GreaterThanSign additiveExpression
 ;
 
 additiveExpression :
   multiplicativeExpression
-	|	additiveExpression '+' multiplicativeExpression
-	|	additiveExpression '-' multiplicativeExpression
+	|	additiveExpression PlusSign multiplicativeExpression
+	|	additiveExpression MinusSign multiplicativeExpression
 ;
 
 multiplicativeExpression :
   unaryExpression
-	|	multiplicativeExpression '*' unaryExpression
-	|	multiplicativeExpression '/' unaryExpression
-	|	multiplicativeExpression '%' unaryExpression
+	|	multiplicativeExpression Asterisk unaryExpression
+	|	multiplicativeExpression Slash unaryExpression
+	|	multiplicativeExpression PercentSign unaryExpression
 ;
 
 unaryExpression :
 	unaryExpressionNotPlusMinus
-  | '+' unaryExpression
-	|	'-' unaryExpression
+  | PlusSign unaryExpression
+	|	MinusSign unaryExpression
 ;
 
 unaryExpressionNotPlusMinus :
   primaryExpression
-	|	'~' unaryExpression
-	|	'!' unaryExpression
+	|	Tilde unaryExpression
+	|	ExclamationMark unaryExpression
 	;
 
 primaryExpression :
 	leftValueExpression
 	| literalExpression
-  | 'self'
+  | SelfValue
   | methodInvocation
-  | '(' expression ')'
+  | LeftParen expression RightParen
   | anonymousFunction
   | initListExpression
 ;
 
 methodInvocation :
-   expression '(' argumentList? ')'
+   expression LeftParen argumentList? RightParen
 ;
+argumentList : expression (Comma expression)* ;
 
-argumentList :
-   expression (',' expression)*
-;
-
-initListExpression :
-  instanceTypeName '{' initList? '}'
-;
-
+initListExpression : instanceTypeName? initList ;
 initList :
-  initListField ( ',' initListField )* #fieldsInitList
-  | expression ( ',' expression )* #valuesInitList
+  LeftBrace RightBrace #emptyInitList
+  | LeftBrace initListField ( Comma initListField )* RightBrace #fieldsInitList
+  | LeftBrace expression ( Comma expression )* RightBrace #valuesInitList
 ;
-
-initListField :
-  identifier ':' expression
-;
+initListField : identifier Colon expression ;
 
 // --------------------expression end-------------------------
 
@@ -706,6 +589,7 @@ keyWord :
   SelfType |
   Public |
   Const |
+  // Mut |
   Implement |
   Extends |
   Let |
@@ -725,38 +609,6 @@ keyWord :
 identifier :
   Identifier | keyWord
 ;
-
-moduleIdentifierSegment :
-  Identifier |
-  Module |
-  Use |
-  Type |
-  Var |
-  Struct |
-  Annotation |
-  Enum |
-  Class |
-  Function |
-  Trait |
-  SelfType |
-  Public |
-  Const |
-  Implement |
-  Extends |
-  Let |
-  As |
-  Loop |
-  While |
-  For |
-  In |
-  Continue |
-  Break |
-  Match |
-  If |
-  Else |
-  Return
-;
-
 // ---------------------word end------------------------
 
 

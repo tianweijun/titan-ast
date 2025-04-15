@@ -33,9 +33,7 @@ public class RegExp2TokenNfaConverter {
     tasks = new LinkedList<>(taskGrammars);
   }
 
-  /**
-   * 把所有的tasks对应正则的nfa构造并设置.
-   */
+  /** 把所有的tasks对应正则的nfa构造并设置. */
   public void convert() {
     int convertMaxTimes = tasks.size();
     int convertTimes = 0;
@@ -50,7 +48,8 @@ public class RegExp2TokenNfaConverter {
         cycleDepentGrammars.append(" ");
       }
       cycleDepentGrammars.delete(cycleDepentGrammars.length() - 1, cycleDepentGrammars.length());
-      throw new AstRuntimeException(String.format("cycleDepentTokenGrammars:'%s'", cycleDepentGrammars));
+      throw new AstRuntimeException(
+          String.format("cycleDepentTokenGrammars:'%s'", cycleDepentGrammars));
     }
   }
 
@@ -66,7 +65,8 @@ public class RegExp2TokenNfaConverter {
   }
 
   private boolean isReadyToBuild(Grammar grammar) {
-    return isReadyToBuild(((RegExpPrimaryGrammarContent) grammar.primaryGrammarContent).orCompositeRegExp);
+    return isReadyToBuild(
+        ((RegExpPrimaryGrammarContent) grammar.primaryGrammarContent).orCompositeRegExp);
   }
 
   private boolean isReadyToBuild(OrCompositeRegExp orCompositeRegExp) {
@@ -88,14 +88,13 @@ public class RegExp2TokenNfaConverter {
   }
 
   private void buildNfa(Grammar grammar) {
-    RegExpPrimaryGrammarContent grammarContent = (RegExpPrimaryGrammarContent) grammar.primaryGrammarContent;
+    RegExpPrimaryGrammarContent grammarContent =
+        (RegExpPrimaryGrammarContent) grammar.primaryGrammarContent;
     TokenNfa tokenNfa = buildByOrCompositeRegExp(grammarContent.orCompositeRegExp);
     ((TokenNfable) grammar).setTokenNfa(tokenNfa);
   }
 
-  /**
-   * 按照后序遍历顺序构造正则节点对应的nfa.
-   */
+  /** 按照后序遍历顺序构造正则节点对应的nfa. */
   private TokenNfa buildByOrCompositeRegExp(OrCompositeRegExp orCompositeRegExp) {
     TokenNfa orCompositeRegExpNfa = new TokenNfa();
     TokenNfaState start = orCompositeRegExpNfa.start;
@@ -142,7 +141,8 @@ public class RegExp2TokenNfaConverter {
   private TokenNfa buildByParenthesisRegExp(ParenthesisRegExp parenthesisRegExp) {
     OrCompositeRegExp orCompositeRegExp = parenthesisRegExp.orCompositeRegExp;
     TokenNfa orCompositeRegExpNfa = buildByOrCompositeRegExp(orCompositeRegExp);
-    return buildByNfaAndTimes(orCompositeRegExpNfa, parenthesisRegExp.repMinTimes, parenthesisRegExp.repMaxTimes);
+    return buildByNfaAndTimes(
+        orCompositeRegExpNfa, parenthesisRegExp.repMinTimes, parenthesisRegExp.repMaxTimes);
   }
 
   private TokenNfa buildByGrammarRegExp(GrammarRegExp grammarRegExp) {
@@ -162,14 +162,16 @@ public class RegExp2TokenNfaConverter {
     TokenNfaState prevLinkedState = rnfa.start;
     for (char ch : chars) {
       TokenNfaState nextState = new TokenNfaState();
-      prevLinkedState.addEdge((int) ch, nextState);
+      prevLinkedState.addEdge(ch & 0x000000FF, nextState);
       prevLinkedState = nextState;
     }
     prevLinkedState.addEdge(epsilon, rnfa.end);
-    return buildByNfaAndTimes(rnfa, sequenceCharsRegExp.repMinTimes, sequenceCharsRegExp.repMaxTimes);
+    return buildByNfaAndTimes(
+        rnfa, sequenceCharsRegExp.repMinTimes, sequenceCharsRegExp.repMaxTimes);
   }
 
-  private TokenNfa buildByOneCharOptionCharsetRegExp(OneCharOptionCharsetRegExp oneCharOptionCharsetRegExp) {
+  private TokenNfa buildByOneCharOptionCharsetRegExp(
+      OneCharOptionCharsetRegExp oneCharOptionCharsetRegExp) {
     char[] chars = oneCharOptionCharsetRegExp.chars;
     if (chars.length == 0) {
       throw new AstRuntimeException(
@@ -179,15 +181,17 @@ public class RegExp2TokenNfaConverter {
     TokenNfaState start = rnfa.start;
     TokenNfaState end = rnfa.end;
     for (char ch : chars) {
-      start.addEdge((int) ch, end);
+      start.addEdge(ch & 0x000000FF, end);
     }
-    return buildByNfaAndTimes(rnfa, oneCharOptionCharsetRegExp.repMinTimes, oneCharOptionCharsetRegExp.repMaxTimes);
+    return buildByNfaAndTimes(
+        rnfa, oneCharOptionCharsetRegExp.repMinTimes, oneCharOptionCharsetRegExp.repMaxTimes);
   }
 
   /*
    * 依据右值nfa为中间内容，按照左值设置重复次数，以完成左值nfa的构造.
    */
-  private TokenNfa buildByNfaAndTimes(TokenNfa rightNfa, RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
+  private TokenNfa buildByNfaAndTimes(
+      TokenNfa rightNfa, RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
     TokenNfa beBuildedNfa = new TokenNfa();
     TokenNfaState start = beBuildedNfa.start;
     TokenNfaState end = beBuildedNfa.end;

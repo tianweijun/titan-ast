@@ -1,5 +1,7 @@
 package titan.ast.impl.ast;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import titan.ast.AstRuntimeException;
 import titan.ast.runtime.AutomataDataIoException;
@@ -12,8 +14,7 @@ import titan.ast.runtime.RuntimeAutomataRichAstApplication;
  */
 public class RuntimeAutomataRichAstApplicationFactory {
 
-  private static final String GRAMMAR_AUTOMATA_RESOUCES_PATH =
-      "titanAstGrammar.automata";
+  private static final String GRAMMAR_AUTOMATA_RESOUCES_PATH = "titanAstGrammar.automata";
   private static RuntimeAutomataRichAstApplication astApplication = null;
 
   public static RuntimeAutomataRichAstApplication getAstApplication() {
@@ -22,13 +23,17 @@ public class RuntimeAutomataRichAstApplicationFactory {
     }
     synchronized (RuntimeAutomataRichAstApplicationFactory.class) {
       if (null == astApplication) {
-        InputStream automataInputStream =
-            RuntimeAutomataRichAstApplicationFactory.class.getClassLoader()
-                .getResourceAsStream(GRAMMAR_AUTOMATA_RESOUCES_PATH);
         astApplication = new RuntimeAutomataRichAstApplication();
-        try {
+
+        try (InputStream inputStream =
+            RuntimeAutomataRichAstApplicationFactory.class
+                .getClassLoader()
+                .getResourceAsStream(GRAMMAR_AUTOMATA_RESOUCES_PATH)) {
+          ByteArrayInputStream automataInputStream =
+              new ByteArrayInputStream(inputStream.readAllBytes());
           astApplication.setContext(automataInputStream);
-        } catch (AutomataDataIoException e) {
+          automataInputStream.close();
+        } catch (AutomataDataIoException | IOException e) {
           throw new AstRuntimeException(e);
         }
       }

@@ -1,0 +1,159 @@
+
+@TerminalGrammar begin ;
+Identifier :	IdentifierStartChar IdentifierNotStartChar* ;
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+// no digit,no punctuation,no wordspace
+IdentifierStartChar :
+   IdentifierStartUtf81ByteChar
+   | IdentifierStartUtf82ByteChar
+   | IdentifierStartUtf83ByteChar
+   | IdentifierUtf84ByteChar
+   | IdentifierUtf85ByteChar
+   | IdentifierUtf86ByteChar
+;
+
+// no punctuation,no wordspace
+IdentifierNotStartChar :
+   IdentifierNotStartUtf81ByteChar
+   | IdentifierNotStartUtf82ByteChar
+   | IdentifierNotStartUtf83ByteChar
+   | IdentifierUtf84ByteChar
+   | IdentifierUtf85ByteChar
+   | IdentifierUtf86ByteChar
+;
+
+IdentifierStartUtf81ByteChar :
+    [\x41-\x5A]   // A-Z
+	  | [\x5F]          // _
+	  | [\x61-\x7A]  // a-z
+;
+
+IdentifierNotStartUtf81ByteChar :
+    IdentifierStartUtf81ByteChar
+	  | [\x30-\x39] // 0-9
+;
+
+// [\xC0-\xDF] [\x80-\xBF]{1} 2byte 110x_xxxx 10xx_xxxx{1}      [0080-07FF]
+// no BackQuoteCn-AsteriskCn '\xC2\xB7'-'\xC3\x97'
+IdentifierStartUtf82ByteChar :
+   // #########['\xC0\x80','\xC2\xB7')BackQuoteCn##########
+   [\xC0-\xC1] [\x80-\xBF] | '\xC2' [\x80-\xB6]
+   // #########('\xC2\xB7','\xC3\x97')AsteriskCn##########
+   | '\xC2' [\xB8-\xBF] | '\xC3' [\x80-\x96]
+   // #########('\xC3\x97','\xDF\xBF']##########
+   | '\xC3' [\x98-\xBF] | [\xC4-\xDF] [\x80-\xBF]
+;
+// no BackQuoteCn-AsteriskCn '\xC2\xB7'-'\xC3\x97'
+IdentifierNotStartUtf82ByteChar :
+   // #########['\xC0\x80','\xC2\xB7')BackQuoteCn##########
+   [\xC0-\xC1] [\x80-\xBF] | '\xC2' [\x80-\xB6]
+   // #########('\xC2\xB7','\xC3\x97')AsteriskCn##########
+   | '\xC2' [\xB8-\xBF] | '\xC3' [\x80-\x96]
+   // #########('\xC3\x97','\xDF\xBF']##########
+   | '\xC3' [\x98-\xBF] | [\xC4-\xDF] [\x80-\xBF]
+;
+
+// [\xE0-\xEF] [\x80-\xBF]{2}    // 3byte 1110_xxxx 10xx_xxxx{2}      [0800-FFFF]
+// no 41punctuationCn-1DelimiterCharCn
+IdentifierStartUtf83ByteChar :
+  // #########['\xE0\x80\x80','\xE2\x80\x98')SingleQuoteCn+1##########
+  [\xE0-\xE1] [\x80-\xBF]{2} | '\xE2\x80' [\x80-\x97]
+  // #########('\xE2\x80\x99','\xE2\x80\x9C')DoubleQuoteCn+1##########
+  | '\xE2\x80' [\x9A-\x9B]
+   // #########('\xE2\x80\x9D','\xE2\x80\xA6')CaretCn##########
+  | '\xE2\x80' [\x9E-\xA5]
+  // #########('\xE2\x80\xA6','\xE3\x80\x80')DelimiterCharCn+2##########
+  | '\xE2\x80' [\xA7-\xBF] | '\xE2' [\x81-\xBF] [\x80-\xBF]
+  // #########('\xE3\x80\x82','\xE3\x80\x8A')LessThanSignCn+1##########
+  | '\xE3\x80' [\x83-\x89]
+  // #########('\xE3\x80\x8B','\xE3\x80\x90')LeftBracketCn+1##########
+  | '\xE3\x80' [\x8C-\x8F]
+  // #########('\xE3\x80\x91','\xEF\xBC\x81')ExclamationMarkCn##########
+  | '\xE3\x80' [\x92-\xBF] | '\xE3' [\x81-\xBF] [\x80-\xBF]
+  | [\xE4-\xEE] [\x80-\xBF]{2} | '\xEF' [\x80-\xBB] [\x80-\xBF]
+  | '\xEF\xBC\x80'
+  // #########('\xEF\xBC\x81','\xEF\xBC\x83')NumberSignCn+3##########
+  | '\xEF\xBC\x82'
+  // #########('\xEF\xBC\x86','\xEF\xBC\x88')LeftParenCn+5##########
+  | '\xEF\xBC\x87'
+  // #########('\xEF\xBC\x8D','\xEF\xBC\x8F')SlashCn##########
+  | '\xEF\xBC\x8E'
+  // #########('\xEF\xBC\x8F','\xEF\xBC\x9A')ColonCn+3##########
+  // | '\xEF\xBC' [\x90-\x99] delete DigitCn[0-9]
+  // #########('\xEF\xBC\x9C','\xEF\xBC\x9E')GreaterThanSignCn+2##########
+  | '\xEF\xBC\x9D'
+  // #########('\xEF\xBC\xA0','\xEF\xBC\xBB')LeftBracketCn+3##########
+  | '\xEF\xBC' [\xA1-\xBA]
+  // #########('\xEF\xBC\xBE','\xEF\xBC\xBF']UnderscoreCn##########
+  | '\xEF\xBC\xBF'
+  // #########('\xEF\xBC\xBF','\xEF\xBD\x80')BackQuoteCn##########
+  // #########('\xEF\xBD\x80','\xEF\xBD\x9B')LeftBraceCn+3##########
+  | '\xEF\xBD' [\x81-\x9A]
+  // #########('\xEF\xBD\x9E','\xEF\xBF\xA3')TildeCn##########
+  | '\xEF\xBD' [\x9F-\xBF] | '\xEF\xBE' [\x80-\xBF]
+  | '\xEF\xBF' [\x80-\xA2]
+  // #########('\xEF\xBF\xA3','\xEF\xBF\xA5')DollarSignCn##########
+  | '\xEF\xBF\xA4'
+  // #########('\xEF\xBF\xA5','\xEF\xBF\xBF']##########
+  | '\xEF\xBF' [\xA6-\xBF]
+;
+IdentifierNotStartUtf83ByteChar :
+  // #########['\xE0\x80\x80','\xE2\x80\x98')SingleQuoteCn+1##########
+   [\xE0-\xE1] [\x80-\xBF]{2} | '\xE2\x80' [\x80-\x97]
+   // #########('\xE2\x80\x99','\xE2\x80\x9C')DoubleQuoteCn+1##########
+   | '\xE2\x80' [\x9A-\x9B]
+    // #########('\xE2\x80\x9D','\xE2\x80\xA6')CaretCn##########
+   | '\xE2\x80' [\x9E-\xA5]
+   // #########('\xE2\x80\xA6','\xE3\x80\x80')WordSpaceCn+2##########
+   | '\xE2\x80' [\xA7-\xBF] | '\xE2' [\x81-\xBF] [\x80-\xBF]
+   // #########('\xE3\x80\x82','\xE3\x80\x8A')LessThanSignCn+1##########
+   | '\xE3\x80' [\x83-\x89]
+   // #########('\xE3\x80\x8B','\xE3\x80\x90')LeftBracketCn+1##########
+   | '\xE3\x80' [\x8C-\x8F]
+   // #########('\xE3\x80\x91','\xEF\xBC\x81')ExclamationMarkCn##########
+   | '\xE3\x80' [\x92-\xBF] | '\xE3' [\x81-\xBF] [\x80-\xBF]
+   | [\xE4-\xEE] [\x80-\xBF]{2} | '\xEF' [\x80-\xBB] [\x80-\xBF]
+   | '\xEF\xBC\x80'
+   // #########('\xEF\xBC\x81','\xEF\xBC\x83')NumberSignCn+3##########
+   | '\xEF\xBC\x82'
+   // #########('\xEF\xBC\x86','\xEF\xBC\x88')LeftParenCn+5##########
+   | '\xEF\xBC\x87'
+   // #########('\xEF\xBC\x8D','\xEF\xBC\x8F')SlashCn##########
+   | '\xEF\xBC\x8E'
+   // #########('\xEF\xBC\x8F','\xEF\xBC\x9A')ColonCn+3##########
+   | '\xEF\xBC' [\x90-\x99]
+   // #########('\xEF\xBC\x9C','\xEF\xBC\x9E')GreaterThanSignCn+2##########
+   | '\xEF\xBC\x9D'
+   // #########('\xEF\xBC\xA0','\xEF\xBC\xBB')LeftBracketCn+3##########
+   | '\xEF\xBC' [\xA1-\xBA]
+   // #########('\xEF\xBC\xBE','\xEF\xBC\xBF']UnderscoreCn##########
+   | '\xEF\xBC\xBF'
+   // #########('\xEF\xBC\xBF','\xEF\xBD\x80')BackQuoteCn##########
+   // #########('\xEF\xBD\x80','\xEF\xBD\x9B')LeftBraceCn+3##########
+   | '\xEF\xBD' [\x81-\x9A]
+   // #########('\xEF\xBD\x9E','\xEF\xBF\xA3')TildeCn##########
+   | '\xEF\xBD' [\x9F-\xBF] | '\xEF\xBE' [\x80-\xBF]
+   | '\xEF\xBF' [\x80-\xA2]
+   // #########('\xEF\xBF\xA3','\xEF\xBF\xA5')DollarSignCn##########
+   | '\xEF\xBF\xA4'
+   // #########('\xEF\xBF\xA5','\xEF\xBF\xBF']##########
+   | '\xEF\xBF' [\xA6-\xBF]
+;
+
+
+// [\xF0-\xF7] [\x80-\xBF]{3}    // 4byte 1111_0xxx 10xx_xxxx{3}      [01_0000-1F_FFFF]
+IdentifierUtf84ByteChar :
+   [\xF0-\xF7] [\x80-\xBF]{3}
+;
+// [\xF8-\xFB] [\x80-\xBF]{4}    // 5byte 1111_10xx 10xx_xxxx{4}      [20_0000-3FF_FFFF]
+IdentifierUtf85ByteChar :
+   [\xF8-\xFB] [\x80-\xBF]{4}
+;
+// [\xFC-\xFD] [\x80-\xBF]{5}    // 6byte 1111_110x 10xx_xxxx{5}      [400_0000-7FFF_FFFF]
+IdentifierUtf86ByteChar :
+   [\xFC-\xFD] [\x80-\xBF]{5}
+;
+
+@TerminalFragmentGrammar end ;

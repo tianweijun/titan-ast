@@ -20,10 +20,14 @@ public abstract class PrimaryGrammarContent {
     this.type = type;
   }
 
-
   public enum PrimaryGrammarContentType {
     REG_EXP,
     NFA
+  }
+
+  public enum NfaPrimaryGrammarContentEdgeType {
+    SEQUENCE_CHARS,
+    ONE_CHAR_OPTION_CHARSET
   }
 
   public static class RegExpPrimaryGrammarContent extends PrimaryGrammarContent {
@@ -47,12 +51,14 @@ public abstract class PrimaryGrammarContent {
   }
 
   public static class NfaPrimaryGrammarContentEdge {
+    public final NfaPrimaryGrammarContentEdgeType type;
+    public final String from;
+    public final String to;
+    public final char[] chars;
 
-    public String from;
-    public String to;
-    public char[] chars;
-
-    public NfaPrimaryGrammarContentEdge(String from, String to, char[] chars) {
+    public NfaPrimaryGrammarContentEdge(
+        NfaPrimaryGrammarContentEdgeType type, String from, String to, char[] chars) {
+      this.type = type;
       this.from = from;
       this.to = to;
       this.chars = chars;

@@ -1,0 +1,44 @@
+@TerminalGrammar begin ;
+
+LeftBrace : LeftBraceFragment ;
+RightBrace : RightBraceFragment ;
+LeftParen : LeftParenFragment ;
+RightParen : RightParenFragment ;
+LeftBracket : LeftBracketFragment ;
+RightBracket : RightBracketFragment ;
+
+Semi : SemiFragment ;
+Comma : CommaFragment ;
+Colon : ColonFragment ;
+Dot : DotFragment ;
+
+PlusSign    : PlusSignFragment ;
+MinusSign   : MinusSignFragment ;
+Asterisk : AsteriskFragment ;
+Slash   : SlashFragment ;
+PercentSign : PercentSignFragment ;
+
+Ampersand : AmpersandFragment ;
+VerticalBar : VerticalBarFragment ;
+Caret : CaretFragment ;
+Tilde : TildeFragment ;
+
+GreaterThanSign : GreaterThanSignFragment ;
+LessThanSign : LessThanSignFragment ;
+EqualsSign : EqualsSignFragment ;
+ExclamationMark : ExclamationMarkFragment ;
+
+AtSign : AtSignFragment ;
+QuestionMark : QuestionMarkFragment ;
+
+// reserved
+DollarSign : DollarSignFragment ;
+NumberSign : NumberSignFragment ;
+BackQuote : BackQuoteFragment ;
+
+// Backslash : '\\' ;
+// SingleQuote : '\'' ;
+// DoubleQuote : '\"' ;
+// Underscore : '_' ;
+
+@TerminalGrammar end ;

@@ -100,23 +100,6 @@ identifier : Identifier | Begin | End | Skip ;
 
 @TerminalGrammar begin ;
 
-BlockComment
-    nfa(start,end)
-     :
-               start'/*'prefix2
-               prefix2[*]suffix1 prefix2~[*]prefix2
-               suffix1[/]end suffix1[*]suffix1 suffix1~[*/]prefix2
-     -> skip
-;
-
-LineComment
-    nfa(start,end)
-     :
-      start'//'prefix2
-      prefix2[]end prefix2[\n]end prefix2~[\n]prefix2
-    -> skip
-;
-
 Comma : ',' ;
 Colon : ':'  ;
 Semi : ';' ;
@@ -144,6 +127,21 @@ AndCompositeRegExpAlias : AndCompositeRegExpAliasFragment ;
 
 Identifier : IdentifierFragment ;
 
+BlockComment
+    nfa(start,end)
+     :
+               start'/*'prefix2
+               prefix2[*]suffix1 prefix2~[*]prefix2
+               suffix1[/]end suffix1[*]suffix1 suffix1~[*/]prefix2
+     -> skip
+;
+LineComment
+    nfa(start,end)
+     :
+      start'//'prefix2
+      prefix2[]end prefix2[\n]end prefix2~[\n]prefix2
+    -> skip
+;
 DelimiterChars : [\s\t\r\n]+ -> skip ;
 
 @TerminalGrammar end ;
@@ -179,6 +177,7 @@ RepeatTimes :
       '?'
       | '*'
       | '+'
+      | '{' naturalNumber '}'
       | '{' naturalNumber? ',' naturalNumber? '}'
 ;
 

@@ -6,6 +6,7 @@ import titan.ast.AstRuntimeException;
 import titan.ast.grammar.GrammarAttribute.NfaTerminalGrammarAttribute;
 import titan.ast.grammar.GrammarCharset;
 import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdge;
+import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdgeType;
 import titan.ast.grammar.regexp.GrammarRegExp;
 import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp;
 import titan.ast.grammar.regexp.RegExp;
@@ -19,15 +20,14 @@ import titan.ast.grammar.regexp.SequenceCharsRegExp;
  */
 public class GrammarParser {
 
-  private GrammarParser() {
-  }
+  private GrammarParser() {}
 
   public static OneCharOptionCharsetRegExp getOneCharOptionCharsetRegExp(String str) {
     char[] charArray = str.toCharArray();
     StringBuilder stringBuilder = new StringBuilder(str.length());
     int indexOfChar = setCharsForOneCharOptionCharset(stringBuilder, charArray, 0);
     char[] chars = stringBuilder.toString().toCharArray();
-    ++indexOfChar;//skip ']'
+    ++indexOfChar; // skip ']'
     RepeatTimes[] repeatTimes = getRepeatTimes(charArray, indexOfChar);
     return new OneCharOptionCharsetRegExp(chars, repeatTimes[0], repeatTimes[1]);
   }
@@ -37,7 +37,7 @@ public class GrammarParser {
     StringBuilder stringBuilder = new StringBuilder(str.length());
     int indexOfChar = setCharsForSequenceChars(stringBuilder, charArray, 0);
     String chars = stringBuilder.toString();
-    ++indexOfChar;//skip '\''
+    ++indexOfChar; // skip '\''
     RepeatTimes[] repeatTimes = getRepeatTimes(charArray, indexOfChar);
     return new SequenceCharsRegExp(chars, repeatTimes[0], repeatTimes[1]);
   }
@@ -63,19 +63,18 @@ public class GrammarParser {
     return new GrammarRegExp(grammarName, repeatTimes[0], repeatTimes[1]);
   }
 
-  //ParenthesisUnitRegExpSuffixFragment : ')' RepeatTimes? ;
-  public static RepeatTimes[] getRepeateTimesByParenthesisUnitRegExpSuffix(String parenthesisUnitRegExpSuffix) {
+  // ParenthesisUnitRegExpSuffixFragment : ')' RepeatTimes? ;
+  public static RepeatTimes[] getRepeateTimesByParenthesisUnitRegExpSuffix(
+      String parenthesisUnitRegExpSuffix) {
     char[] charArray = parenthesisUnitRegExpSuffix.toCharArray();
-    return getRepeatTimes(charArray, 1);//skip ')'
+    return getRepeatTimes(charArray, 1); // skip ')'
   }
 
   private static RepeatTimes[] getRepeatTimes(char[] charArray, int indexOfChar) {
     RepeatTimes repMinTimes = RepeatTimes.getNumberTimes(1);
     RepeatTimes repMaxTimes = RepeatTimes.getNumberTimes(1);
     if (indexOfChar >= charArray.length) {
-      return new RepeatTimes[]{
-          repMinTimes, repMaxTimes
-      };
+      return new RepeatTimes[] {repMinTimes, repMaxTimes};
     }
 
     char firstCh = charArray[indexOfChar];
@@ -102,20 +101,30 @@ public class GrammarParser {
         repMaxTimes = RepeatTimes.getNumberTimes(1);
       }
     }
-    return new RepeatTimes[]{
-        repMinTimes, repMaxTimes
-    };
+    return new RepeatTimes[] {repMinTimes, repMaxTimes};
   }
 
-  //'{' naturalNumber? ',' naturalNumber? '}'
+  // '{' naturalNumber '}' // '{' naturalNumber? ',' naturalNumber? '}'
   private static RepeatTimes[] getRepeatTimesByLeftBrace(char[] charArray, int indexOfChar) {
     StringBuilder repMinTimesStr = new StringBuilder(charArray.length - indexOfChar);
+    boolean isEndParse = false;
     for (indexOfChar += 1; indexOfChar < charArray.length; indexOfChar++) {
       char ch = charArray[indexOfChar];
       if (ch == ',') {
         break;
       }
+      if (ch == '}') {
+        isEndParse = true;
+        break;
+      }
       repMinTimesStr.append(ch);
+    }
+    RepeatTimes repMinTimes = RepeatTimes.getInfinityTimes();
+    RepeatTimes repMaxTimes = RepeatTimes.getInfinityTimes();
+    if (isEndParse) { // 没有逗号，只能是｛2｝这种形式
+      repMinTimes.setTimes(Integer.parseInt(repMinTimesStr.toString(), 10));
+      repMaxTimes.setTimes(repMinTimes.times);
+      return new RepeatTimes[] {repMinTimes, repMaxTimes};
     }
     StringBuilder repMaxTimesStr = new StringBuilder(charArray.length - indexOfChar);
     for (indexOfChar += 1; indexOfChar < charArray.length; indexOfChar++) {
@@ -125,8 +134,6 @@ public class GrammarParser {
       }
       repMaxTimesStr.append(ch);
     }
-    RepeatTimes repMinTimes = RepeatTimes.getInfinityTimes();
-    RepeatTimes repMaxTimes = RepeatTimes.getInfinityTimes();
     if (!repMinTimesStr.isEmpty()) {
       repMinTimes.setTimes(Integer.parseInt(repMinTimesStr.toString(), 10));
     }
@@ -135,12 +142,12 @@ public class GrammarParser {
     }
     if (!RegExp.isRightRepeatTimes(repMinTimes, repMaxTimes)) {
       throw new AstRuntimeException(
-          String.format("{repMinTimes,repMaxTimes} is not right,error near : {%s,%s}", repMinTimesStr, repMaxTimesStr));
+          String.format(
+              "{repMinTimes,repMaxTimes} is not right,error near : {%s,%s}",
+              repMinTimesStr, repMaxTimesStr));
     }
 
-    return new RepeatTimes[]{
-        repMinTimes, repMaxTimes
-    };
+    return new RepeatTimes[] {repMinTimes, repMaxTimes};
   }
 
   private static boolean isPrefixOfRepeatTimes(char ch) {
@@ -158,9 +165,9 @@ public class GrammarParser {
     char ch = charArray[indexOfChar];
     if (ch == '~') {
       creationDescriptor.isNot = true;
-      ++indexOfChar;//charArray[indexOfChar]=='['
+      ++indexOfChar; // charArray[indexOfChar]=='['
     }
-    ++indexOfChar;//skip '['
+    ++indexOfChar; // skip '['
     for (; indexOfChar < charArray.length; ) {
       ch = charArray[indexOfChar];
       if (ch == '\\') {
@@ -182,7 +189,8 @@ public class GrammarParser {
   }
 
   // '\'' CharForSequenceChars* '\'' RepeatTimes?
-  public static int setCharsForSequenceChars(StringBuilder charsBuilder, char[] charArray, int indexOfChar) {
+  public static int setCharsForSequenceChars(
+      StringBuilder charsBuilder, char[] charArray, int indexOfChar) {
     StringBuilder stringBuilder = new StringBuilder(charArray.length - indexOfChar);
     ++indexOfChar; // skip'
     while (indexOfChar < charArray.length) {
@@ -201,18 +209,17 @@ public class GrammarParser {
     return indexOfChar;
   }
 
-  private static int setEscapeCharForOneCharOptionCharset(StringBuilder stringBuilder, char[] charArray,
-      int indexOfChar) {
-    ++indexOfChar;//skip '\\'
+  private static int setEscapeCharForOneCharOptionCharset(
+      StringBuilder stringBuilder, char[] charArray, int indexOfChar) {
+    ++indexOfChar; // skip '\\'
     char ch = charArray[indexOfChar];
     if (ch == 'x' || ch == 'X') {
       return setHexadecimalEscapeChar(charArray, indexOfChar, stringBuilder);
     }
     char escapeChar = ch;
     switch (ch) {
-      case '-', ']', '\\' -> {
-      }
-      //0\\abfnrtvs
+      case '-', ']', '\\' -> {}
+      // 0\\abfnrtvs
       case '0' -> {
         escapeChar = 0;
       }
@@ -241,23 +248,22 @@ public class GrammarParser {
         escapeChar = ' ';
       }
     }
-    stringBuilder.append((char) (escapeChar & 0xFF));
+    stringBuilder.append(escapeChar);
     ++indexOfChar;
     return indexOfChar;
   }
 
-
-  private static int setEscapeCharForSequenceChars(StringBuilder stringBuilder, char[] charArray, int indexOfChar) {
-    ++indexOfChar;//skip '\\'
+  private static int setEscapeCharForSequenceChars(
+      StringBuilder stringBuilder, char[] charArray, int indexOfChar) {
+    ++indexOfChar; // skip '\\'
     char ch = charArray[indexOfChar];
     if (ch == 'x' || ch == 'X') {
       return setHexadecimalEscapeChar(charArray, indexOfChar, stringBuilder);
     }
     char escapeChar = ch;
     switch (ch) {
-      case '\'', '\\' -> {
-      }
-      //0\\abfnrtvs
+      case '\'', '\\' -> {}
+      // 0\\abfnrtvs
       case '0' -> {
         escapeChar = 0;
       }
@@ -286,12 +292,13 @@ public class GrammarParser {
         escapeChar = ' ';
       }
     }
-    stringBuilder.append((char) (escapeChar & 0xFF));
+    stringBuilder.append(escapeChar);
     ++indexOfChar;
     return indexOfChar;
   }
 
-  private static int setHexadecimalEscapeChar(char[] charArray, int indexOfChar, StringBuilder stringBuilder) {
+  private static int setHexadecimalEscapeChar(
+      char[] charArray, int indexOfChar, StringBuilder stringBuilder) {
     char[] hexNumberChars = new char[GrammarCharset.HEX_LENGTH_OF_TEXT_CHAR];
     int indexOfHexNumber = 0;
     int indexOfHexCharText = indexOfChar + 1;
@@ -312,7 +319,7 @@ public class GrammarParser {
       multiples *= 16;
       --indexOfHexNumber;
     }
-    stringBuilder.append((char) (vchar & 0xFF));
+    stringBuilder.append((char) vchar);
     return indexOfChar + sizeOfHexNumbers + 1;
   }
 
@@ -346,7 +353,7 @@ public class GrammarParser {
     return nonformatAias.substring(1);
   }
 
-  //'nfa' '(' IdentifierFragment ',' IdentifierFragment  ')' ;
+  // 'nfa' '(' IdentifierFragment ',' IdentifierFragment  ')' ;
   public static NfaTerminalGrammarAttribute getNfaTerminalGrammarAttribute(String str) {
     String start = "";
     String end = "";
@@ -359,7 +366,7 @@ public class GrammarParser {
       }
       ++indexOfCharArray;
     }
-    ++indexOfCharArray;//skip '('
+    ++indexOfCharArray; // skip '('
     StringBuilder stringBuilder = new StringBuilder(charArray.length);
     while (indexOfCharArray < charArray.length) {
       char ch = charArray[indexOfCharArray];
@@ -370,7 +377,7 @@ public class GrammarParser {
       ++indexOfCharArray;
     }
     start = stringBuilder.toString();
-    ++indexOfCharArray;//skip ','
+    ++indexOfCharArray; // skip ','
     stringBuilder.delete(0, stringBuilder.length());
     while (indexOfCharArray < charArray.length) {
       char ch = charArray[indexOfCharArray];
@@ -390,45 +397,46 @@ public class GrammarParser {
    */
   public static NfaPrimaryGrammarContentEdge getNfaEdge(String str) {
     char[] charArray = str.toCharArray();
-    //from
-    boolean isSequenceChars = false;
-    boolean isOneCharOptionCharset = false;
+    NfaPrimaryGrammarContentEdgeType type = null;
+    // from
     StringBuilder stringBuilder = new StringBuilder(charArray.length);
     int indexOfChar = 0;
     while (indexOfChar < charArray.length) {
       char ch = charArray[indexOfChar];
       if (ch == '\'') {
-        isSequenceChars = true;
+        type = NfaPrimaryGrammarContentEdgeType.SEQUENCE_CHARS;
         break;
       }
       if (ch == '[' || ch == '~') {
-        isOneCharOptionCharset = true;
+        type = NfaPrimaryGrammarContentEdgeType.ONE_CHAR_OPTION_CHARSET;
         break;
       }
       stringBuilder.append(ch);
       ++indexOfChar;
     }
     String from = stringBuilder.toString();
-    //chars
+    // chars
     stringBuilder.delete(0, stringBuilder.length());
-    if (isSequenceChars) {
-      indexOfChar = setCharsForSequenceChars(stringBuilder, charArray, indexOfChar);
-    }
-    if (isOneCharOptionCharset) {
-      indexOfChar = setCharsForOneCharOptionCharset(stringBuilder, charArray, indexOfChar);
+    switch (type) {
+      case SEQUENCE_CHARS -> {
+        indexOfChar = setCharsForSequenceChars(stringBuilder, charArray, indexOfChar);
+      }
+      case ONE_CHAR_OPTION_CHARSET -> {
+        indexOfChar = setCharsForOneCharOptionCharset(stringBuilder, charArray, indexOfChar);
+      }
     }
     char[] chars = stringBuilder.toString().toCharArray();
-    //to
-    ++indexOfChar;//skip '\'' or ']'
+    // to
+    ++indexOfChar; // skip '\'' or ']'
     String to = new String(charArray, indexOfChar, charArray.length - indexOfChar);
-    return new NfaPrimaryGrammarContentEdge(from, to, chars);
+    return new NfaPrimaryGrammarContentEdge(type, from, to, chars);
   }
 
   // 'derive' '(' IdentifierFragment ')'
   public static String getRootTerminalGrammarNameByDerivedTerminalGrammarAttribute(
       String derivedTerminalGrammarAttribute) {
-    return derivedTerminalGrammarAttribute.substring(GrammarCharset.KW_DERIVE.length() + 1,
-        derivedTerminalGrammarAttribute.length() - 1);
+    return derivedTerminalGrammarAttribute.substring(
+        GrammarCharset.KW_DERIVE.length() + 1, derivedTerminalGrammarAttribute.length() - 1);
   }
 
   private static class OneCharOptionCharsetRegExpCreationDescriptor {
@@ -441,9 +449,9 @@ public class GrammarParser {
     public char[] getChars() {
       chars = new boolean[GrammarCharset.MAX_CHAR + 1];
       Arrays.fill(chars, false);
-      //处理[]中的chars
+      // 处理[]中的chars
       buildCharsRegExpUnitOptionChars();
-      //处理~
+      // 处理~
       if (isNot) {
         for (int i = 0; i < chars.length; i++) {
           boolean isExistCh = chars[i];
@@ -468,9 +476,7 @@ public class GrammarParser {
       return retChars;
     }
 
-    /**
-     * 处理-
-     */
+    /** 处理- */
     private void buildCharsRegExpUnitOptionChars() {
       if (indexsOfRangeFlag.isEmpty()) {
         buildCharsRegExpUnitOptionCharSet(0, originalChars.length - 1);
@@ -493,8 +499,7 @@ public class GrammarParser {
       }
     }
 
-    private void buildCharsRegExpUnitOptionRangeSet(
-        int startIndexOfChar, int endIndexOfChar) {
+    private void buildCharsRegExpUnitOptionRangeSet(int startIndexOfChar, int endIndexOfChar) {
       if (startIndexOfChar >= 0
           && endIndexOfChar < originalChars.length
           && startIndexOfChar + 2 == endIndexOfChar) {
@@ -506,8 +511,7 @@ public class GrammarParser {
       }
     }
 
-    private void buildCharsRegExpUnitOptionCharSet(
-        int startIndexOfChar, int endIndexOfChar) {
+    private void buildCharsRegExpUnitOptionCharSet(int startIndexOfChar, int endIndexOfChar) {
       if (startIndexOfChar >= 0
           && endIndexOfChar < originalChars.length
           && startIndexOfChar <= endIndexOfChar) {
@@ -518,6 +522,5 @@ public class GrammarParser {
         }
       }
     }
-
   }
 }
