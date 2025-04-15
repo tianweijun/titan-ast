@@ -12,7 +12,8 @@ import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder.GrammarFileAuto
 public class TitanlangPersistentAutomataTest {
 
   public static void main(String[] args) {
-    String fileDirectory = "D:\\github-pro\\titan\\titan-ast\\test\\titanlang\\";
+    String fileDirectory =
+        "D:\\github-pro\\titan\\titan-language-compiler\\src\\resources\\grammar\\";
     String[] testArgs = {
       "-grammarFilePaths",
       fileDirectory + "titanLanguageAsciiLexer.txt",

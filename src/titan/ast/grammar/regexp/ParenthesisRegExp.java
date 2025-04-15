@@ -1,6 +1,5 @@
 package titan.ast.grammar.regexp;
 
-
 /**
  * .
  *
@@ -36,5 +35,12 @@ public class ParenthesisRegExp extends UnitRegExp {
     int result = super.hashCode();
     result = 31 * result + orCompositeRegExp.hashCode();
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return String.format(
+        "(%s){%s,%s}",
+        orCompositeRegExp.toString(), repMinTimes.toString(), repMaxTimes.toString());
   }
 }

@@ -1,7 +1,6 @@
 package titan.ast.grammar.regexp;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * .
@@ -45,5 +44,17 @@ public class AndCompositeRegExp extends RegExp {
     result = 31 * result + children.hashCode();
     result = 31 * result + alias.hashCode();
     return result;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    for(UnitRegExp unitRegExp : children){
+      stringBuilder.append(unitRegExp.toString()).append("  ");
+    }
+    if(!stringBuilder.isEmpty()){
+      stringBuilder.delete(stringBuilder.length() - 2,stringBuilder.length());
+    }
+    return stringBuilder.toString();
   }
 }

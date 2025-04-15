@@ -57,4 +57,9 @@ public abstract class RegExp {
     result = 31 * result + repMaxTimes.hashCode();
     return result;
   }
+
+  @Override
+  public String toString() {
+    return String.format("%s{%s,%s}",type.name(),repMinTimes.toString(),repMaxTimes.toString());
+  }
 }

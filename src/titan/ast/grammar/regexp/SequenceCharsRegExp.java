@@ -42,4 +42,14 @@ public class SequenceCharsRegExp extends UnitRegExp {
     result = 31 * result + chars.hashCode();
     return result;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (char ch : chars.toCharArray()) {
+      stringBuilder.append("\\x" + Integer.toHexString(ch).toUpperCase());
+    }
+    return String.format(
+        "'%s'{%s,%s}", stringBuilder.toString(), repMinTimes.toString(), repMaxTimes.toString());
+  }
 }

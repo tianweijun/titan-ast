@@ -46,4 +46,9 @@ public class GrammarRegExp extends UnitRegExp {
     result = 31 * result + grammarName.hashCode();
     return result;
   }
+
+  @Override
+  public String toString() {
+    return String.format("%s{%s,%s}",grammarName,repMinTimes.toString(),repMaxTimes.toString());
+  }
 }

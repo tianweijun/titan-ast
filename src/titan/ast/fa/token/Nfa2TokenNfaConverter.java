@@ -6,6 +6,7 @@ import java.util.HashMap;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContent;
 import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdge;
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OneCharOptionCharsetRegExpChar;
 
 /**
  * 表述nfa的文本结构类似一下例子： 'OneLineMacro nfa(0,10) : 0[#]1 1[\r]2 1~[\r]4 2[\401]7 2[\n]3 2~[\n]4 4~[\r]4
@@ -45,24 +46,24 @@ public class Nfa2TokenNfaConverter {
     for (NfaPrimaryGrammarContentEdge edge : nfaContent.edges) {
       TokenNfaState from = states.get(edge.from);
       TokenNfaState to = states.get(edge.to);
-      char[] chars = edge.chars;
-      if (chars.length < 1) {
-        from.addEdge(TokenNfa.EPSILON, to);
-      } else {
-        switch (edge.type) {
-          case SEQUENCE_CHARS -> {
-            TokenNfaState prev = from;
-            for (char ch : edge.chars) {
-              TokenNfaState next = new TokenNfaState();
-              prev.addEdge(ch & 0x000000FF, next);
-              prev = next;
-            }
-            prev.addEdge(TokenNfa.EPSILON, to);
+      switch (edge.type) {
+        case SEQUENCE_CHARS -> {
+          TokenNfaState prev = from;
+          for (char ch : edge.chars) {
+            TokenNfaState next = new TokenNfaState();
+            prev.addEdge(ch & 0x000000FF, next);
+            prev = next;
           }
-          case ONE_CHAR_OPTION_CHARSET -> {
-            for (char ch : edge.chars) {
-              from.addEdge(ch & 0x000000FF, to);
+          prev.addEdge(TokenNfa.EPSILON, to);
+        }
+        case ONE_CHAR_OPTION_CHARSET -> {
+          for (OneCharOptionCharsetRegExpChar optionChar : edge.optionChars) {
+            for (int ch = optionChar.min; ch <= optionChar.max; ch++) {
+              from.addEdge(ch, to);
             }
+          }
+          if (edge.optionChars.isEmpty()) {
+            from.addEdge(TokenNfa.EPSILON, to);
           }
         }
       }

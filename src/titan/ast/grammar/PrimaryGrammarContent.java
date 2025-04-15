@@ -1,7 +1,9 @@
 package titan.ast.grammar;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OneCharOptionCharsetRegExpChar;
 import titan.ast.grammar.regexp.OrCompositeRegExp;
 
 /**
@@ -55,13 +57,19 @@ public abstract class PrimaryGrammarContent {
     public final String from;
     public final String to;
     public final char[] chars;
+    public final LinkedList<OneCharOptionCharsetRegExpChar> optionChars;
 
     public NfaPrimaryGrammarContentEdge(
-        NfaPrimaryGrammarContentEdgeType type, String from, String to, char[] chars) {
+        NfaPrimaryGrammarContentEdgeType type,
+        String from,
+        String to,
+        char[] chars,
+        LinkedList<OneCharOptionCharsetRegExpChar> optionChars) {
       this.type = type;
       this.from = from;
       this.to = to;
       this.chars = chars;
+      this.optionChars = optionChars;
     }
   }
 }

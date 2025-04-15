@@ -37,4 +37,17 @@ public class OrCompositeRegExp extends RegExp {
     result = 31 * result + children.hashCode();
     return result;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (AndCompositeRegExp andCompositeRegExp : children) {
+      stringBuilder.append(andCompositeRegExp.toString()).append(" | ");
+    }
+    if (!stringBuilder.isEmpty()) {
+      stringBuilder.delete(stringBuilder.length() - 3,stringBuilder.length());
+    }
+    return String.format(
+        "OrCompositeRegExp{%s}", stringBuilder.toString());
+  }
 }

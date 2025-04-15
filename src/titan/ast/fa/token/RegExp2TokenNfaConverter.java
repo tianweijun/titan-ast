@@ -9,6 +9,7 @@ import titan.ast.grammar.PrimaryGrammarContent.RegExpPrimaryGrammarContent;
 import titan.ast.grammar.regexp.AndCompositeRegExp;
 import titan.ast.grammar.regexp.GrammarRegExp;
 import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp;
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OneCharOptionCharsetRegExpChar;
 import titan.ast.grammar.regexp.OrCompositeRegExp;
 import titan.ast.grammar.regexp.ParenthesisRegExp;
 import titan.ast.grammar.regexp.RepeatTimes;
@@ -162,7 +163,7 @@ public class RegExp2TokenNfaConverter {
     TokenNfaState prevLinkedState = rnfa.start;
     for (char ch : chars) {
       TokenNfaState nextState = new TokenNfaState();
-      prevLinkedState.addEdge(ch & 0x000000FF, nextState);
+      prevLinkedState.addEdge(0x000000FF & ch, nextState);
       prevLinkedState = nextState;
     }
     prevLinkedState.addEdge(epsilon, rnfa.end);
@@ -172,16 +173,18 @@ public class RegExp2TokenNfaConverter {
 
   private TokenNfa buildByOneCharOptionCharsetRegExp(
       OneCharOptionCharsetRegExp oneCharOptionCharsetRegExp) {
-    char[] chars = oneCharOptionCharsetRegExp.chars;
-    if (chars.length == 0) {
+    LinkedList<OneCharOptionCharsetRegExpChar> chars = oneCharOptionCharsetRegExp.chars;
+    if (chars.isEmpty()) {
       throw new AstRuntimeException(
           String.format("token grammar %s:'xxx'{min,max},'xxx' is empty", taskGrammar.name));
     }
     TokenNfa rnfa = new TokenNfa();
     TokenNfaState start = rnfa.start;
     TokenNfaState end = rnfa.end;
-    for (char ch : chars) {
-      start.addEdge(ch & 0x000000FF, end);
+    for (OneCharOptionCharsetRegExpChar optionChar : chars) {
+      for (int ch = optionChar.min; ch <= optionChar.max; ch++) {
+        start.addEdge(ch, end);
+      }
     }
     return buildByNfaAndTimes(
         rnfa, oneCharOptionCharsetRegExp.repMinTimes, oneCharOptionCharsetRegExp.repMaxTimes);

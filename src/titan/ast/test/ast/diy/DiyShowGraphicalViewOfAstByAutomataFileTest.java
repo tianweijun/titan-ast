@@ -1,5 +1,8 @@
 package titan.ast.test.ast.diy;
 
+import titan.ast.CommandLineAstApplication;
+import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder;
+import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
 import titan.ast.logger.Logger;
 import titan.ast.runtime.AstGeneratorResult;
 import titan.ast.runtime.AutomataDataIoException;
@@ -18,18 +21,12 @@ public class DiyShowGraphicalViewOfAstByAutomataFileTest {
       "D://github-pro/titan/titan-ast/test/diy/automata.data",
       "-sourceFilePath",
       "D://github-pro/titan/titan-ast/test/diy/diy.txt",
-      "-graphicalViewOfAst"
+      "-graphicalViewOfAst","utf-8"
     };
-    RuntimeAutomataRichAstApplication runtimeAutomataAstApplication =
-        new RuntimeAutomataRichAstApplication();
-    runtimeAutomataAstApplication.setContext(testArgs[1]);
-
-    AstGeneratorResult astGeneratorResult = runtimeAutomataAstApplication.buildAst(testArgs[3]);
-    if (astGeneratorResult.isOk()) {
-      runtimeAutomataAstApplication.displayGraphicalViewOfAst(astGeneratorResult.getOkAst());
-    } else {
-      Logger.info(astGeneratorResult.getErrorMsg());
-    }
+    CommandLineAstApplication commandLineAstApplication = new CommandLineAstApplication(testArgs,
+        new DefaultGrammarFileAutomataAstApplicationBuilder(
+            GrammarFileAutomataAstApplicationEnum.AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION));
+    commandLineAstApplication.run();
 
     Logger.info("[ShowGraphicalViewOfAstByAutomataFileTest]: run end");
   }

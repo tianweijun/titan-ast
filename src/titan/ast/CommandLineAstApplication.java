@@ -51,8 +51,8 @@ public class CommandLineAstApplication {
     } catch (AstRuntimeException e) {
       Logger.info(
           String.format("CommandLineAstApplication run failed,cause by %s", e.getMessage()));
-      return;
-      // throw e;
+      //return;
+       throw e;
     }
 
     Logger.info("CommandLineAstApplication  run successfully");

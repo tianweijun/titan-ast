@@ -9,6 +9,7 @@ import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdge;
 import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdgeType;
 import titan.ast.grammar.regexp.GrammarRegExp;
 import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp;
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OneCharOptionCharsetRegExpChar;
 import titan.ast.grammar.regexp.RegExp;
 import titan.ast.grammar.regexp.RepeatTimes;
 import titan.ast.grammar.regexp.SequenceCharsRegExp;
@@ -24,9 +25,8 @@ public class GrammarParser {
 
   public static OneCharOptionCharsetRegExp getOneCharOptionCharsetRegExp(String str) {
     char[] charArray = str.toCharArray();
-    StringBuilder stringBuilder = new StringBuilder(str.length());
-    int indexOfChar = setCharsForOneCharOptionCharset(stringBuilder, charArray, 0);
-    char[] chars = stringBuilder.toString().toCharArray();
+    LinkedList<OneCharOptionCharsetRegExpChar> chars = new LinkedList<>();
+    int indexOfChar = setCharsForOneCharOptionCharset(chars, charArray, 0);
     ++indexOfChar; // skip ']'
     RepeatTimes[] repeatTimes = getRepeatTimes(charArray, indexOfChar);
     return new OneCharOptionCharsetRegExp(chars, repeatTimes[0], repeatTimes[1]);
@@ -158,7 +158,7 @@ public class GrammarParser {
   }
 
   public static int setCharsForOneCharOptionCharset(
-      StringBuilder charsBuilder, char[] charArray, int indexOfChar) {
+      LinkedList<OneCharOptionCharsetRegExpChar> chars, char[] charArray, int indexOfChar) {
     OneCharOptionCharsetRegExpCreationDescriptor creationDescriptor =
         new OneCharOptionCharsetRegExpCreationDescriptor();
     StringBuilder stringBuilder = new StringBuilder(charArray.length - indexOfChar);
@@ -168,7 +168,7 @@ public class GrammarParser {
       ++indexOfChar; // charArray[indexOfChar]=='['
     }
     ++indexOfChar; // skip '['
-    for (; indexOfChar < charArray.length; ) {
+    while (indexOfChar < charArray.length) {
       ch = charArray[indexOfChar];
       if (ch == '\\') {
         indexOfChar = setEscapeCharForOneCharOptionCharset(stringBuilder, charArray, indexOfChar);
@@ -184,7 +184,7 @@ public class GrammarParser {
       ++indexOfChar;
     }
     creationDescriptor.originalChars = stringBuilder.toString().toCharArray();
-    charsBuilder.append(creationDescriptor.getChars());
+    chars.addAll(creationDescriptor.getChars());
     return indexOfChar;
   }
 
@@ -416,20 +416,22 @@ public class GrammarParser {
     }
     String from = stringBuilder.toString();
     // chars
+    char[] chars = new char[0];
+    LinkedList<OneCharOptionCharsetRegExpChar> optionChars = new LinkedList<>();
     stringBuilder.delete(0, stringBuilder.length());
     switch (type) {
       case SEQUENCE_CHARS -> {
         indexOfChar = setCharsForSequenceChars(stringBuilder, charArray, indexOfChar);
+        chars = stringBuilder.toString().toCharArray();
       }
       case ONE_CHAR_OPTION_CHARSET -> {
-        indexOfChar = setCharsForOneCharOptionCharset(stringBuilder, charArray, indexOfChar);
+        indexOfChar = setCharsForOneCharOptionCharset(optionChars, charArray, indexOfChar);
       }
     }
-    char[] chars = stringBuilder.toString().toCharArray();
     // to
     ++indexOfChar; // skip '\'' or ']'
     String to = new String(charArray, indexOfChar, charArray.length - indexOfChar);
-    return new NfaPrimaryGrammarContentEdge(type, from, to, chars);
+    return new NfaPrimaryGrammarContentEdge(type, from, to, chars, optionChars);
   }
 
   // 'derive' '(' IdentifierFragment ')'
@@ -446,7 +448,7 @@ public class GrammarParser {
     public boolean[] chars;
     LinkedList<Integer> indexsOfRangeFlag = new LinkedList<>();
 
-    public char[] getChars() {
+    public LinkedList<OneCharOptionCharsetRegExpChar> getChars() {
       chars = new boolean[GrammarCharset.MAX_CHAR + 1];
       Arrays.fill(chars, false);
       // 处理[]中的chars
@@ -458,21 +460,52 @@ public class GrammarParser {
           chars[i] = !isExistCh;
         }
       }
-      // count
-      int countOfChars = 0;
-      for (boolean isExistCh : chars) {
-        if (isExistCh) {
-          ++countOfChars;
+      return getOneCharOptionCharsetRegExpChars();
+    }
+
+    private LinkedList<OneCharOptionCharsetRegExpChar> getOneCharOptionCharsetRegExpChars() {
+      LinkedList<OneCharOptionCharsetRegExpChar> retChars = new LinkedList<>();
+      int min = -1;
+      int max = -1;
+      for (int ch = 0; ch < chars.length; ++ch) {
+        if (chars[ch]) {
+          // min不存在，max只能是不存在。
+          if (min == -1) {
+            min = ch;
+            continue;
+          }
+          // min存在，max不存在
+          if (max == -1) {
+            if (min + 1 == ch) { // 连续
+              max = ch;
+              continue;
+            }
+            // 不连续
+            retChars.add(new OneCharOptionCharsetRegExpChar(min, min));
+            min = ch;
+            max = -1;
+            continue;
+          }
+          // min存在，max存在
+          if (max + 1 == ch) { // 连续
+            max = ch;
+            continue;
+          }
+          // 不连续
+          retChars.add(new OneCharOptionCharsetRegExpChar(min, max));
+          min = ch;
+          max = -1;
         }
       }
-      char[] retChars = new char[countOfChars];
-      int indexOfRetChars = 0;
-      for (int ch = 0; ch < chars.length; ch++) {
-        boolean isExistCh = chars[ch];
-        if (isExistCh) {
-          retChars[indexOfRetChars++] = (char) ch;
+
+      if (min != -1) {
+        if (max != -1) {
+          retChars.add(new OneCharOptionCharsetRegExpChar(min, max));
+        } else {
+          retChars.add(new OneCharOptionCharsetRegExpChar(min, min));
         }
       }
+
       return retChars;
     }
 
@@ -503,8 +536,8 @@ public class GrammarParser {
       if (startIndexOfChar >= 0
           && endIndexOfChar < originalChars.length
           && startIndexOfChar + 2 == endIndexOfChar) {
-        char minChar = originalChars[startIndexOfChar];
-        char maxChar = originalChars[endIndexOfChar];
+        int minChar = originalChars[startIndexOfChar] & 0x000000FF;
+        int maxChar = originalChars[endIndexOfChar] & 0x000000FF;
         for (int ch = minChar; ch <= maxChar; ch++) {
           chars[ch] = true;
         }
@@ -517,7 +550,7 @@ public class GrammarParser {
           && startIndexOfChar <= endIndexOfChar) {
 
         for (int i = startIndexOfChar; i <= endIndexOfChar; i++) {
-          int ch = originalChars[i];
+          int ch = originalChars[i] & 0x000000FF;
           chars[ch] = true;
         }
       }
