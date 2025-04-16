@@ -3,13 +3,15 @@ package titan.ast.fa.token;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+
 import titan.ast.AstRuntimeException;
 import titan.ast.grammar.Grammar;
 import titan.ast.grammar.PrimaryGrammarContent.RegExpPrimaryGrammarContent;
 import titan.ast.grammar.regexp.AndCompositeRegExp;
 import titan.ast.grammar.regexp.GrammarRegExp;
 import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp;
-import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OneCharOptionCharsetRegExpChar;
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OptionChar;
 import titan.ast.grammar.regexp.OrCompositeRegExp;
 import titan.ast.grammar.regexp.ParenthesisRegExp;
 import titan.ast.grammar.regexp.RepeatTimes;
@@ -173,7 +175,7 @@ public class RegExp2TokenNfaConverter {
 
   private TokenNfa buildByOneCharOptionCharsetRegExp(
       OneCharOptionCharsetRegExp oneCharOptionCharsetRegExp) {
-    LinkedList<OneCharOptionCharsetRegExpChar> chars = oneCharOptionCharsetRegExp.chars;
+    List<OptionChar> chars = oneCharOptionCharsetRegExp.chars;
     if (chars.isEmpty()) {
       throw new AstRuntimeException(
           String.format("token grammar %s:'xxx'{min,max},'xxx' is empty", taskGrammar.name));
@@ -181,7 +183,7 @@ public class RegExp2TokenNfaConverter {
     TokenNfa rnfa = new TokenNfa();
     TokenNfaState start = rnfa.start;
     TokenNfaState end = rnfa.end;
-    for (OneCharOptionCharsetRegExpChar optionChar : chars) {
+    for (OptionChar optionChar : chars) {
       for (int ch = optionChar.min; ch <= optionChar.max; ch++) {
         start.addEdge(ch, end);
       }

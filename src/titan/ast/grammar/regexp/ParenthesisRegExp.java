@@ -14,6 +14,13 @@ public class ParenthesisRegExp extends UnitRegExp {
     this.orCompositeRegExp = orCompositeRegExp;
   }
 
+  public ParenthesisRegExp(
+      RepeatTimes repMinTimes, RepeatTimes repMaxTimes, OrCompositeRegExp orCompositeRegExp) {
+    super(RegExpType.PARENTHESIS);
+    this.setRepeatTimes(repMinTimes, repMaxTimes);
+    this.orCompositeRegExp = orCompositeRegExp;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

@@ -1,6 +1,8 @@
 package titan.ast.grammar.regexp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * .
@@ -13,9 +15,14 @@ public class AndCompositeRegExp extends RegExp {
 
   public String alias = "";
 
-
   public AndCompositeRegExp() {
     super(RegExpType.AND_COMPOSITE);
+  }
+
+  public AndCompositeRegExp(UnitRegExp... unitRegExps) {
+    this();
+    children = new ArrayList<>(unitRegExps.length);
+    Collections.addAll(children, unitRegExps);
   }
 
   public void setAlias(String alias) {
@@ -49,11 +56,11 @@ public class AndCompositeRegExp extends RegExp {
   @Override
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
-    for(UnitRegExp unitRegExp : children){
+    for (UnitRegExp unitRegExp : children) {
       stringBuilder.append(unitRegExp.toString()).append("  ");
     }
-    if(!stringBuilder.isEmpty()){
-      stringBuilder.delete(stringBuilder.length() - 2,stringBuilder.length());
+    if (!stringBuilder.isEmpty()) {
+      stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
     }
     return stringBuilder.toString();
   }

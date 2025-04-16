@@ -5,7 +5,7 @@
 
 @NonterminalGrammar begin ;
 diy :
-  // (set | BlockComment)+
+  (set | BlockComment)+
 ;
 
 set :
@@ -16,7 +16,7 @@ set :
 
 @TerminalGrammar begin ;
 
-Identifier : IdentifierNondigit  ;
+//Identifier : IdentifierNondigit  ;
 
  WS
     : [\s\t\n\r]+ -> skip
@@ -25,17 +25,18 @@ Identifier : IdentifierNondigit  ;
 
 @TerminalFragmentGrammar begin ;
 
+/*
 IdentifierNondigit
     :   Nondigit
     ;
-	
+
 Nondigit
     :   [\x61-\x7A\x41-\x5A\x5F]
     ;
 Digit
     :    [0-9]
     ;
-
+*/
 @TerminalFragmentGrammar end ;
 
 @DerivedTerminalGrammar derive(Identifier) begin ;

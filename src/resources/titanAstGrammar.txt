@@ -100,7 +100,6 @@ identifier : Identifier | Begin | End | Skip ;
 
 @TerminalGrammar begin ;
 
-Comma : ',' ;
 Colon : ':'  ;
 Semi : ';' ;
 VerticalBar : '|' ;
@@ -132,7 +131,7 @@ BlockComment
      :
                start'/*'prefix2
                prefix2[*]suffix1 prefix2~[*]prefix2
-               suffix1[/]end suffix1[*]suffix1 suffix1~[*/]prefix2
+               suffix1[/]end suffix1[*]suffix1 suffix1~[/*]prefix2
      -> skip
 ;
 LineComment
@@ -151,22 +150,19 @@ DelimiterChars : [\s\t\r\n]+ -> skip ;
 IdentifierFragment : IdentifierNondigit  ( IdentifierNondigit | Digit )* ;
 IdentifierNondigit : [a-zA-Z_] ;
 Digit : [0-9] ;
-naturalNumber : Digit+ ;
+NaturalNumber : Digit+ ;
 HexadecimalDigit : [0-9] | [a-f] | [A-F] ;
+HexadecimalEscapeChar : '\\' [xX] HexadecimalDigit{1,2} ;
 
-HexadecimalEscapeChar :
-      '\\' [xX] HexadecimalDigit
-    | '\\' [xX] HexadecimalDigit HexadecimalDigit
-;
 CharForSequenceChars :
-        ~['\\] | '\\\'' | '\\s'
+        ~['\\]
         | HexadecimalEscapeChar
-        | '\\' [0\\abfnrtv]
+        | '\\' ['0\\abfnrstv]
 ;
 OptionCharNonhyphens :
-       ~[\]\-\\] | '\\]' | '\\-' | '\\s'
+       ~[\]\-\\]
        | HexadecimalEscapeChar
-       | '\\' [0\\abfnrtv]
+       | '\\' [\-\]0\\abfnrstv]
 ;
 CharForOneCharOptionCharset :
     OptionCharNonhyphens
@@ -177,8 +173,8 @@ RepeatTimes :
       '?'
       | '*'
       | '+'
-      | '{' naturalNumber '}'
-      | '{' naturalNumber? ',' naturalNumber? '}'
+      | '{' NaturalNumber '}'
+      | '{' NaturalNumber? ',' NaturalNumber? '}'
 ;
 
 GrammarUnitRegExpRepeatTimesFragment : IdentifierFragment RepeatTimes ;

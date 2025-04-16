@@ -33,7 +33,7 @@ public class AstBuilder {
       RichTokenParseErrorData error =
           richAstGeneratorResult.richTokensResult.getRichTokenParseErrorData();
       return String.format(
-          "an error occurred because the text is not matching any grammar of token,error near %s[%d-%d,%d-%d): %s",
+          "definition of grammar error : the text is not matching any token,error near %s[%d-%d,%d-%d): %s",
           grammarFilePath,error.startLineNumber, error.startOffsetInLine, error.endLineNumber, error.endOffsetInLine,
           error.errorText);
 
@@ -42,7 +42,7 @@ public class AstBuilder {
       RichAstParseErrorData error =
           richAstGeneratorResult.richAstResult.getRichAstParseErrorData();
       return String.format(
-          "an error occurred because the text is not matching any grammar of nonterimal,error near %s[%d-%d,%d-%d): "
+          "definition of grammar error : the text is not matching any syntax,error near %s[%d-%d,%d-%d): "
               + "%s",
           grammarFilePath,error.startLineNumber, error.startOffsetInLine, error.endLineNumber, error.endOffsetInLine,
           error.errorText);

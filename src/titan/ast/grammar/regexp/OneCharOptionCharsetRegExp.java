@@ -1,6 +1,6 @@
 package titan.ast.grammar.regexp;
 
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * .
@@ -9,20 +9,31 @@ import java.util.LinkedList;
  */
 public class OneCharOptionCharsetRegExp extends UnitRegExp {
 
-  public LinkedList<OneCharOptionCharsetRegExpChar> chars;
+  public List<OptionChar> chars;
 
   public OneCharOptionCharsetRegExp() {
     super(RegExpType.ONE_CHAR_OPTION_CHARSET);
   }
 
   public OneCharOptionCharsetRegExp(
-      LinkedList<OneCharOptionCharsetRegExpChar> chars,
-      RepeatTimes repMinTimes,
-      RepeatTimes repMaxTimes) {
+      RepeatTimes repMinTimes, RepeatTimes repMaxTimes, List<OptionChar> chars) {
     this();
+    setRepeatTimes(repMinTimes, repMaxTimes);
     this.chars = chars;
-    this.repMinTimes.setTimes(repMinTimes);
-    this.repMaxTimes.setTimes(repMaxTimes);
+  }
+
+  public OneCharOptionCharsetRegExp(OptionChar... optionChars) {
+    this();
+    chars = new ArrayList<>(optionChars.length);
+    Collections.addAll(chars, optionChars);
+  }
+
+  public OneCharOptionCharsetRegExp(
+      RepeatTimes repMinTimes, RepeatTimes repMaxTimes, OptionChar... optionChars) {
+    this();
+    setRepeatTimes(repMinTimes, repMaxTimes);
+    chars = new ArrayList<>(optionChars.length);
+    Collections.addAll(chars, optionChars);
   }
 
   @Override
@@ -45,7 +56,7 @@ public class OneCharOptionCharsetRegExp extends UnitRegExp {
   @Override
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
-    for (OneCharOptionCharsetRegExpChar ch : chars) {
+    for (OptionChar ch : chars) {
       stringBuilder.append(ch.toString()).append("  ");
     }
     if (!stringBuilder.isEmpty()) {
@@ -55,13 +66,28 @@ public class OneCharOptionCharsetRegExp extends UnitRegExp {
         "[%s]{%s,%s}", stringBuilder.toString(), repMinTimes.toString(), repMaxTimes.toString());
   }
 
-  public static class OneCharOptionCharsetRegExpChar {
+  public static class OptionChar {
     public final int min;
     public final int max;
 
-    public OneCharOptionCharsetRegExpChar(int min, int max) {
+    public OptionChar(int min) {
+      this.min = min;
+      this.max = min;
+    }
+
+    public OptionChar(int min, int max) {
       this.min = min;
       this.max = max;
+    }
+
+    public OptionChar(char min) {
+      this.min = min & 0xFF;
+      this.max = min & 0xFF;
+    }
+
+    public OptionChar(char min, char max) {
+      this.min = min & 0xFF;
+      this.max = max & 0xFF;
     }
 
     @Override
@@ -69,7 +95,7 @@ public class OneCharOptionCharsetRegExp extends UnitRegExp {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
 
-      OneCharOptionCharsetRegExpChar that = (OneCharOptionCharsetRegExpChar) o;
+      OptionChar that = (OptionChar) o;
       return min == that.min && max == that.max;
     }
 

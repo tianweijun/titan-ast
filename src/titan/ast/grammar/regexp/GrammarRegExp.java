@@ -18,10 +18,9 @@ public class GrammarRegExp extends UnitRegExp {
     this.grammarName = grammarName;
   }
 
-  public GrammarRegExp(String grammarName, RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
+  public GrammarRegExp(RepeatTimes repMinTimes, RepeatTimes repMaxTimes, String grammarName) {
     this(grammarName);
-    this.repMinTimes.setTimes(repMinTimes);
-    this.repMaxTimes.setTimes(repMaxTimes);
+    setRepeatTimes(repMinTimes, repMaxTimes);
   }
 
   @Override
@@ -49,6 +48,6 @@ public class GrammarRegExp extends UnitRegExp {
 
   @Override
   public String toString() {
-    return String.format("%s{%s,%s}",grammarName,repMinTimes.toString(),repMaxTimes.toString());
+    return String.format("%s{%s,%s}", grammarName, repMinTimes.toString(), repMaxTimes.toString());
   }
 }

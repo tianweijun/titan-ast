@@ -7,11 +7,11 @@ import java.util.List;
  *
  * @author tian wei jun
  */
-public interface GrammarFileAutomataAstApplicationBuilder {
+public interface GrammarAutomataAstApplicationBuilder {
 
   void build(List<String> grammarFilePaths);
 
-  GrammarFileAutomataAstApplication get();
+  GrammarAutomataAstApplication get();
 
 
 }

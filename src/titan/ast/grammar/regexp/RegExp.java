@@ -10,9 +10,9 @@ import titan.ast.grammar.regexp.RepeatTimes.RepeatTimesType;
 public abstract class RegExp {
 
   public final RegExpType type;
-  //public RegExp parent = null;
-  public RepeatTimes repMinTimes = RepeatTimes.getNumberTimes(1);
-  public RepeatTimes repMaxTimes = RepeatTimes.getNumberTimes(1);
+  // public RegExp parent = null;
+  public RepeatTimes repMinTimes = RepeatTimes.numberTimes(1);
+  public RepeatTimes repMaxTimes = RepeatTimes.numberTimes(1);
 
   public RegExp(RegExpType type) {
     this.type = type;
@@ -33,8 +33,8 @@ public abstract class RegExp {
   }
 
   public void setRepeatTimes(RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
-    this.repMinTimes.setTimes(repMinTimes);
-    this.repMaxTimes.setTimes(repMaxTimes);
+    this.repMinTimes = repMinTimes;
+    this.repMaxTimes = repMaxTimes;
   }
 
   @Override
@@ -47,7 +47,9 @@ public abstract class RegExp {
     }
 
     RegExp regExp = (RegExp) o;
-    return type == regExp.type && repMinTimes.equals(regExp.repMinTimes) && repMaxTimes.equals(regExp.repMaxTimes);
+    return type == regExp.type
+        && repMinTimes.equals(regExp.repMinTimes)
+        && repMaxTimes.equals(regExp.repMaxTimes);
   }
 
   @Override
@@ -60,6 +62,6 @@ public abstract class RegExp {
 
   @Override
   public String toString() {
-    return String.format("%s{%s,%s}",type.name(),repMinTimes.toString(),repMaxTimes.toString());
+    return String.format("%s{%s,%s}", type.name(), repMinTimes.toString(), repMaxTimes.toString());
   }
 }

@@ -1,8 +1,8 @@
 package titan.ast.test.ast.ast;
 
 import titan.ast.CommandLineAstApplication;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
 import titan.ast.logger.Logger;
 import titan.ast.runtime.AutomataDataIoException;
 
@@ -23,7 +23,7 @@ public class AstShowGraphicalViewOfAstByAutomataFileTest {
     };
 
     new CommandLineAstApplication(testArgs,
-        new DefaultGrammarFileAutomataAstApplicationBuilder(
+        new DefaultGrammarAutomataAstApplicationBuilder(
             GrammarFileAutomataAstApplicationEnum.AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION)).run();
 
     Logger.info("[ShowGraphicalViewOfAstByAutomataFileTest]: run end");

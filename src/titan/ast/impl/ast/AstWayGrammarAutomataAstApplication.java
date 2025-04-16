@@ -1,22 +1,21 @@
 package titan.ast.impl.ast;
 
 import java.util.List;
-import titan.ast.GrammarFileAutomataAstApplication;
+import titan.ast.GrammarAutomataAstApplication;
 import titan.ast.impl.ast.contextast.ContextAst;
-import titan.ast.impl.ast.regexp.GrammarInitializer;
 
 /**
  * .
  *
  * @author tian wei jun
  */
-public class AstWayGrammarFileAutomataAstApplication extends GrammarFileAutomataAstApplication {
+public class AstWayGrammarAutomataAstApplication extends GrammarAutomataAstApplication {
 
-  public AstWayGrammarFileAutomataAstApplication(String grammarFilePath) {
+  public AstWayGrammarAutomataAstApplication(String grammarFilePath) {
     super(grammarFilePath);
   }
 
-  public AstWayGrammarFileAutomataAstApplication(List<String> grammarFilePaths) {
+  public AstWayGrammarAutomataAstApplication(List<String> grammarFilePaths) {
     super(grammarFilePaths);
   }
 

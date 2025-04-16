@@ -1,24 +1,24 @@
 package titan.ast;
 
 import java.util.List;
-import titan.ast.impl.ast.AstWayGrammarFileAutomataAstApplication;
+import titan.ast.impl.ast.AstWayGrammarAutomataAstApplication;
 
 /**
  * .
  *
  * @author tian wei jun
  */
-public class DefaultGrammarFileAutomataAstApplicationBuilder implements GrammarFileAutomataAstApplicationBuilder {
+public class DefaultGrammarAutomataAstApplicationBuilder implements GrammarAutomataAstApplicationBuilder {
 
   private final GrammarFileAutomataAstApplicationEnum type;
-  private GrammarFileAutomataAstApplication automataAstApplication = null;
+  private GrammarAutomataAstApplication automataAstApplication = null;
 
-  public DefaultGrammarFileAutomataAstApplicationBuilder() {
+  public DefaultGrammarAutomataAstApplicationBuilder() {
     type =
         GrammarFileAutomataAstApplicationEnum.AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION;
   }
 
-  public DefaultGrammarFileAutomataAstApplicationBuilder(GrammarFileAutomataAstApplicationEnum type) {
+  public DefaultGrammarAutomataAstApplicationBuilder(GrammarFileAutomataAstApplicationEnum type) {
     this.type = type;
   }
 
@@ -29,13 +29,13 @@ public class DefaultGrammarFileAutomataAstApplicationBuilder implements GrammarF
     }
     switch (type) {
       case AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION -> {
-        automataAstApplication = new AstWayGrammarFileAutomataAstApplication(grammarFilePaths);
+        automataAstApplication = new AstWayGrammarAutomataAstApplication(grammarFilePaths);
       }
     }
   }
 
   @Override
-  public GrammarFileAutomataAstApplication get() {
+  public GrammarAutomataAstApplication get() {
     return automataAstApplication;
   }
 

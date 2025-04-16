@@ -1,9 +1,7 @@
 package titan.ast.grammar;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OneCharOptionCharsetRegExpChar;
+import java.util.*;
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OptionChar;
 import titan.ast.grammar.regexp.OrCompositeRegExp;
 
 /**
@@ -57,19 +55,38 @@ public abstract class PrimaryGrammarContent {
     public final String from;
     public final String to;
     public final char[] chars;
-    public final LinkedList<OneCharOptionCharsetRegExpChar> optionChars;
+    public final List<OptionChar> optionChars;
 
     public NfaPrimaryGrammarContentEdge(
         NfaPrimaryGrammarContentEdgeType type,
         String from,
         String to,
         char[] chars,
-        LinkedList<OneCharOptionCharsetRegExpChar> optionChars) {
+        List<OptionChar> optionChars) {
       this.type = type;
       this.from = from;
       this.to = to;
       this.chars = chars;
       this.optionChars = optionChars;
+    }
+
+    public static NfaPrimaryGrammarContentEdge sequenceCharsEdge(
+        String from, String to, String chars) {
+      return new NfaPrimaryGrammarContentEdge(
+          NfaPrimaryGrammarContentEdgeType.SEQUENCE_CHARS, from, to, chars.toCharArray(), null);
+    }
+
+    public static NfaPrimaryGrammarContentEdge optionCharsEdge(
+        String from, String to, OptionChar... optionCharsArray) {
+      List<OptionChar> optionChars;
+      if (optionCharsArray == null || optionCharsArray.length == 0) {
+        optionChars = new ArrayList<>();
+      } else {
+        optionChars = new ArrayList<>(optionCharsArray.length);
+        optionChars.addAll(Arrays.asList(optionCharsArray));
+      }
+      return new NfaPrimaryGrammarContentEdge(
+          NfaPrimaryGrammarContentEdgeType.ONE_CHAR_OPTION_CHARSET, from, to, null, optionChars);
     }
   }
 }

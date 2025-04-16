@@ -1,8 +1,8 @@
 package titan.ast.test.ast.java;
 
 import titan.ast.CommandLineAstApplication;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
 
 /**
  * 生成持久化自动机代码测试.
@@ -21,7 +21,7 @@ public class JavaPersistentAutomataTest {
       "D://github-pro/titan/titan-ast/test/java/automata.data"
     };
     new CommandLineAstApplication(testArgs,
-        new DefaultGrammarFileAutomataAstApplicationBuilder(
+        new DefaultGrammarAutomataAstApplicationBuilder(
             GrammarFileAutomataAstApplicationEnum.AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION)).run();
   }
 }

@@ -1,8 +1,8 @@
 package titan.ast.test.ast.json;
 
 import titan.ast.CommandLineAstApplication;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
 import titan.ast.logger.Logger;
 
 /**
@@ -22,7 +22,7 @@ public class JsonShowGraphicalViewOfAstByAutomataFileTest {
     };
 
     new CommandLineAstApplication(testArgs,
-        new DefaultGrammarFileAutomataAstApplicationBuilder(
+        new DefaultGrammarAutomataAstApplicationBuilder(
             GrammarFileAutomataAstApplicationEnum.AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION)).run();
     Logger.info("[ShowGraphicalViewOfAstByAutomataFileTest]: run end");
   }

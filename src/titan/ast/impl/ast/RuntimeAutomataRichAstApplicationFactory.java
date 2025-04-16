@@ -25,14 +25,11 @@ public class RuntimeAutomataRichAstApplicationFactory {
       if (null == astApplication) {
         astApplication = new RuntimeAutomataRichAstApplication();
 
-        try (InputStream inputStream =
+        try (InputStream automataInputStream =
             RuntimeAutomataRichAstApplicationFactory.class
                 .getClassLoader()
                 .getResourceAsStream(GRAMMAR_AUTOMATA_RESOUCES_PATH)) {
-          ByteArrayInputStream automataInputStream =
-              new ByteArrayInputStream(inputStream.readAllBytes());
           astApplication.setContext(automataInputStream);
-          automataInputStream.close();
         } catch (AutomataDataIoException | IOException e) {
           throw new AstRuntimeException(e);
         }

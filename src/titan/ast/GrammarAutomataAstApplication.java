@@ -22,27 +22,31 @@ import titan.ast.persistence.PersistentAutomataBuilder;
 import titan.ast.runtime.AutomataDataIoException;
 import titan.ast.runtime.RuntimeAutomataRichAstApplication;
 
-public abstract class GrammarFileAutomataAstApplication {
+public abstract class GrammarAutomataAstApplication {
 
-  public GrammarFileAutomataAstApplication(String grammarFilePath) {
+  public GrammarAutomataAstApplication(String grammarFilePath) {
     ArrayList<String> grammarFilePaths = new ArrayList<>(1);
     grammarFilePaths.add(grammarFilePath);
     setAstAutomataContext(grammarFilePaths);
   }
 
-  public GrammarFileAutomataAstApplication(List<String> grammarFilePaths) {
+  public GrammarAutomataAstApplication(List<String> grammarFilePaths) {
     setAstAutomataContext(grammarFilePaths);
   }
 
   public void setAstAutomataContext(List<String> grammarFilePaths) {
     AstContext.init();
     initGrammar(grammarFilePaths);
-    //token
+    setAstAutomataContextAfterInitGrammar();
+  }
+
+  protected void setAstAutomataContextAfterInitGrammar() {
+    // token
     buildTokenNfa();
     buildTokenDfa();
     new DerivedTerminalGrammarAutomataDataBuilder().build();
     buildTokenAutomata();
-    //syntax
+    // syntax
     buildProductionRule();
     buildSyntaxDfa();
     buildAstAutomata();
@@ -74,7 +78,6 @@ public abstract class GrammarFileAutomataAstApplication {
   private void buildSyntaxDfa() {
     new SyntaxDfaBuilder().build();
   }
-
 
   protected abstract void initGrammar(List<String> grammarFilePaths);
 

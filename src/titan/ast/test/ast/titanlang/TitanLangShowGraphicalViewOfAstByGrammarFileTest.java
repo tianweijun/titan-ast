@@ -1,10 +1,10 @@
-package titan.ast.test.ast.diy;
+package titan.ast.test.ast.titanlang;
 
 import titan.ast.CommandLineAstApplication;
 import titan.ast.DefaultGrammarAutomataAstApplicationBuilder;
 import titan.ast.DefaultGrammarAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
 
-public class DiyShowGraphicalViewOfAstByGrammarFileTest {
+public class TitanLangShowGraphicalViewOfAstByGrammarFileTest {
 
   public static void main(String[] args) {
     String fileDirectory = "D:\\github-pro\\titan\\titan-ast\\test\\titanlang\\";
@@ -18,9 +18,9 @@ public class DiyShowGraphicalViewOfAstByGrammarFileTest {
       fileDirectory + "titanLanguageCharsLiteralLexer.txt",
       fileDirectory + "titanLanguagePunctuationLexer.txt",
       fileDirectory + "titanLanguageIdentifierLexer.txt",
-      "D://github-pro/titan/titan-ast/test/diy/diy.grammar",
+      fileDirectory + "titanLanguageParser.txt",
       "-sourceFilePath",
-      "D://github-pro/titan/titan-ast/test/diy/diy.txt",
+      "D:\\github-pro\\titan\\titan-ast\\test\\titanlang\\helloworld.titan",
       "-graphicalViewOfAst",
       "utf-8"
     };

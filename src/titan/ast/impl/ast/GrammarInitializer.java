@@ -1,4 +1,4 @@
-package titan.ast.impl.ast.regexp;
+package titan.ast.impl.ast;
 
 import java.util.ArrayList;
 import java.util.HashSet;

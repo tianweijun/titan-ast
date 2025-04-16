@@ -1,6 +1,8 @@
 package titan.ast.grammar.regexp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * .
@@ -13,6 +15,12 @@ public class OrCompositeRegExp extends RegExp {
 
   public OrCompositeRegExp() {
     super(RegExpType.OR_COMPOSITE);
+  }
+
+  public OrCompositeRegExp(AndCompositeRegExp... andCompositeRegExps) {
+    this();
+    children = new ArrayList<>(andCompositeRegExps.length);
+    Collections.addAll(children, andCompositeRegExps);
   }
 
   @Override
@@ -45,9 +53,8 @@ public class OrCompositeRegExp extends RegExp {
       stringBuilder.append(andCompositeRegExp.toString()).append(" | ");
     }
     if (!stringBuilder.isEmpty()) {
-      stringBuilder.delete(stringBuilder.length() - 3,stringBuilder.length());
+      stringBuilder.delete(stringBuilder.length() - 3, stringBuilder.length());
     }
-    return String.format(
-        "OrCompositeRegExp{%s}", stringBuilder.toString());
+    return String.format("OrCompositeRegExp{%s}", stringBuilder.toString());
   }
 }

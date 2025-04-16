@@ -1,4 +1,4 @@
-package titan.ast.impl.ast.regexp;
+package titan.ast.impl.ast;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -9,7 +9,7 @@ import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdge;
 import titan.ast.grammar.PrimaryGrammarContent.NfaPrimaryGrammarContentEdgeType;
 import titan.ast.grammar.regexp.GrammarRegExp;
 import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp;
-import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OneCharOptionCharsetRegExpChar;
+import titan.ast.grammar.regexp.OneCharOptionCharsetRegExp.OptionChar;
 import titan.ast.grammar.regexp.RegExp;
 import titan.ast.grammar.regexp.RepeatTimes;
 import titan.ast.grammar.regexp.SequenceCharsRegExp;
@@ -25,11 +25,11 @@ public class GrammarParser {
 
   public static OneCharOptionCharsetRegExp getOneCharOptionCharsetRegExp(String str) {
     char[] charArray = str.toCharArray();
-    LinkedList<OneCharOptionCharsetRegExpChar> chars = new LinkedList<>();
+    LinkedList<OptionChar> chars = new LinkedList<>();
     int indexOfChar = setCharsForOneCharOptionCharset(chars, charArray, 0);
     ++indexOfChar; // skip ']'
     RepeatTimes[] repeatTimes = getRepeatTimes(charArray, indexOfChar);
-    return new OneCharOptionCharsetRegExp(chars, repeatTimes[0], repeatTimes[1]);
+    return new OneCharOptionCharsetRegExp(repeatTimes[0], repeatTimes[1], chars);
   }
 
   public static SequenceCharsRegExp getSequenceCharsRegExp(String str) {
@@ -39,7 +39,7 @@ public class GrammarParser {
     String chars = stringBuilder.toString();
     ++indexOfChar; // skip '\''
     RepeatTimes[] repeatTimes = getRepeatTimes(charArray, indexOfChar);
-    return new SequenceCharsRegExp(chars, repeatTimes[0], repeatTimes[1]);
+    return new SequenceCharsRegExp(repeatTimes[0], repeatTimes[1], chars);
   }
 
   public static GrammarRegExp getGrammarRegExp(String grammarName) {
@@ -60,7 +60,7 @@ public class GrammarParser {
     }
     String grammarName = stringBuilder.toString();
     RepeatTimes[] repeatTimes = getRepeatTimes(charArray, indexOfChar);
-    return new GrammarRegExp(grammarName, repeatTimes[0], repeatTimes[1]);
+    return new GrammarRegExp(repeatTimes[0], repeatTimes[1], grammarName);
   }
 
   // ParenthesisUnitRegExpSuffixFragment : ')' RepeatTimes? ;
@@ -71,8 +71,8 @@ public class GrammarParser {
   }
 
   private static RepeatTimes[] getRepeatTimes(char[] charArray, int indexOfChar) {
-    RepeatTimes repMinTimes = RepeatTimes.getNumberTimes(1);
-    RepeatTimes repMaxTimes = RepeatTimes.getNumberTimes(1);
+    RepeatTimes repMinTimes = RepeatTimes.numberTimes(1);
+    RepeatTimes repMaxTimes = RepeatTimes.numberTimes(1);
     if (indexOfChar >= charArray.length) {
       return new RepeatTimes[] {repMinTimes, repMaxTimes};
     }
@@ -80,16 +80,16 @@ public class GrammarParser {
     char firstCh = charArray[indexOfChar];
     switch (firstCh) {
       case '?' -> {
-        repMinTimes = RepeatTimes.getNumberTimes(0);
-        repMaxTimes = RepeatTimes.getNumberTimes(1);
+        repMinTimes = RepeatTimes.numberTimes(0);
+        repMaxTimes = RepeatTimes.numberTimes(1);
       }
       case '*' -> {
-        repMinTimes = RepeatTimes.getNumberTimes(0);
-        repMaxTimes = RepeatTimes.getInfinityTimes();
+        repMinTimes = RepeatTimes.numberTimes(0);
+        repMaxTimes = RepeatTimes.infinityTimes();
       }
       case '+' -> {
-        repMinTimes = RepeatTimes.getNumberTimes(1);
-        repMaxTimes = RepeatTimes.getInfinityTimes();
+        repMinTimes = RepeatTimes.numberTimes(1);
+        repMaxTimes = RepeatTimes.infinityTimes();
       }
       case '{' -> {
         RepeatTimes[] repeatTimes = getRepeatTimesByLeftBrace(charArray, indexOfChar);
@@ -97,8 +97,8 @@ public class GrammarParser {
         repMaxTimes = repeatTimes[1];
       }
       default -> {
-        repMinTimes = RepeatTimes.getNumberTimes(1);
-        repMaxTimes = RepeatTimes.getNumberTimes(1);
+        repMinTimes = RepeatTimes.numberTimes(1);
+        repMaxTimes = RepeatTimes.numberTimes(1);
       }
     }
     return new RepeatTimes[] {repMinTimes, repMaxTimes};
@@ -119,11 +119,11 @@ public class GrammarParser {
       }
       repMinTimesStr.append(ch);
     }
-    RepeatTimes repMinTimes = RepeatTimes.getInfinityTimes();
-    RepeatTimes repMaxTimes = RepeatTimes.getInfinityTimes();
+    RepeatTimes repMinTimes = RepeatTimes.infinityTimes();
+    RepeatTimes repMaxTimes = RepeatTimes.infinityTimes();
     if (isEndParse) { // 没有逗号，只能是｛2｝这种形式
-      repMinTimes.setTimes(Integer.parseInt(repMinTimesStr.toString(), 10));
-      repMaxTimes.setTimes(repMinTimes.times);
+      repMinTimes = RepeatTimes.numberTimes(Integer.parseInt(repMinTimesStr.toString(), 10));
+      repMaxTimes = RepeatTimes.numberTimes(repMinTimes.times);
       return new RepeatTimes[] {repMinTimes, repMaxTimes};
     }
     StringBuilder repMaxTimesStr = new StringBuilder(charArray.length - indexOfChar);
@@ -135,10 +135,10 @@ public class GrammarParser {
       repMaxTimesStr.append(ch);
     }
     if (!repMinTimesStr.isEmpty()) {
-      repMinTimes.setTimes(Integer.parseInt(repMinTimesStr.toString(), 10));
+      repMinTimes = RepeatTimes.numberTimes(Integer.parseInt(repMinTimesStr.toString(), 10));
     }
     if (!repMaxTimesStr.isEmpty()) {
-      repMaxTimes.setTimes(Integer.parseInt(repMaxTimesStr.toString(), 10));
+      repMaxTimes = RepeatTimes.numberTimes(Integer.parseInt(repMaxTimesStr.toString(), 10));
     }
     if (!RegExp.isRightRepeatTimes(repMinTimes, repMaxTimes)) {
       throw new AstRuntimeException(
@@ -158,7 +158,7 @@ public class GrammarParser {
   }
 
   public static int setCharsForOneCharOptionCharset(
-      LinkedList<OneCharOptionCharsetRegExpChar> chars, char[] charArray, int indexOfChar) {
+      LinkedList<OptionChar> chars, char[] charArray, int indexOfChar) {
     OneCharOptionCharsetRegExpCreationDescriptor creationDescriptor =
         new OneCharOptionCharsetRegExpCreationDescriptor();
     StringBuilder stringBuilder = new StringBuilder(charArray.length - indexOfChar);
@@ -325,7 +325,7 @@ public class GrammarParser {
 
   public static int getIntByHexDigitChar(char tchar) {
     if (isDigitChar(tchar)) {
-      return getIntByDigitChar(tchar);
+      return tchar - '0';
     }
     if (tchar >= 'a' && tchar <= 'f') {
       return 10 + tchar - 'a';
@@ -334,10 +334,6 @@ public class GrammarParser {
       return 10 + tchar - 'A';
     }
     return 0;
-  }
-
-  public static int getIntByDigitChar(char tchar) {
-    return tchar - '0';
   }
 
   public static boolean isHexDigitChar(char tchar) {
@@ -417,7 +413,7 @@ public class GrammarParser {
     String from = stringBuilder.toString();
     // chars
     char[] chars = new char[0];
-    LinkedList<OneCharOptionCharsetRegExpChar> optionChars = new LinkedList<>();
+    LinkedList<OptionChar> optionChars = new LinkedList<>();
     stringBuilder.delete(0, stringBuilder.length());
     switch (type) {
       case SEQUENCE_CHARS -> {
@@ -448,7 +444,7 @@ public class GrammarParser {
     public boolean[] chars;
     LinkedList<Integer> indexsOfRangeFlag = new LinkedList<>();
 
-    public LinkedList<OneCharOptionCharsetRegExpChar> getChars() {
+    public LinkedList<OptionChar> getChars() {
       chars = new boolean[GrammarCharset.MAX_CHAR + 1];
       Arrays.fill(chars, false);
       // 处理[]中的chars
@@ -463,8 +459,8 @@ public class GrammarParser {
       return getOneCharOptionCharsetRegExpChars();
     }
 
-    private LinkedList<OneCharOptionCharsetRegExpChar> getOneCharOptionCharsetRegExpChars() {
-      LinkedList<OneCharOptionCharsetRegExpChar> retChars = new LinkedList<>();
+    private LinkedList<OptionChar> getOneCharOptionCharsetRegExpChars() {
+      LinkedList<OptionChar> retChars = new LinkedList<>();
       int min = -1;
       int max = -1;
       for (int ch = 0; ch < chars.length; ++ch) {
@@ -481,7 +477,7 @@ public class GrammarParser {
               continue;
             }
             // 不连续
-            retChars.add(new OneCharOptionCharsetRegExpChar(min, min));
+            retChars.add(new OptionChar(min, min));
             min = ch;
             max = -1;
             continue;
@@ -492,7 +488,7 @@ public class GrammarParser {
             continue;
           }
           // 不连续
-          retChars.add(new OneCharOptionCharsetRegExpChar(min, max));
+          retChars.add(new OptionChar(min, max));
           min = ch;
           max = -1;
         }
@@ -500,9 +496,9 @@ public class GrammarParser {
 
       if (min != -1) {
         if (max != -1) {
-          retChars.add(new OneCharOptionCharsetRegExpChar(min, max));
+          retChars.add(new OptionChar(min, max));
         } else {
-          retChars.add(new OneCharOptionCharsetRegExpChar(min, min));
+          retChars.add(new OptionChar(min, min));
         }
       }
 

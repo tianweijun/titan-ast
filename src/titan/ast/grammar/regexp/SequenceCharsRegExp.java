@@ -13,11 +13,15 @@ public class SequenceCharsRegExp extends UnitRegExp {
     super(RegExpType.SEQUENCE_CHARS);
   }
 
-  public SequenceCharsRegExp(String chars, RepeatTimes repMinTimes, RepeatTimes repMaxTimes) {
+  public SequenceCharsRegExp(String chars) {
     this();
     this.chars = chars;
-    this.repMinTimes.setTimes(repMinTimes);
-    this.repMaxTimes.setTimes(repMaxTimes);
+  }
+
+  public SequenceCharsRegExp(RepeatTimes repMinTimes, RepeatTimes repMaxTimes, String chars) {
+    this();
+    this.chars = chars;
+    setRepeatTimes(repMinTimes, repMaxTimes);
   }
 
   @Override

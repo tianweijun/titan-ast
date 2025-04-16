@@ -1,8 +1,8 @@
 package titan.ast.test.ast.java;
 
 import titan.ast.CommandLineAstApplication;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder;
-import titan.ast.DefaultGrammarFileAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder;
+import titan.ast.DefaultGrammarAutomataAstApplicationBuilder.GrammarFileAutomataAstApplicationEnum;
 
 public class JavaShowGraphicalViewOfAstByGrammarFileTest {
 
@@ -17,7 +17,7 @@ public class JavaShowGraphicalViewOfAstByGrammarFileTest {
     };
 
     new CommandLineAstApplication(testArgs,
-        new DefaultGrammarFileAutomataAstApplicationBuilder(
+        new DefaultGrammarAutomataAstApplicationBuilder(
             GrammarFileAutomataAstApplicationEnum.AST_WAY_GRAMMAR_FILE_AUTOMATA_AST_APPLICATION)).run();
   }
 }
