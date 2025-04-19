@@ -19,13 +19,11 @@ public class CommandLineAstApplication {
 
   public CommandLineAstApplication(String[] args) {
     commandLineParameters = new CommandLineArgParser().parse(args);
-    grammarAutomataAstApplicationBuilder =
-        new DefaultGrammarAutomataAstApplicationBuilder();
+    grammarAutomataAstApplicationBuilder = new DefaultGrammarAutomataAstApplicationBuilder();
   }
 
   public CommandLineAstApplication(
-      String[] args,
-      GrammarAutomataAstApplicationBuilder grammarAutomataAstApplicationBuilder) {
+      String[] args, GrammarAutomataAstApplicationBuilder grammarAutomataAstApplicationBuilder) {
     commandLineParameters = new CommandLineArgParser().parse(args);
     this.grammarAutomataAstApplicationBuilder = grammarAutomataAstApplicationBuilder;
   }
@@ -51,8 +49,8 @@ public class CommandLineAstApplication {
     } catch (AstRuntimeException e) {
       Logger.info(
           String.format("CommandLineAstApplication run failed,cause by %s", e.getMessage()));
-      //return;
-       throw e;
+      return;
+      // throw e;
     }
 
     Logger.info("CommandLineAstApplication  run successfully");
