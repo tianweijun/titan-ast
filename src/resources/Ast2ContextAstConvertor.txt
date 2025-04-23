@@ -2,7 +2,6 @@
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import titan.ast.AstRuntimeException;
 import titan.ast.runtime.Ast;
 import titan.ast.runtime.NonterminalAst;
 import titan.ast.runtime.TerminalAst;
@@ -59,7 +58,7 @@ public class Ast2ContextAstConvertor {
                | IllegalAccessException
                | InstantiationException
                | InvocationTargetException e) {
-        throw new AstRuntimeException(e);
+        throw new RuntimeException(e);
       }
       nonterminalContextAst.grammar = nonterminalAst.grammar;
       nonterminalContextAst.alias = nonterminalAst.alias;
