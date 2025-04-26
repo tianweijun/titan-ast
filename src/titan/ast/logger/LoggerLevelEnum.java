@@ -7,16 +7,18 @@ package titan.ast.logger;
  */
 public enum LoggerLevelEnum {
   // debug < info < warn < error < fatal
-  DEBUG(0),
-  INFO(1),
-  WARN(2),
-  ERROR(3),
-  FATAL(4);
+  DEBUG(0, "debug"),
+  INFO(1, "info"),
+  WARN(2, "warn"),
+  ERROR(3, "error"),
+  FATAL(4, "fatal");
 
   private final int level;
+  private final String name;
 
-  LoggerLevelEnum(int level) {
+  LoggerLevelEnum(int level, String name) {
     this.level = level;
+    this.name = name;
   }
 
   /**
@@ -27,20 +29,11 @@ public enum LoggerLevelEnum {
    */
   public static LoggerLevelEnum getByName(String name) {
     LoggerLevelEnum levelEnum = INFO;
-    if ("DEBUG".equalsIgnoreCase(name)) {
-      levelEnum = DEBUG;
-    }
-    if ("INFO".equalsIgnoreCase(name)) {
-      levelEnum = INFO;
-    }
-    if ("WARN".equalsIgnoreCase(name)) {
-      levelEnum = WARN;
-    }
-    if ("ERROR".equalsIgnoreCase(name)) {
-      levelEnum = ERROR;
-    }
-    if ("FATAL".equalsIgnoreCase(name)) {
-      levelEnum = FATAL;
+    for (LoggerLevelEnum loggerLevelEnum : LoggerLevelEnum.values()) {
+      if (loggerLevelEnum.name.equals(name)) {
+        levelEnum = loggerLevelEnum;
+        break;
+      }
     }
     return levelEnum;
   }

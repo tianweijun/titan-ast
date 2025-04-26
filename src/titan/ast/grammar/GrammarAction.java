@@ -23,7 +23,7 @@ public enum GrammarAction {
   public static GrammarAction getActionByString(String name) {
     GrammarAction res = TEXT;
     for (GrammarAction action : GrammarAction.values()) {
-      if (action.name.equalsIgnoreCase(name)) {
+      if (action.name.equals(name)) {
         res = action;
         break;
       }
