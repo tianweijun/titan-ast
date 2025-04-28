@@ -16,7 +16,7 @@ class LineNumberDetail {
     this.lineNumberRanges = lineNumberRanges;
   }
 
-  LineNumberRange getLineNumberRangeDto(int bytePosition) {
+  LineNumberRange getLineNumberRange(int bytePosition) {
     int left = 0;
     int right = lineNumberRanges.length - 1;
 

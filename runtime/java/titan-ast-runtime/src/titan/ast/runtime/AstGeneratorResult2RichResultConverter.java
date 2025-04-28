@@ -103,9 +103,9 @@ class AstGeneratorResult2RichResultConverter {
       AstParseErrorData astParseErrorData, ArrayList<Token> tokens) {
     LineNumberDetail lineNumberDetail = buildLineNumberDetail(tokens);
     LineNumberRange startLineNumberRange =
-        lineNumberDetail.getLineNumberRangeDto(astParseErrorData.start);
+        lineNumberDetail.getLineNumberRange(astParseErrorData.start);
     LineNumberRange endLineNumberRange =
-        lineNumberDetail.getLineNumberRangeDto(astParseErrorData.end - 1);
+        lineNumberDetail.getLineNumberRange(astParseErrorData.end - 1);
     int startOffsetInLine =
         stringEncoder.getOffsetInLine(tokens, startLineNumberRange, astParseErrorData.start);
     int endOffsetInLine =
@@ -129,9 +129,9 @@ class AstGeneratorResult2RichResultConverter {
     LineNumberDetail lineNumberDetail = buildLineNumberDetail(tokens);
 
     LineNumberRange startLineNumberRange =
-        lineNumberDetail.getLineNumberRangeDto(tokenParseErrorData.start);
+        lineNumberDetail.getLineNumberRange(tokenParseErrorData.start);
     LineNumberRange endLineNumberRange =
-        lineNumberDetail.getLineNumberRangeDto(tokenParseErrorData.end - 1);
+        lineNumberDetail.getLineNumberRange(tokenParseErrorData.end - 1);
     int startOffsetInLine =
         stringEncoder.getOffsetInLine(tokens, startLineNumberRange, tokenParseErrorData.start);
     int endOffsetInLine =
