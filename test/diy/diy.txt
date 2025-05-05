@@ -1,6 +1,0 @@
-／**／
-
-set 哈哈 Equal 年龄 end
-set su_Sm1     equal ss 结束
-
-/*ani好中国*/

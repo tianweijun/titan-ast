@@ -1,0 +1,209 @@
+/*
+ 编码：ISO-8859-1/Latin-1；
+*/
+
+@StartGrammar compilationUnit ;
+
+@NonterminalGrammar begin ;
+
+startGrammar : '@StartGrammar' identifier ';'  ;
+
+// --------------------------RegExp-------------------------------
+grammarUnitRegExp : identifier | GrammarUnitRegExpRepeatTimes ;
+sequenceCharsUnitRegExp : SequenceCharsUnitRegExp ;
+oneCharOptionCharsetUnitRegExp : OneCharOptionCharsetUnitRegExp ;
+parenthesisUnitRegExp :
+  ParenthesisUnitRegExpPrefix inclusiveOrCompositeRegExp ParenthesisUnitRegExpSuffix
+;
+unitRegExp :
+      grammarUnitRegExp
+    | sequenceCharsUnitRegExp
+    | oneCharOptionCharsetUnitRegExp
+    | parenthesisUnitRegExp
+;
+andCompositeRegExp : unitRegExp+ ;
+exclusiveOrCompositeRegExp : andCompositeRegExp AndCompositeRegExpAlias? ;
+inclusiveOrCompositeRegExp :
+  exclusiveOrCompositeRegExp
+  | inclusiveOrCompositeRegExp '|' exclusiveOrCompositeRegExp
+;
+
+// --------------------------RegExpGrammar---------------------------------
+grammarAttribute :
+  NfaTerminalGrammarAttribute | LazinessTerminalGrammarAttribute
+;
+grammarAttributes : grammarAttribute+ ;
+grammarAction :  Arrow Skip ;
+regExpGrammar :
+   identifier grammarAttributes? ':' inclusiveOrCompositeRegExp grammarAction? ';'
+;
+
+// -------------terminalGrammar------------------
+terminalGrammarBeginning : '@TerminalGrammar' 'begin' ';' ;
+terminalGrammarEnd : '@TerminalGrammar' 'end' ';' ;
+
+nfaTerminalGrammar :
+ identifier grammarAttributes? ':' NfaEdge+ grammarAction? ';'
+;
+terminalGrammar :
+   regExpGrammar | nfaTerminalGrammar
+;
+terminalGrammarBlock :
+   terminalGrammarBeginning
+   terminalGrammar*
+   terminalGrammarEnd
+;
+
+// -------------terminalFragmentGrammar------------------
+terminalFragmentGrammarBeginning : '@TerminalFragmentGrammar' 'begin' ';' ;
+terminalFragmentGrammarEnd : '@TerminalFragmentGrammar' 'end' ';' ;
+terminalFragmentGrammarBlock :
+   terminalFragmentGrammarBeginning
+   terminalGrammar*
+   terminalFragmentGrammarEnd
+;
+
+// -------------DerivedTerminalGrammar------------------
+derivedTerminalGrammarBeginning : '@DerivedTerminalGrammar' DerivedTerminalGrammarAttribute 'begin' ';' ;
+derivedTerminalGrammarEnd : '@DerivedTerminalGrammar' 'end' ';' ;
+
+derivedTerminalGrammarBlock :
+   derivedTerminalGrammarBeginning
+   regExpGrammar*  // regExpGrammar:sequenceCharsUnitRegExp ('|' sequenceCharsUnitRegExp)*
+   derivedTerminalGrammarEnd
+;
+
+// -----------------------NonterminalGrammar-----------------------
+nonterminalGrammarBeginning : '@NonterminalGrammar' 'begin' ';' ;
+nonterminalGrammarEnd : '@NonterminalGrammar' 'end' ';' ;
+
+nonterminalGrammarBlock :
+   nonterminalGrammarBeginning
+   regExpGrammar*
+   nonterminalGrammarEnd
+;
+
+// -----------------------compilationUnit-----------------------
+item :
+  startGrammar
+  | terminalFragmentGrammarBlock
+  | terminalGrammarBlock
+  | derivedTerminalGrammarBlock
+  | nonterminalGrammarBlock
+;
+
+compilationUnit : item+ ;
+
+identifier : Identifier | Begin | End | Skip ;
+
+@NonterminalGrammar end ;
+
+@TerminalGrammar begin ;
+
+Comma : ',' ;
+Colon : ':'  ;
+Semi : ';' ;
+VerticalBar : '|' ;
+Arrow : '->' ;
+
+StartGrammarPrefix : '@StartGrammar' ;
+NonterminalGrammarPrefix : '@NonterminalGrammar' ;
+TerminalGrammarPrefix : '@TerminalGrammar' ;
+TerminalFragmentGrammarPrefix : '@TerminalFragmentGrammar' ;
+DerivedTerminalGrammarPrefix : '@DerivedTerminalGrammar' ;
+
+GrammarUnitRegExpRepeatTimes : GrammarUnitRegExpRepeatTimesFragment ;
+SequenceCharsUnitRegExp : SequenceCharsUnitRegExpFragment ;
+OneCharOptionCharsetUnitRegExp : OneCharOptionCharsetUnitRegExpFragment ;
+ParenthesisUnitRegExpPrefix : '(' ;
+ParenthesisUnitRegExpSuffix : ParenthesisUnitRegExpSuffixFragment ;
+
+NfaTerminalGrammarAttribute : NfaTerminalGrammarAttributeFragment ;
+LazinessTerminalGrammarAttribute :  LazinessTerminalGrammarAttributeFragment ;
+DerivedTerminalGrammarAttribute : DerivedTerminalGrammarAttributeFragment ;
+NfaEdge : NfaEdgeFragment ;
+
+AndCompositeRegExpAlias : AndCompositeRegExpAliasFragment ;
+
+Identifier : IdentifierFragment ;
+
+BlockComment
+    nfa(start,end)
+     :
+               start'/*'prefix2
+               prefix2[*]suffix1 prefix2~[*]prefix2
+               suffix1[/]end suffix1[*]suffix1 suffix1~[*/]prefix2
+     -> skip
+;
+LineComment
+    nfa(start,end)
+     :
+      start'//'prefix2
+      prefix2[]end prefix2[\n]end prefix2~[\n]prefix2
+    -> skip
+;
+DelimiterChars : [\s\t\r\n]+ -> skip ;
+
+@TerminalGrammar end ;
+
+@TerminalFragmentGrammar begin ;
+
+IdentifierFragment : IdentifierNondigit  ( IdentifierNondigit | Digit )* ;
+IdentifierNondigit : [a-zA-Z_] ;
+Digit : [0-9] ;
+naturalNumber : Digit+ ;
+HexadecimalDigit : [0-9] | [a-f] | [A-F] ;
+
+HexadecimalEscapeChar :
+      '\\' [xX] HexadecimalDigit
+    | '\\' [xX] HexadecimalDigit HexadecimalDigit
+;
+CharForSequenceChars :
+        ~['\\] | '\\\'' | '\\s'
+        | HexadecimalEscapeChar
+        | '\\' [0\\abfnrtv]
+;
+OptionCharNonhyphens :
+       ~[\]\-\\] | '\\]' | '\\-' | '\\s'
+       | HexadecimalEscapeChar
+       | '\\' [0\\abfnrtv]
+;
+CharForOneCharOptionCharset :
+    OptionCharNonhyphens
+    | OptionCharNonhyphens '-' OptionCharNonhyphens
+;
+
+RepeatTimes :
+      '?'
+      | '*'
+      | '+'
+      | '{' naturalNumber '}'
+      | '{' naturalNumber? ',' naturalNumber? '}'
+;
+
+GrammarUnitRegExpRepeatTimesFragment : IdentifierFragment RepeatTimes ;
+SequenceCharsUnitRegExpFragment : 
+  '\'' CharForSequenceChars* '\'' RepeatTimes? ;
+OneCharOptionCharsetUnitRegExpFragment : 
+  '~'? '[' CharForOneCharOptionCharset* ']' RepeatTimes? ;
+ParenthesisUnitRegExpSuffixFragment : ')' RepeatTimes? ;
+  
+NfaTerminalGrammarAttributeFragment : 'nfa' '(' IdentifierFragment ',' IdentifierFragment  ')' ;
+LazinessTerminalGrammarAttributeFragment :  'laziness()' ;
+DerivedTerminalGrammarAttributeFragment :  'derive' '(' IdentifierFragment ')' ;
+NfaEdgeFragment :
+    IdentifierFragment '\'' CharForSequenceChars* '\'' IdentifierFragment
+    | IdentifierFragment '~'? '[' CharForOneCharOptionCharset* ']' IdentifierFragment
+;
+
+AndCompositeRegExpAliasFragment : '#'  IdentifierFragment ;
+
+@TerminalFragmentGrammar end ;
+
+@DerivedTerminalGrammar derive(Identifier) begin ;
+
+Begin : 'begin' ;
+End : 'end' ;
+Skip : 'skip' ;
+
+@DerivedTerminalGrammar end ;
